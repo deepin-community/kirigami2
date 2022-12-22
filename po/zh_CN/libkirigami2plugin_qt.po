@@ -1,0 +1,232 @@
+# Weng Xuetian <wengxt@gmail.com>, 2016.
+msgid ""
+msgstr ""
+"Project-Id-Version: kdeorg\n"
+"PO-Revision-Date: 2021-12-22 14:06\n"
+"Language-Team: Chinese Simplified\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Qt-Contexts: true\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Crowdin-Project: kdeorg\n"
+"X-Crowdin-Project-ID: 269464\n"
+"X-Crowdin-Language: zh-CN\n"
+"X-Crowdin-File: /kf5-trunk/messages/kirigami/libkirigami2plugin_qt.pot\n"
+"X-Crowdin-File-ID: 6217\n"
+
+#: controls/AboutItem.qml:115
+#, qt-format
+msgctxt "AboutItem|"
+msgid "%1 (%2)"
+msgstr "%1 (%2)"
+
+#: controls/AboutItem.qml:124
+#, qt-format
+msgctxt "AboutItem|"
+msgid "Visit %1's KDE Store page"
+msgstr "访问 %1 的 KDE 商店页面"
+
+#: controls/AboutItem.qml:133
+#, qt-format
+msgctxt "AboutItem|"
+msgid "Send an email to %1"
+msgstr "发送电子邮件到 %1"
+
+#: controls/AboutItem.qml:180
+msgctxt "AboutItem|"
+msgid "Get Involved"
+msgstr "参与工作"
+
+#: controls/AboutItem.qml:192
+msgctxt "AboutItem|"
+msgid "Copyright"
+msgstr "Copyright"
+
+#: controls/AboutItem.qml:240
+msgctxt "AboutItem|"
+msgid "License:"
+msgstr "许可证："
+
+#: controls/AboutItem.qml:262
+#, qt-format
+msgctxt "AboutItem|"
+msgid "License: %1"
+msgstr "许可证：%1"
+
+#: controls/AboutItem.qml:273
+msgctxt "AboutItem|"
+msgid "Libraries in use"
+msgstr "使用的程序库"
+
+#: controls/AboutItem.qml:303
+msgctxt "AboutItem|"
+msgid "Authors"
+msgstr "开发人员"
+
+#: controls/AboutItem.qml:312
+msgctxt "AboutItem|"
+msgid "Show author photos"
+msgstr "显示开发人员照片"
+
+#: controls/AboutItem.qml:343
+msgctxt "AboutItem|"
+msgid "Credits"
+msgstr "致谢"
+
+#: controls/AboutItem.qml:356
+msgctxt "AboutItem|"
+msgid "Translators"
+msgstr "翻译人员"
+
+#: controls/AboutPage.qml:77
+#, qt-format
+msgctxt "AboutPage|"
+msgid "About %1"
+msgstr "关于 %1"
+
+#: controls/AboutPage.qml:80
+msgctxt "AboutPage|"
+msgid "Report Bug…"
+msgstr "报告程序缺陷…"
+
+#: controls/AbstractApplicationWindow.qml:341
+msgctxt "AbstractApplicationWindow|"
+msgid "Quit"
+msgstr "退出"
+
+#: controls/ActionToolBar.qml:188
+msgctxt "ActionToolBar|"
+msgid "More Actions"
+msgstr "更多操作"
+
+#: controls/Avatar.qml:152
+#, qt-format
+msgctxt "Avatar|"
+msgid "%1 — %2"
+msgstr "%1 — %2"
+
+#: controls/ContextDrawer.qml:66
+msgctxt "ContextDrawer|"
+msgid "Actions"
+msgstr "操作"
+
+#: controls/GlobalDrawer.qml:471
+msgctxt "GlobalDrawer|"
+msgid "Back"
+msgstr "返回"
+
+#: controls/GlobalDrawer.qml:564
+msgctxt "GlobalDrawer|"
+msgid "Close Sidebar"
+msgstr "关闭侧栏"
+
+#: controls/PasswordField.qml:32
+msgctxt "PasswordField|"
+msgid "Password"
+msgstr "密码"
+
+#: controls/SearchField.qml:57
+msgctxt "SearchField|"
+msgid "Search…"
+msgstr "搜索…"
+
+#: controls/SearchField.qml:59
+msgctxt "SearchField|"
+msgid "Search"
+msgstr "搜索"
+
+#: controls/settingscomponents/CategorizedSettings.qml:29
+#: controls/settingscomponents/CategorizedSettings.qml:52
+msgctxt "CategorizedSettings|"
+msgid "Settings"
+msgstr "设置"
+
+#: controls/settingscomponents/CategorizedSettings.qml:29
+#, qt-format
+msgctxt "CategorizedSettings|"
+msgid "Settings — %1"
+msgstr "设置 — %1"
+
+#. Accessibility text for a page tab. Keep the text as concise as possible and don't use a percent sign.
+#: controls/swipenavigator/templates/PageTab.qml:39
+#, qt-format
+msgctxt "PageTab|"
+msgid "Current page. Progress: %1 percent."
+msgstr "当前页面。进度：百分之 %1。"
+
+#. Accessibility text for a page tab. Keep the text as concise as possible.
+#: controls/swipenavigator/templates/PageTab.qml:42
+#, qt-format
+msgctxt "PageTab|"
+msgid "Navigate to %1. Progress: %2 percent."
+msgstr "前往 %1。进度：百分之 %2。"
+
+#. Accessibility text for a page tab. Keep the text as concise as possible.
+#: controls/swipenavigator/templates/PageTab.qml:47
+msgctxt "PageTab|"
+msgid "Current page."
+msgstr "当前页面。"
+
+#. Accessibility text for a page tab that's requesting the user's attention. Keep the text as concise as possible.
+#: controls/swipenavigator/templates/PageTab.qml:50
+#, qt-format
+msgctxt "PageTab|"
+msgid "Navigate to %1. Demanding attention."
+msgstr "前往 %1。要求关注。"
+
+#. Accessibility text for a page tab that's requesting the user's attention. Keep the text as concise as possible.
+#: controls/swipenavigator/templates/PageTab.qml:53
+#, qt-format
+msgctxt "PageTab|"
+msgid "Navigate to %1."
+msgstr "前往 %1。"
+
+#: controls/templates/OverlayDrawer.qml:123
+msgctxt "OverlayDrawer|"
+msgid "Close"
+msgstr "关闭"
+
+#: controls/templates/OverlayDrawer.qml:129
+msgctxt "OverlayDrawer|"
+msgid "Open"
+msgstr "打开"
+
+#: controls/templates/private/BackButton.qml:36
+msgctxt "BackButton|"
+msgid "Navigate Back"
+msgstr "后退"
+
+#: controls/templates/private/ForwardButton.qml:34
+msgctxt "ForwardButton|"
+msgid "Navigate Forward"
+msgstr "前进"
+
+#: controls/ToolBarApplicationHeader.qml:113
+msgctxt "ToolBarApplicationHeader|"
+msgid "More Actions"
+msgstr "更多操作"
+
+#: controls/UrlButton.qml:45
+msgctxt "UrlButton|"
+msgid "Copy link address"
+msgstr "复制链接地址"
+
+#: settings.cpp:210
+#, qt-format
+msgctxt "Settings|"
+msgid "KDE Frameworks %1"
+msgstr "KDE 程序框架 %1"
+
+#: settings.cpp:212
+#, qt-format
+msgctxt "Settings|"
+msgid "The %1 windowing system"
+msgstr "%1 窗口系统"
+
+#: settings.cpp:213
+#, qt-format
+msgctxt "Settings|"
+msgid "Qt %2 (built against %3)"
+msgstr "Qt %2 (针对 %3 进行构建)"

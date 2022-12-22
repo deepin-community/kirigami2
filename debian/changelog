@@ -1,0 +1,480 @@
+kirigami2 (5.90.0-1+deepin1) UNRELEASED; urgency=medium
+
+  * update
+  * update
+
+ -- Debian Qt/KDE Maintainers <debian-qt-kde@lists.debian.org>  Thu, 08 Dec 2022 15:54:39 +0800
+
+kirigami2 (5.90.0-1) experimental; urgency=medium
+
+  [ Norbert Preining ]
+  * New upstream release (5.89.0).
+
+  [ Aurélien COUDERC ]
+  * New upstream release (5.90.0).
+  * Added myself to the uploaders.
+  * Update symbols from build for 5.90.0.
+  * Update copyright information.
+  * Add lintian overrides for lintian wrongly finding license information in a
+    template giving examples.
+
+ -- Aurélien COUDERC <coucouf@debian.org>  Fri, 11 Feb 2022 23:46:44 +0100
+
+kirigami2 (5.88.0-1) unstable; urgency=medium
+
+  [ Norbert Preining ]
+  * New upstream release (5.87.0).
+  * New upstream release (5.88.0).
+  * Force-bump frameworks internal b-d to 5.88.
+
+ -- Norbert Preining <norbert@preining.info>  Wed, 17 Nov 2021 06:07:40 +0900
+
+kirigami2 (5.86.0-1) unstable; urgency=medium
+
+  [ Norbert Preining ]
+  * New upstream release (5.86.0).
+  * Bump Standards-Version to 4.6.0, no change required.
+
+ -- Norbert Preining <norbert@preining.info>  Mon, 13 Sep 2021 10:56:50 +0900
+
+kirigami2 (5.85.0-2) unstable; urgency=medium
+
+  * Release to unstable.
+
+ -- Norbert Preining <norbert@preining.info>  Sat, 28 Aug 2021 23:42:47 +0900
+
+kirigami2 (5.85.0-1) experimental; urgency=medium
+
+  [ Norbert Preining ]
+  * New upstream release (5.85.0).
+  * Add qtbase5-private-dev build depends.
+
+ -- Norbert Preining <norbert@preining.info>  Mon, 16 Aug 2021 08:17:59 +0900
+
+kirigami2 (5.83.0-3) unstable; urgency=medium
+
+  * Upload to unstable.
+
+ -- Norbert Preining <norbert@preining.info>  Mon, 16 Aug 2021 11:53:05 +0900
+
+kirigami2 (5.83.0-2) experimental; urgency=medium
+
+  [ Norbert Preining ]
+  * Drop gcc specific symbols.
+
+ -- Norbert Preining <norbert@preining.info>  Mon, 14 Jun 2021 06:23:02 +0900
+
+kirigami2 (5.83.0-1) experimental; urgency=medium
+
+  [ Norbert Preining ]
+  * New upstream release (5.83.0).
+  * Update symbols.
+
+ -- Norbert Preining <norbert@preining.info>  Sun, 13 Jun 2021 13:25:32 +0900
+
+kirigami2 (5.82.0-1) experimental; urgency=medium
+
+  [ Norbert Preining ]
+  * New upstream release (5.82.0).
+  * Removed Maximiliano Curia from the uploaders, thanks for your work
+    on the package!
+
+ -- Norbert Preining <norbert@preining.info>  Sat, 08 May 2021 21:14:19 +0900
+
+kirigami2 (5.81.0-2) experimental; urgency=medium
+
+  [ Norbert Preining ]
+  * Update symbols file from build logs.
+
+ -- Norbert Preining <norbert@preining.info>  Tue, 13 Apr 2021 23:23:55 +0900
+
+kirigami2 (5.81.0-1) experimental; urgency=medium
+
+  [ Norbert Preining ]
+  * New upstream version (5.81.0)
+  * Bump inter-frameworks dependencies.
+
+ -- Norbert Preining <norbert@preining.info>  Mon, 12 Apr 2021 10:18:19 +0900
+
+kirigami2 (5.80.0-1) experimental; urgency=medium
+
+  [ Norbert Preining ]
+  * New upstream version (5.80.0)
+  * Bump inter-frameworks dependencies.
+  * Update symbols.
+
+ -- Norbert Preining <norbert@preining.info>  Mon, 15 Mar 2021 15:10:34 +0900
+
+kirigami2 (5.79.0-1) experimental; urgency=medium
+
+  [ Norbert Preining ]
+  * Remove graphviz from build depends.
+  * New upstream release (5.79.0).
+
+ -- Norbert Preining <norbert@preining.info>  Tue, 16 Feb 2021 06:45:28 +0900
+
+kirigami2 (5.78.0-3) unstable; urgency=medium
+
+  * Include upstream fix for crashing systemsettings.
+
+ -- Norbert Preining <norbert@preining.info>  Sat, 23 Jan 2021 00:01:33 +0900
+
+kirigami2 (5.78.0-2) unstable; urgency=medium
+
+  * Release to unstable.
+
+ -- Norbert Preining <norbert@preining.info>  Sun, 17 Jan 2021 12:02:22 +0900
+
+kirigami2 (5.78.0-1) experimental; urgency=medium
+
+  [ Norbert Preining ]
+  * New upstream release (5.78.0).
+  * Update build-deps and deps with the info from cmake.
+
+ -- Norbert Preining <norbert@preining.info>  Wed, 13 Jan 2021 10:32:42 +0900
+
+kirigami2 (5.77.0-2) unstable; urgency=medium
+
+  * Release to unstable.
+
+ -- Norbert Preining <norbert@preining.info>  Tue, 22 Dec 2020 10:33:35 +0900
+
+kirigami2 (5.77.0-1) experimental; urgency=medium
+
+  [ Norbert Preining ]
+  * Bump Standards-Version to 4.5.1 (No changes needed).
+  * New upstream release (5.77.0).
+  * Update build-deps and deps with the info from cmake.
+  * Add myself to Uploaders.
+  * Update maintainer to Debian Qt/KDE Maintainers.
+  * Drop upstream included patch.
+
+ -- Norbert Preining <norbert@preining.info>  Fri, 18 Dec 2020 10:03:54 +0900
+
+kirigami2 (5.74.0-3) unstable; urgency=medium
+
+  * Team upload.
+  * Backport upstream commit 6eaefba5001445fa7e198e4caa0bde738240d66f to fix a
+    crash; patch
+    upstream_Remove-actions-and-delegates-from-ToolBarLayout-when.patch.
+  * Remove the unused autopkgtest stuff.
+  * Do not enable the examples, as we do not ship them anyway:
+    - drop the -DBUILD_EXAMPLES=ON cmake parameter
+    - drop debian/not-installed, no more needed now
+  * Add the qml-module-qtquick-layouts dependency in
+    qml-module-org-kde-kirigami2, needed for some components. (Closes: #934404)
+  * Remove unused debian/kirigami-gallery.lintian-overrides.
+
+ -- Pino Toscano <pino@debian.org>  Fri, 13 Nov 2020 21:06:14 +0100
+
+kirigami2 (5.74.0-2) unstable; urgency=medium
+
+  * Team upload to unstable.
+
+ -- Sandro Knauß <hefee@debian.org>  Mon, 19 Oct 2020 23:17:20 +0200
+
+kirigami2 (5.74.0-1) experimental; urgency=medium
+
+  * Team upload.
+
+  [ Sandro Knauß ]
+  * New upstream release (5.74.0).
+  * Update build-deps and deps with the info from cmake.
+  * Update Homepage link to point to new invent.kde.org
+  * Update repository related entries to metadata file.
+  * Update field Source in debian/copyright to invent.kde.org move.
+  * Update Bug-* entries to metadata file.
+
+ -- Sandro Knauß <hefee@debian.org>  Sun, 27 Sep 2020 17:45:52 +0200
+
+kirigami2 (5.70.0-1) unstable; urgency=medium
+
+  * Team upload.
+
+  [ Pino Toscano ]
+  * Update install files.
+
+  [ Sandro Knauß ]
+  * Bump compat level to 13.
+  * New upstream release (5.70.0).
+  * Update build-deps and deps with the info from cmake.
+  * Set field Upstream-Contact in debian/copyright.
+  * Remove obsolete fields Contact, Name from debian/upstream/metadata
+    (already present in machine-readable debian/copyright).
+  * Update symbols from build for 5.70.0.
+
+ -- Sandro Knauß <hefee@debian.org>  Tue, 26 May 2020 23:57:35 +0200
+
+kirigami2 (5.69.0-1) experimental; urgency=medium
+
+  * Team upload.
+
+  [ Sandro Knauß ]
+  * Bump compat level to 12.
+  * Bump Standards-Version to 4.5.0 (No changes needed).
+  * Add Rules-Requires-Root field to control.
+  * New upstream release (5.69.0).
+  * Update build-deps and deps with the info from cmake.
+  * Delete not needed Breaks/Confilcts.
+  * Add symbols file for libkf5kirigami2-5.
+  * Add Build-Depends-Package to symbols file.
+  * Enable hardening all.
+  * Remove backported patches.
+  * Remove not needed injection of linker flags.
+
+ -- Sandro Knauß <hefee@debian.org>  Thu, 30 Apr 2020 17:55:46 +0200
+
+kirigami2 (5.62.0-2) unstable; urgency=medium
+
+  * New revision
+  * Add new upstream patch: fix-compatibility-with-Qt5.11.patch.
+    Thanks to Matthieu Gallien (Closes: 940939)
+  * Release to unstable
+
+ -- Maximiliano Curia <maxy@debian.org>  Tue, 24 Sep 2019 10:52:03 -0700
+
+kirigami2 (5.62.0-1) unstable; urgency=medium
+
+  * Update reprotest args variable
+  * New upstream release (5.62.0).
+  * Update build-deps and deps with the info from cmake
+  * Release to unstable
+
+ -- Maximiliano Curia <maxy@debian.org>  Fri, 20 Sep 2019 10:13:05 -0700
+
+kirigami2 (5.61.0-1) experimental; urgency=medium
+
+  * New revision
+  * Salsa CI automatic initialization by Tuco
+  * New upstream release (5.61.0).
+  * Update build-deps and deps with the info from cmake
+  * Ignore reprotest build path variations
+  * Release to experimental
+
+ -- Maximiliano Curia <maxy@debian.org>  Mon, 09 Sep 2019 21:10:40 +0100
+
+kirigami2 (5.54.0-1) unstable; urgency=medium
+
+  * New upstream release (5.52.0).
+  * Update build-deps and deps with the info from cmake
+  * New upstream release (5.53.0).
+  * Update build-deps and deps with the info from cmake
+  * New upstream release (5.54.0).
+  * Update build-deps and deps with the info from cmake
+  * Bump group breaks (5.54)
+  * Release to unstable
+
+ -- Maximiliano Curia <maxy@debian.org>  Thu, 17 Jan 2019 19:27:01 -0300
+
+kirigami2 (5.51.0-1) unstable; urgency=medium
+
+  * New upstream release (5.50.0).
+  * Update build-deps and deps with the info from cmake
+  * Drop kirigami-gallery
+  * Bump group breaks (5.50)
+  * New upstream release (5.51.0).
+  * Update build-deps and deps with the info from cmake
+  * Bump group breaks (5.51)
+  * Release to unstable
+
+ -- Maximiliano Curia <maxy@debian.org>  Wed, 07 Nov 2018 17:17:01 +0100
+
+kirigami2 (5.49.0-1) unstable; urgency=medium
+
+  * New upstream release (5.48.0).
+  * Update build-deps and deps with the info from cmake
+  * New upstream release (5.49.0).
+  * Update build-deps and deps with the info from cmake
+  * Bump group breaks (5.49)
+  * Release to unstable
+
+ -- Maximiliano Curia <maxy@debian.org>  Fri, 17 Aug 2018 16:18:41 +0200
+
+kirigami2 (5.47.0-2) unstable; urgency=medium
+
+  * Update build-deps and deps with the info from cmake
+  * Disable autopkgtest (Closes: 901746)
+  * Release to unstable
+
+ -- Maximiliano Curia <maxy@debian.org>  Tue, 19 Jun 2018 15:41:43 +0200
+
+kirigami2 (5.47.0-1) unstable; urgency=medium
+
+  * New revision
+  * Update Vcs fields
+  * Add upstream metadata
+  * New upstream release (5.47.0).
+  * Bump group breaks (5.47)
+  * Release to unstable
+
+ -- Maximiliano Curia <maxy@debian.org>  Fri, 15 Jun 2018 12:09:40 +0200
+
+kirigami2 (5.46.0-1) unstable; urgency=medium
+
+  * New upstream release (5.46.0).
+  * Bump Standards-Version to 4.1.4.
+  * Use https for the debian/copyright
+  * Bump group breaks (5.46)
+  * Release to unstable
+
+ -- Maximiliano Curia <maxy@debian.org>  Thu, 17 May 2018 22:15:11 +0200
+
+kirigami2 (5.45.0-1) unstable; urgency=medium
+
+  * New upstream release (5.45.0).
+  * Update build-deps and deps with the info from cmake
+  * Bump group breaks (5.45)
+  * Release to unstable
+
+ -- Maximiliano Curia <maxy@debian.org>  Sat, 05 May 2018 08:10:37 +0200
+
+kirigami2 (5.44.0-2) sid; urgency=medium
+
+  * New revision
+  * Use the system icons, do not clone breeze
+  * Release to sid
+
+ -- Maximiliano Curia <maxy@debian.org>  Thu, 22 Mar 2018 18:03:53 +0100
+
+kirigami2 (5.44.0-1) sid; urgency=medium
+
+  * New upstream release (5.44.0).
+  * Update build-deps and deps with the info from cmake
+  * Bump group breaks (5.44)
+  * Release to sid
+
+ -- Maximiliano Curia <maxy@debian.org>  Wed, 21 Mar 2018 14:40:58 +0100
+
+kirigami2 (5.43.0-1) experimental; urgency=medium
+
+  [ Dmitry Shachnev ]
+  * Change build-dependency from qttools5-dev-tools to qttools5-dev.
+    (Closes: #881080)
+  * Remove XSBC-Original-Maintainer field from debian/control.
+  * Use correct Format field in debian/copyright.
+  * Use HTTPS in debian/watch.
+  * Update changelog for 1.1.0-2 release
+
+  [ Maximiliano Curia ]
+  * Use the salsa canonical urls
+  * New upstream release (5.43.0).
+  * Update build-deps and deps with the info from cmake
+  * Bump group breaks (5.43)
+  * Drop qml-module-org-kde-kquickcontrolsaddons runtime dependency
+  * Release to experimental
+
+ -- Maximiliano Curia <maxy@debian.org>  Mon, 26 Feb 2018 11:43:46 +0100
+
+kirigami2 (5.42.0-3) sid; urgency=medium
+
+  * New revision
+  * Add kpackagetool as a build dep
+  * Release to sid
+
+ -- Maximiliano Curia <maxy@debian.org>  Sat, 10 Feb 2018 14:33:16 +0100
+
+kirigami2 (5.42.0-2) sid; urgency=medium
+
+  * New revision
+  * Drop libkf5declarative-dev build dep
+  * Release to sid
+
+ -- Maximiliano Curia <maxy@debian.org>  Sat, 10 Feb 2018 11:28:58 +0100
+
+kirigami2 (5.42.0-1) experimental; urgency=medium
+
+  * New upstream release (5.42.0).
+  * Add link options as-needed
+  * Bump debhelper build-dep and compat to 11.
+  * Build without build_stamp
+  * Update build-deps and deps with the info from cmake
+  * Bump group breaks (5.42)
+  * Bump Standards-Version to 4.1.3.
+  * Release to experimental
+
+ -- Maximiliano Curia <maxy@debian.org>  Fri, 02 Feb 2018 12:05:26 +0100
+
+kirigami2 (5.41.0-1) experimental; urgency=medium
+
+  [ Maximiliano Curia ]
+  * New upstream release (5.38.0).
+  * New upstream release (5.41.0).
+  * Update build-deps and deps with the info from cmake
+  * Bump Standards-Version to 4.1.2.
+  * Update install files
+  * Enable QCH build
+  * Add qch documentation package
+  * Update copyright file
+  * Release to experimental
+
+  [ Jonathan Riddell ]
+  * new library package
+
+ -- Maximiliano Curia <maxy@debian.org>  Fri, 15 Dec 2017 10:42:47 -0300
+
+kirigami2 (5.37.0-3) unstable; urgency=medium
+
+  * Team upload.
+  * Change build-dependency from qttools5-dev-tools to qttools5-dev.
+    (Closes: #881076)
+
+ -- Dmitry Shachnev <mitya57@debian.org>  Wed, 08 Nov 2017 17:01:56 +0300
+
+kirigami2 (5.37.0-2) sid; urgency=medium
+
+  * New revision
+  * Bump Standards-Version to 4.1.0.
+  * Release to sid
+
+ -- Maximiliano Curia <maxy@debian.org>  Sun, 03 Sep 2017 09:58:22 +0200
+
+kirigami2 (5.37.0-1) experimental; urgency=medium
+
+  * Update watch file
+  * New upstream release (5.37.0).
+  * Update build-deps and deps with the info from cmake
+  * Bump Standards-Version to 4.0.1.
+  * wrap-and-sort
+  * Release to experimental
+
+ -- Maximiliano Curia <maxy@debian.org>  Wed, 16 Aug 2017 10:42:38 +0200
+
+kirigami2 (2.2.0-1) experimental; urgency=medium
+
+  * Initial debian release
+  * Update copyright information
+  * Disable tests at build time
+  * Bump Standards-Version to 4.0.0, no changes needed.
+  * debian/watch: use https
+  * Release to experimental
+
+ -- Maximiliano Curia <maxy@debian.org>  Wed, 12 Jul 2017 13:09:33 +0200
+
+kirigami2 (2.2.0-0neon) xenial; urgency=medium
+
+  * New release
+
+ -- Neon CI <neon@kde.org>  Wed, 21 Jun 2017 13:45:07 +0000
+
+kirigami2 (2.1.1-0neon) xenial; urgency=medium
+
+  * New release
+
+ -- Neon CI <neon@kde.org>  Tue, 02 May 2017 09:49:24 +0000
+
+kirigami2 (2.0.0-0neon) xenial; urgency=medium
+
+  * New release
+
+ -- Neon CI <neon@kde.org>  Thu, 12 Jan 2017 12:36:09 +0000
+
+kirigami (1.1.0-2) unstable; urgency=medium
+
+  * Team upload.
+  * Change build-dependency from qttools5-dev-tools to qttools5-dev.
+    (Closes: #881080)
+  * Remove XSBC-Original-Maintainer field from debian/control.
+  * Use correct Format field in debian/copyright.
+  * Use HTTPS in debian/watch.
+
+ -- Dmitry Shachnev <mitya57@debian.org>  Thu, 09 Nov 2017 14:17:12 +0300

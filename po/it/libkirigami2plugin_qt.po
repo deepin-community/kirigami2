@@ -1,0 +1,229 @@
+# Vincenzo Reale <smart2128vr@gmail.com>, 2017, 2018, 2019, 2020, 2021.
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"PO-Revision-Date: 2021-11-29 03:39+0100\n"
+"Last-Translator: Vincenzo Reale <smart2128vr@gmail.com>\n"
+"Language-Team: Italian <kde-i18n-it@kde.org>\n"
+"Language: it\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Lokalize 21.08.3\n"
+"X-Qt-Contexts: true\n"
+
+#: controls/AboutItem.qml:115
+#, qt-format
+msgctxt "AboutItem|"
+msgid "%1 (%2)"
+msgstr "%1 (%2)"
+
+#: controls/AboutItem.qml:124
+#, qt-format
+msgctxt "AboutItem|"
+msgid "Visit %1's KDE Store page"
+msgstr "Visita la pagina del KDE Store di %1"
+
+#: controls/AboutItem.qml:133
+#, qt-format
+msgctxt "AboutItem|"
+msgid "Send an email to %1"
+msgstr "Invia un messaggio di posta elettronica a %1"
+
+#: controls/AboutItem.qml:180
+msgctxt "AboutItem|"
+msgid "Get Involved"
+msgstr "Partecipa"
+
+#: controls/AboutItem.qml:192
+msgctxt "AboutItem|"
+msgid "Copyright"
+msgstr "Copyright"
+
+#: controls/AboutItem.qml:240
+msgctxt "AboutItem|"
+msgid "License:"
+msgstr "Licenza:"
+
+#: controls/AboutItem.qml:262
+#, qt-format
+msgctxt "AboutItem|"
+msgid "License: %1"
+msgstr "Licenza: %1"
+
+#: controls/AboutItem.qml:273
+msgctxt "AboutItem|"
+msgid "Libraries in use"
+msgstr "Librerie in uso"
+
+#: controls/AboutItem.qml:303
+msgctxt "AboutItem|"
+msgid "Authors"
+msgstr "Autori"
+
+#: controls/AboutItem.qml:312
+msgctxt "AboutItem|"
+msgid "Show author photos"
+msgstr "Mostra le foto degli autori"
+
+#: controls/AboutItem.qml:343
+msgctxt "AboutItem|"
+msgid "Credits"
+msgstr "Riconoscimenti"
+
+#: controls/AboutItem.qml:356
+msgctxt "AboutItem|"
+msgid "Translators"
+msgstr "Traduttori"
+
+#: controls/AboutPage.qml:77
+#, qt-format
+msgctxt "AboutPage|"
+msgid "About %1"
+msgstr "Informazioni su %1"
+
+#: controls/AboutPage.qml:80
+msgctxt "AboutPage|"
+msgid "Report Bug…"
+msgstr "Segnala bug…"
+
+#: controls/AbstractApplicationWindow.qml:341
+msgctxt "AbstractApplicationWindow|"
+msgid "Quit"
+msgstr "Esci"
+
+#: controls/ActionToolBar.qml:188
+msgctxt "ActionToolBar|"
+msgid "More Actions"
+msgstr "Altre azioni"
+
+#: controls/Avatar.qml:152
+#, qt-format
+msgctxt "Avatar|"
+msgid "%1 — %2"
+msgstr "%1 — %2"
+
+#: controls/ContextDrawer.qml:66
+msgctxt "ContextDrawer|"
+msgid "Actions"
+msgstr "Azioni"
+
+#: controls/GlobalDrawer.qml:471
+msgctxt "GlobalDrawer|"
+msgid "Back"
+msgstr "Indietro"
+
+#: controls/GlobalDrawer.qml:564
+msgctxt "GlobalDrawer|"
+msgid "Close Sidebar"
+msgstr "Chiudi la barra laterale"
+
+#: controls/PasswordField.qml:32
+msgctxt "PasswordField|"
+msgid "Password"
+msgstr "Password"
+
+#: controls/SearchField.qml:57
+msgctxt "SearchField|"
+msgid "Search…"
+msgstr "Cerca…"
+
+#: controls/SearchField.qml:59
+msgctxt "SearchField|"
+msgid "Search"
+msgstr "Cerca"
+
+#: controls/settingscomponents/CategorizedSettings.qml:29
+#: controls/settingscomponents/CategorizedSettings.qml:52
+msgctxt "CategorizedSettings|"
+msgid "Settings"
+msgstr "Impostazioni"
+
+#: controls/settingscomponents/CategorizedSettings.qml:29
+#, qt-format
+msgctxt "CategorizedSettings|"
+msgid "Settings — %1"
+msgstr "Impostazioni — %1"
+
+#. Accessibility text for a page tab. Keep the text as concise as possible and don't use a percent sign.
+#: controls/swipenavigator/templates/PageTab.qml:39
+#, qt-format
+msgctxt "PageTab|"
+msgid "Current page. Progress: %1 percent."
+msgstr "Pagina attuale. Avanzamento: %1 percento."
+
+#. Accessibility text for a page tab. Keep the text as concise as possible.
+#: controls/swipenavigator/templates/PageTab.qml:42
+#, qt-format
+msgctxt "PageTab|"
+msgid "Navigate to %1. Progress: %2 percent."
+msgstr "Vai a %1. Avanzamento: %2 percento."
+
+#. Accessibility text for a page tab. Keep the text as concise as possible.
+#: controls/swipenavigator/templates/PageTab.qml:47
+msgctxt "PageTab|"
+msgid "Current page."
+msgstr "Pagina attuale."
+
+#. Accessibility text for a page tab that's requesting the user's attention. Keep the text as concise as possible.
+#: controls/swipenavigator/templates/PageTab.qml:50
+#, qt-format
+msgctxt "PageTab|"
+msgid "Navigate to %1. Demanding attention."
+msgstr "Vai a %1. Richiede attenzione."
+
+#. Accessibility text for a page tab that's requesting the user's attention. Keep the text as concise as possible.
+#: controls/swipenavigator/templates/PageTab.qml:53
+#, qt-format
+msgctxt "PageTab|"
+msgid "Navigate to %1."
+msgstr "Vai a %1."
+
+#: controls/templates/OverlayDrawer.qml:123
+msgctxt "OverlayDrawer|"
+msgid "Close"
+msgstr "Chiudi"
+
+#: controls/templates/OverlayDrawer.qml:129
+msgctxt "OverlayDrawer|"
+msgid "Open"
+msgstr "Apri"
+
+#: controls/templates/private/BackButton.qml:36
+msgctxt "BackButton|"
+msgid "Navigate Back"
+msgstr "Naviga indietro"
+
+#: controls/templates/private/ForwardButton.qml:34
+msgctxt "ForwardButton|"
+msgid "Navigate Forward"
+msgstr "Naviga in avanti"
+
+#: controls/ToolBarApplicationHeader.qml:113
+msgctxt "ToolBarApplicationHeader|"
+msgid "More Actions"
+msgstr "Altre azioni"
+
+#: controls/UrlButton.qml:45
+msgctxt "UrlButton|"
+msgid "Copy link address"
+msgstr "Copia indirizzo del collegamento"
+
+#: settings.cpp:210
+#, qt-format
+msgctxt "Settings|"
+msgid "KDE Frameworks %1"
+msgstr "KDE Frameworks %1"
+
+#: settings.cpp:212
+#, qt-format
+msgctxt "Settings|"
+msgid "The %1 windowing system"
+msgstr "Il sistema di gestione delle finestre %1"
+
+#: settings.cpp:213
+#, qt-format
+msgctxt "Settings|"
+msgid "Qt %2 (built against %3)"
+msgstr "Qt %2 (compilato con %3)"

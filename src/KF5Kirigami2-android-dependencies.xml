@@ -1,0 +1,9 @@
+<rules>
+    <dependencies>
+        <lib name="KF5Kirigami2">
+            <depends>
+                <bundled file="plugins/kf5/kirigami" />
+            </depends>
+        </lib>
+    </dependencies>
+</rules>

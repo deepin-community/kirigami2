@@ -1,0 +1,229 @@
+# Shinjo Park <kde@peremen.name>, 2017, 2018, 2019, 2020, 2021.
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"PO-Revision-Date: 2021-12-08 00:40+0100\n"
+"Last-Translator: Shinjo Park <kde@peremen.name>\n"
+"Language-Team: Korean <kde-kr@kde.org>\n"
+"Language: ko\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Lokalize 21.08.1\n"
+"X-Qt-Contexts: true\n"
+
+#: controls/AboutItem.qml:115
+#, qt-format
+msgctxt "AboutItem|"
+msgid "%1 (%2)"
+msgstr "%1 (%2)"
+
+#: controls/AboutItem.qml:124
+#, qt-format
+msgctxt "AboutItem|"
+msgid "Visit %1's KDE Store page"
+msgstr "%1의 KDE 스토어 페이지 방문"
+
+#: controls/AboutItem.qml:133
+#, qt-format
+msgctxt "AboutItem|"
+msgid "Send an email to %1"
+msgstr "%1(으)로 이메일 보내기"
+
+#: controls/AboutItem.qml:180
+msgctxt "AboutItem|"
+msgid "Get Involved"
+msgstr "참여하기"
+
+#: controls/AboutItem.qml:192
+msgctxt "AboutItem|"
+msgid "Copyright"
+msgstr "저작권"
+
+#: controls/AboutItem.qml:240
+msgctxt "AboutItem|"
+msgid "License:"
+msgstr "라이선스:"
+
+#: controls/AboutItem.qml:262
+#, qt-format
+msgctxt "AboutItem|"
+msgid "License: %1"
+msgstr "라이선스: %1"
+
+#: controls/AboutItem.qml:273
+msgctxt "AboutItem|"
+msgid "Libraries in use"
+msgstr "사용하는 라이브러리"
+
+#: controls/AboutItem.qml:303
+msgctxt "AboutItem|"
+msgid "Authors"
+msgstr "작성자"
+
+#: controls/AboutItem.qml:312
+msgctxt "AboutItem|"
+msgid "Show author photos"
+msgstr "작성자 사진 표시"
+
+#: controls/AboutItem.qml:343
+msgctxt "AboutItem|"
+msgid "Credits"
+msgstr "제작진"
+
+#: controls/AboutItem.qml:356
+msgctxt "AboutItem|"
+msgid "Translators"
+msgstr "번역자"
+
+#: controls/AboutPage.qml:77
+#, qt-format
+msgctxt "AboutPage|"
+msgid "About %1"
+msgstr "%1 정보"
+
+#: controls/AboutPage.qml:80
+msgctxt "AboutPage|"
+msgid "Report Bug…"
+msgstr "버그 보고…"
+
+#: controls/AbstractApplicationWindow.qml:341
+msgctxt "AbstractApplicationWindow|"
+msgid "Quit"
+msgstr "끝내기"
+
+#: controls/ActionToolBar.qml:188
+msgctxt "ActionToolBar|"
+msgid "More Actions"
+msgstr "더 많은 동작"
+
+#: controls/Avatar.qml:152
+#, qt-format
+msgctxt "Avatar|"
+msgid "%1 — %2"
+msgstr "%1 — %2"
+
+#: controls/ContextDrawer.qml:66
+msgctxt "ContextDrawer|"
+msgid "Actions"
+msgstr "동작"
+
+#: controls/GlobalDrawer.qml:471
+msgctxt "GlobalDrawer|"
+msgid "Back"
+msgstr "뒤로"
+
+#: controls/GlobalDrawer.qml:564
+msgctxt "GlobalDrawer|"
+msgid "Close Sidebar"
+msgstr "사이드바 닫기"
+
+#: controls/PasswordField.qml:32
+msgctxt "PasswordField|"
+msgid "Password"
+msgstr "암호"
+
+#: controls/SearchField.qml:57
+msgctxt "SearchField|"
+msgid "Search…"
+msgstr "검색…"
+
+#: controls/SearchField.qml:59
+msgctxt "SearchField|"
+msgid "Search"
+msgstr "검색"
+
+#: controls/settingscomponents/CategorizedSettings.qml:29
+#: controls/settingscomponents/CategorizedSettings.qml:52
+msgctxt "CategorizedSettings|"
+msgid "Settings"
+msgstr "설정"
+
+#: controls/settingscomponents/CategorizedSettings.qml:29
+#, qt-format
+msgctxt "CategorizedSettings|"
+msgid "Settings — %1"
+msgstr "설정 — %1"
+
+#. Accessibility text for a page tab. Keep the text as concise as possible and don't use a percent sign.
+#: controls/swipenavigator/templates/PageTab.qml:39
+#, qt-format
+msgctxt "PageTab|"
+msgid "Current page. Progress: %1 percent."
+msgstr "현재 쪽입니다. 진행 상황: %1퍼센트."
+
+#. Accessibility text for a page tab. Keep the text as concise as possible.
+#: controls/swipenavigator/templates/PageTab.qml:42
+#, qt-format
+msgctxt "PageTab|"
+msgid "Navigate to %1. Progress: %2 percent."
+msgstr "%1(으)로 탐색합니다. 진행 상황: %2퍼센트."
+
+#. Accessibility text for a page tab. Keep the text as concise as possible.
+#: controls/swipenavigator/templates/PageTab.qml:47
+msgctxt "PageTab|"
+msgid "Current page."
+msgstr "현재 쪽입니다."
+
+#. Accessibility text for a page tab that's requesting the user's attention. Keep the text as concise as possible.
+#: controls/swipenavigator/templates/PageTab.qml:50
+#, qt-format
+msgctxt "PageTab|"
+msgid "Navigate to %1. Demanding attention."
+msgstr "%1(으)로 탐색합니다. 주목을 기다립니다."
+
+#. Accessibility text for a page tab that's requesting the user's attention. Keep the text as concise as possible.
+#: controls/swipenavigator/templates/PageTab.qml:53
+#, qt-format
+msgctxt "PageTab|"
+msgid "Navigate to %1."
+msgstr "%1(으)로 탐색합니다."
+
+#: controls/templates/OverlayDrawer.qml:123
+msgctxt "OverlayDrawer|"
+msgid "Close"
+msgstr "닫기"
+
+#: controls/templates/OverlayDrawer.qml:129
+msgctxt "OverlayDrawer|"
+msgid "Open"
+msgstr "열기"
+
+#: controls/templates/private/BackButton.qml:36
+msgctxt "BackButton|"
+msgid "Navigate Back"
+msgstr "이전 탐색"
+
+#: controls/templates/private/ForwardButton.qml:34
+msgctxt "ForwardButton|"
+msgid "Navigate Forward"
+msgstr "다음 탐색"
+
+#: controls/ToolBarApplicationHeader.qml:113
+msgctxt "ToolBarApplicationHeader|"
+msgid "More Actions"
+msgstr "더 많은 동작"
+
+#: controls/UrlButton.qml:45
+msgctxt "UrlButton|"
+msgid "Copy link address"
+msgstr "링크 주소 복사"
+
+#: settings.cpp:210
+#, qt-format
+msgctxt "Settings|"
+msgid "KDE Frameworks %1"
+msgstr "KDE 프레임워크 %1"
+
+#: settings.cpp:212
+#, qt-format
+msgctxt "Settings|"
+msgid "The %1 windowing system"
+msgstr "%1 창 시스템"
+
+#: settings.cpp:213
+#, qt-format
+msgctxt "Settings|"
+msgid "Qt %2 (built against %3)"
+msgstr "Qt %2(%3(으)로 빌드됨)"
