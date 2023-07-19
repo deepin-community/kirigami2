@@ -127,7 +127,7 @@ DelegateRecycler::~DelegateRecycler()
 void DelegateRecycler::syncIndex()
 {
     const QVariant newIndex = m_propertiesTracker->property("trackedIndex");
-    if (!newIndex.isValid()) {
+    if (!m_item || !newIndex.isValid()) {
         return;
     }
     QQmlContext *ctx = QQmlEngine::contextForObject(m_item)->parentContext();
@@ -137,7 +137,7 @@ void DelegateRecycler::syncIndex()
 void DelegateRecycler::syncModel()
 {
     const QVariant newModel = m_propertiesTracker->property("trackedModel");
-    if (!newModel.isValid()) {
+    if (!m_item || !newModel.isValid()) {
         return;
     }
     QQmlContext *ctx = QQmlEngine::contextForObject(m_item)->parentContext();
@@ -156,7 +156,7 @@ void DelegateRecycler::syncModel()
 void DelegateRecycler::syncModelProperties()
 {
     const QVariant model = m_propertiesTracker->property("trackedModel");
-    if (!model.isValid()) {
+    if (!m_item || !model.isValid()) {
         return;
     }
     QQmlContext *ctx = QQmlEngine::contextForObject(m_item)->parentContext();
@@ -174,7 +174,7 @@ void DelegateRecycler::syncModelProperties()
 void DelegateRecycler::syncModelData()
 {
     const QVariant newModelData = m_propertiesTracker->property("trackedModelData");
-    if (!newModelData.isValid()) {
+    if (!m_item || !newModelData.isValid()) {
         return;
     }
     QQmlContext *ctx = QQmlEngine::contextForObject(m_item)->parentContext();
@@ -241,7 +241,10 @@ QtObject {
     if (!m_item) {
         QQuickItem *candidate = parentItem();
         QQmlContext *ctx = nullptr;
-        while (candidate) {
+        if (component->creationContext()) {
+            ctx = new QQmlContext(component->creationContext());
+        }
+        while (!ctx && candidate) {
             QQmlContext *parentCtx = QQmlEngine::contextForObject(candidate);
             if (parentCtx) {
                 ctx = new QQmlContext(parentCtx, candidate);
@@ -340,12 +343,20 @@ DelegateRecyclerAttached *DelegateRecycler::qmlAttachedProperties(QObject *objec
     return new DelegateRecyclerAttached(object);
 }
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 void DelegateRecycler::geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry)
+#else
+void DelegateRecycler::geometryChange(const QRectF &newGeometry, const QRectF &oldGeometry)
+#endif
 {
     if (m_item && newGeometry.size() != oldGeometry.size()) {
         updateSize(true);
     }
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     QQuickItem::geometryChanged(newGeometry, oldGeometry);
+#else
+    QQuickItem::geometryChange(newGeometry, oldGeometry);
+#endif
 }
 
 void DelegateRecycler::focusInEvent(QFocusEvent *event)

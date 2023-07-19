@@ -1,10 +1,15 @@
-if(NOT Qt5QuickTest_FOUND)
-    message(STATUS "Qt5QuickTest not found, autotests will not be built.")
+if(NOT TARGET Qt${QT_MAJOR_VERSION}::QuickTest)
+    message(STATUS "Qt${QT_MAJOR_VERSION}QuickTest not found, autotests will not be built.")
     return()
 endif()
 
 add_executable(qmltest qmltest.cpp)
-target_link_libraries(qmltest Qt5::QuickTest)
+target_link_libraries(qmltest PRIVATE Qt::Qml Qt${QT_MAJOR_VERSION}::QuickTest)
+
+if (NOT BUILD_SHARED_LIBS)
+    target_compile_definitions(qmltest PRIVATE STATIC_MODULE)
+    target_link_libraries(qmltest PRIVATE KirigamiPlugin)
+endif()
 
 macro(kirigami_add_tests)
     if (WIN32)
@@ -23,18 +28,22 @@ macro(kirigami_add_tests)
 endmacro()
 
 kirigami_add_tests(
+    tst_actiontoolbar.qml
+    tst_avatar.qml
+    tst_basiclistitem_tooltip.qml
+    tst_formlayout.qml
+    tst_icon.qml
     tst_keynavigation.qml
     tst_listskeynavigation.qml
-    tst_pagerow.qml
-    tst_icon.qml
-    tst_actiontoolbar.qml
-    tst_pagerouter.qml
-    tst_routerwindow.qml
-    tst_avatar.qml
-    tst_theme.qml
     tst_mnemonicdata.qml
-    pagepool/tst_pagepool.qml
+    tst_pagerouter.qml
+    tst_pagerow.qml
+    tst_routerwindow.qml
+    tst_theme.qml
+
     pagepool/tst_layers.qml
+    pagepool/tst_pagepool.qml
+
     wheelhandler/tst_filterMouseEvents.qml
     wheelhandler/tst_invokables.qml
     wheelhandler/tst_onWheel.qml

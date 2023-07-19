@@ -4,16 +4,16 @@
  *  SPDX-License-Identifier: LGPL-2.0-or-later
  */
 
-import QtQuick 2.1
-import QtQuick.Layouts 1.2
-import org.kde.kirigami 2.4 as Kirigami
-import QtQuick.Controls 2.0 as Controls
+import QtQuick 2.15
+import QtQuick.Layouts 1.15
+import org.kde.kirigami 2.20 as Kirigami
+import QtQuick.Controls 2.15 as QQC2
 
 Kirigami.ApplicationWindow {
     id: root
+
     width: Kirigami.Units.gridUnit * 60
     height: Kirigami.Units.gridUnit * 40
-
 
     pageStack.initialPage: mainPageComponent
     globalDrawer: Kirigami.OverlayDrawer {
@@ -22,13 +22,12 @@ Kirigami.ApplicationWindow {
         contentItem: Item {
             implicitWidth: Kirigami.Units.gridUnit * 10
 
-            Controls.Label {
+            QQC2.Label {
                 text: "This is a sidebar"
                 width: parent.width - Kirigami.Units.smallSpacing * 2
                 wrapMode: Text.WordWrap
                 anchors.horizontalCenter: parent.horizontalCenter
             }
-
         }
     }
 

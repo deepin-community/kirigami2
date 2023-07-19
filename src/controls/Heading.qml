@@ -6,17 +6,16 @@
 
 import QtQuick 2.0
 import QtQuick.Controls 2.0 as QQC2
-import org.kde.kirigami 2.4
+import org.kde.kirigami 2.4 as Kirigami
 
 /**
- * A heading label used for subsections of texts.
+ * @brief A heading label used for subsections of texts.
  *
  * The characteristics of the text will be automatically set according to the
- * Theme. Use this components for section titles or headings in your UI,
+ * Kirigami.Theme. Use this components for section titles or headings in your UI,
  * for example page or section titles.
  *
  * Example usage:
- *
  * @code
  * import org.kde.kirigami 2.4 as Kirigami
  * [...]
@@ -39,17 +38,30 @@ QQC2.Label {
     id: heading
 
     /**
-     * The level determines how big the section header is display, values
-     * between 1 (big) and 5 (small) are accepted. (default: 1)
+     * @brief This property holds the level of the heading, which determines its size.
+     *
+     * This property holds the level, which determines how large the header is.
+     *
+     * Acceptable values range from 1 (big) to 5 (small).
+     *
+     * default: ``1``
      */
     property int level: 1
 
     /**
-     * Adjust the point size in between a level and another. (default: 0)
+     * @brief This property holds the point size between heading levels.
+     *
+     * default: ``0``
+     *
      * @deprecated
      */
     property int step: 0
 
+    /**
+     * @brief This enumeration defines heading types.
+     *
+     * This enum helps with heading visibility (making it less or more important).
+     */
     enum Type {
         Normal,
         Primary,
@@ -57,22 +69,24 @@ QQC2.Label {
     }
 
     /**
-     * The type of the heading. This can be:
+     * @brief This property holds the heading type.
      *
-     * * Kirigami.Heading.Type.Normal: Create a normal heading (default)
-     * * Kirigami.Heading.Type.Primary: Makes the heading more prominent. Useful
+     * The type of the heading. This can be:
+     * * ``Kirigami.Heading.Type.Normal``: Create a normal heading (default)
+     * * ``Kirigami.Heading.Type.Primary``: Makes the heading more prominent. Useful
      *   when making the heading bigger is not enough.
-     * * Kirigami.Heading.Type.Secondary: Makes the heading less prominent.
+     * * ``Kirigami.Heading.Type.Secondary``: Makes the heading less prominent.
      *   Useful when an heading is for a less important section in an application.
      *
+     * @property Heading::Type type
      * @since 5.82
      */
-    property int type: Heading.Type.Normal
+    property int type: Kirigami.Heading.Type.Normal
 
     font.pointSize: __headerPointSize(level)
-    font.weight: type === Heading.Type.Primary ? Font.DemiBold : Font.Normal
+    font.weight: type === Kirigami.Heading.Type.Primary ? Font.DemiBold : Font.Normal
 
-    opacity: type === Heading.Type.Secondary ? 0.7 : 1
+    opacity: type === Kirigami.Heading.Type.Secondary ? 0.7 : 1
 
     Accessible.role: Accessible.Heading
 
@@ -93,7 +107,7 @@ QQC2.Label {
     // We mean it.
     //
     function __headerPointSize(level) {
-        const n = Theme.defaultFont.pointSize;
+        const n = Kirigami.Theme.defaultFont.pointSize;
         switch (level) {
         case 1:
             return n * 1.35 + step;

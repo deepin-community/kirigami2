@@ -1,11 +1,11 @@
-
-import QtQuick 2.12
-import QtQuick.Layouts 1.4
-import QtQuick.Controls 2.12 as Controls
-import org.kde.kirigami 2.13 as Kirigami
+import QtQuick 2.15
+import QtQuick.Layouts 1.15
+import QtQuick.Controls 2.15 as Controls
+import org.kde.kirigami 2.20 as Kirigami
 
 RowLayout {
     id: root
+
     width: 500
     height: 500
 
@@ -43,7 +43,7 @@ RowLayout {
         Controls.Button {
             text: "Next"
             onClicked: {
-                i = (i+1)%icons.length
+                i = (i + 1) % icons.length
                 icon.source = icons[i]
                // palette.update()
             }
@@ -71,7 +71,7 @@ RowLayout {
     }
     Item {
         Layout.preferredWidth: 500
-        Layout.preferredHeight: 500/(image.sourceSize.width/image.sourceSize.height)
+        Layout.preferredHeight: 500 / (image.sourceSize.width / image.sourceSize.height)
         Image {
             id: image
             source: "https://source.unsplash.com/random"

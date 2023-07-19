@@ -4,14 +4,15 @@
  *  SPDX-License-Identifier: LGPL-2.0-or-later
  */
 
-import QtQuick 2.5
-import "private"
+import "private" as P
 import "templates" as T
 
 /**
  * An item delegate Intended to support extra actions obtainable
  * by uncovering them by dragging away the item with the handle
  * This acts as a container for normal list items.
+ *
+ * Example usage:
  * @code
  * ListView {
  *     model: myModel
@@ -38,5 +39,5 @@ import "templates" as T
 T.SwipeListItem {
     id: listItem
 
-    background: DefaultListItemBackground {}
+    background: P.DefaultListItemBackground {}
 }

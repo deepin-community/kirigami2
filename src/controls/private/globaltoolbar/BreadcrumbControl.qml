@@ -5,7 +5,6 @@
  */
 
 import QtQuick 2.15
-import QtQuick.Controls 2.15 as Controls
 import QtQuick.Layouts 1.15
 import org.kde.kirigami 2.19 as Kirigami
 
@@ -37,7 +36,7 @@ Flickable {
             delegate: MouseArea {
                 Layout.preferredWidth: delegateLayout.implicitWidth
                 Layout.fillHeight: true
-                onClicked: {
+                onClicked: mouse => {
                     if (mainRepeater.useLayers) {
                         while (pageRow.layers.depth > modelData + 1) {
                             pageRow.layers.pop();

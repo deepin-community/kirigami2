@@ -41,7 +41,7 @@ T.PageTab {
 
     PrivateSwipeProgress {
         anchors.fill: parent
-        visible: control.progress != undefined
+        visible: control.progress !== undefined
         progress: control.progress
     }
 

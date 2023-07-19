@@ -352,6 +352,7 @@ class PageRouter : public QObject, public QQmlParserStatus
      * its state. Not providing an `initialRoute` will result in undefined
      * behavior.
      *
+     * @see org::kde::kirigami::PageRoute::name
      * @include PageRouterInitialRoute.qml
      */
     Q_PROPERTY(QJSValue initialRoute READ initialRoute WRITE setInitialRoute NOTIFY initialRouteChanged)
@@ -499,8 +500,13 @@ private:
     void placeInCache(ParsedRoute *route);
 
     static void appendRoute(QQmlListProperty<PageRoute> *list, PageRoute *);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     static int routeCount(QQmlListProperty<PageRoute> *list);
     static PageRoute *route(QQmlListProperty<PageRoute> *list, int);
+#else
+    static qsizetype routeCount(QQmlListProperty<PageRoute> *list);
+    static PageRoute *route(QQmlListProperty<PageRoute> *list, qsizetype);
+#endif
     static void clearRoutes(QQmlListProperty<PageRoute> *list);
 
     QVariant dataFor(QObject *object);

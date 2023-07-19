@@ -5,7 +5,6 @@
  */
 
 import QtQuick 2.6
-import QtQuick.Layouts 1.2
 import org.kde.kirigami 2.4 as Kirigami
 
 /**
@@ -17,6 +16,10 @@ import org.kde.kirigami 2.4 as Kirigami
  *
  * It is recommended to use DelagateRecycler as base delegate like the following code:
  * @code
+ * import QtQuick 2.15
+ * import QtQuick.Layouts 1.15
+ * import QtQuick.Controls 2.15 as QQC2
+ * import org.kde.kirigami 2.19 as Kirigami
  *   ...
  *   Component {
  *       id: delegateComponent
@@ -28,7 +31,7 @@ import org.kde.kirigami 2.4 as Kirigami
  *                   listView: mainList
  *                   onMoveRequested: listModel.move(oldIndex, newIndex, 1)
  *               }
- *               Controls.Label {
+ *               QQC2.Label {
  *                   text: model.label
  *               }
  *           }
@@ -39,14 +42,14 @@ import org.kde.kirigami 2.4 as Kirigami
  *
  *       model: ListModel {
  *           id: listModel
- *           ListItem {
- *               lablel: "Item 1"
+ *           ListElement {
+ *               label: "Item 1"
  *           }
- *           ListItem {
- *               lablel: "Item 2"
+ *           ListElement {
+ *               label: "Item 2"
  *           }
- *           ListItem {
- *               lablel: "Item 3"
+ *           ListElement {
+ *               label: "Item 3"
  *           }
  *       }
  *       //this is optional to make list items animated when reordered
@@ -64,28 +67,28 @@ import org.kde.kirigami 2.4 as Kirigami
  *   ...
  * @endcode
  *
- * @inherit QtQuick.Item
  * @since 2.5
+ * @inherit QtQuick.Item
  */
 Item {
     id: root
 
     /**
-     * listItem: Item
-     * The id of the delegate that we want to drag around, which *must*
-     * be a child of the actual ListView's delegate
+     * @brief This property holds the delegate that will be dragged around.
+     *
+     * This item *must* be a child of the actual ListView's delegate.
      */
     property Item listItem
 
     /**
-     * listView: Listview
-     * The id of the ListView the delegates belong to.
+     * @brief This property holds the ListView that the delegate belong to.
      */
     property ListView listView
 
     /**
-     * Emitted when the drag handle wants to move the item in the model
-     * The following example does the move in the case a ListModel is used
+     * @brief This signal is emitted when the drag handle wants to move the item in the model.
+     *
+     * The following example does the move in the case a ListModel is used:
      * @code
      *  onMoveRequested: listModel.move(oldIndex, newIndex, 1)
      * @endcode
@@ -95,8 +98,8 @@ Item {
     signal moveRequested(int oldIndex, int newIndex)
 
     /**
-     * Emitted when the drag operation is complete and the item has been
-     * dropped in the new final position
+     * @brief This signal is emitted when the drag operation is complete and the item has been
+     * dropped in the new final position.
      */
     signal dropped()
 
@@ -110,7 +113,6 @@ Item {
             target: listItem
             axis: Drag.YAxis
             minimumY: 0
-            maximumY: listView.height - listItem.height
         }
         cursorShape: pressed ? Qt.ClosedHandCursor : Qt.OpenHandCursor
 
@@ -120,13 +122,14 @@ Item {
             property int startY
             property int mouseDownY
             property Item originalParent
-            property int autoScrollThreshold: (listView.contentHeight > listView.height) ? listItem.height * 3 : 0
             opacity: mouseArea.pressed || (!Kirigami.Settings.tabletMode && listItem.hovered) ? 1 : 0.6
+            property int listItemLastY
+            property bool draggingUp
 
             function arrangeItem() {
-                var newIndex = listView.indexAt(1, listView.contentItem.mapFromItem(listItem, 0, 0).y + internal.mouseDownY);
+                const newIndex = listView.indexAt(1, listView.contentItem.mapFromItem(mouseArea, 0, internal.mouseDownY).y);
 
-                if (Math.abs(listItem.y - internal.startY) > height && newIndex > -1 && newIndex !== index) {
+                if (newIndex > -1 && ((internal.draggingUp && newIndex < index) || (!internal.draggingUp && newIndex > index))) {
                     root.moveRequested(index, newIndex);
                 }
             }
@@ -136,26 +139,35 @@ Item {
         preventStealing: true
 
 
-        onPressed: {
+        onPressed: mouse => {
             internal.originalParent = listItem.parent;
             listItem.parent = listView;
             listItem.y = internal.originalParent.mapToItem(listItem.parent, listItem.x, listItem.y).y;
             internal.originalParent.z = 99;
             internal.startY = listItem.y;
+            internal.listItemLastY = listItem.y;
             internal.mouseDownY = mouse.y;
+            // while dragging listItem's height could change
+            // we want a const maximumY during the dragging time
+            mouseArea.drag.maximumY = listView.height - listItem.height;
         }
 
-        onPositionChanged: {
-            if (!pressed) {
+        onPositionChanged: mouse => {
+            if (!pressed || listItem.y === internal.listItemLastY) {
                 return;
             }
+
+            internal.draggingUp = listItem.y < internal.listItemLastY
+            internal.listItemLastY = listItem.y;
+
             internal.arrangeItem();
 
-            scrollTimer.interval = 500 * Math.max(0.1, (1-Math.max(internal.autoScrollThreshold - listItem.y, listItem.y - listView.height + internal.autoScrollThreshold + listItem.height) / internal.autoScrollThreshold));
-            scrollTimer.running = (listItem.y < internal.autoScrollThreshold ||
-                        listItem.y > listView.height - internal.autoScrollThreshold);
+             // autoscroll when the dragging item reaches the listView's top/bottom boundary
+            scrollTimer.running = (listView.contentHeight > listView.height)
+                               && ( (listItem.y === 0 && !listView.atYBeginning) ||
+                                    (listItem.y === mouseArea.drag.maximumY && !listView.atYEnd) );
         }
-        onReleased: {
+        onReleased: mouse => {
             listItem.y = internal.originalParent.mapFromItem(listItem, 0, 0).y;
             listItem.parent = internal.originalParent;
             dropAnimation.running = true;
@@ -180,13 +192,21 @@ Item {
         }
         Timer {
             id: scrollTimer
-            interval: 500
+            interval: 50
             repeat: true
             onTriggered: {
-                if (listItem.y < internal.autoScrollThreshold) {
-                    listView.contentY = Math.max(0, listView.contentY - Kirigami.Units.gridUnit)
+                if (internal.draggingUp) {
+                    listView.contentY -= Kirigami.Units.gridUnit;
+                    if (listView.atYBeginning) {
+                        listView.positionViewAtBeginning();
+                        stop();
+                    }
                 } else {
-                    listView.contentY = Math.min(listView.contentHeight - listView.height, listView.contentY + Kirigami.Units.gridUnit)
+                    listView.contentY += Kirigami.Units.gridUnit;
+                    if (listView.atYEnd) {
+                        listView.positionViewAtEnd();
+                        stop();
+                    }
                 }
                 internal.arrangeItem();
             }

@@ -66,8 +66,14 @@ public:
     }
     void componentComplete() override;
 
+private:
     static void appendItem(QQmlListProperty<QQuickItem> *prop, QQuickItem *value);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     static int itemCount(QQmlListProperty<QQuickItem> *prop);
     static QQuickItem *itemAt(QQmlListProperty<QQuickItem> *prop, int index);
+#else
+    static qsizetype itemCount(QQmlListProperty<QQuickItem> *prop);
+    static QQuickItem *itemAt(QQmlListProperty<QQuickItem> *prop, qsizetype index);
+#endif
     static void clearItems(QQmlListProperty<QQuickItem> *prop);
 };

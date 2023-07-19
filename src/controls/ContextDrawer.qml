@@ -5,15 +5,13 @@
  */
 
 import QtQuick 2.1
-import QtQuick.Layouts 1.2
-import org.kde.kirigami 2.4
-
-import "private"
-import "templates/private"
+import QtQuick.Controls 2.2 as QQC2
+import org.kde.kirigami 2.4 as Kirigami
+import "private" as P
 
 /**
- * A drawer specialization that will show a list of actions that are
- * specific of the current page shown by the application
+ * A specialized type of drawer that will show a list of actions
+ * relevant to the application's current page.
  *
  * Example usage:
  * @code
@@ -53,24 +51,47 @@ import "templates/private"
  * }
  * @endcode
  *
- * @inherit AbstractDrawer
+ * @inherit OverlayDrawer
  */
-OverlayDrawer {
+Kirigami.OverlayDrawer {
     id: root
     handleClosedIcon.source: null
     handleOpenIcon.source: null
+
     /**
-     * title: string
-     * A title for the action list that will be shown to the user when opens the drawer
+     * @brief A title for the action list that will be shown to the user when opens the drawer
+     *
+     * default: ``qsTr("Actions")``
      */
     property string title: qsTr("Actions")
 
     /**
-     * actions: list<Action>
      * This can be any type of object that a ListView can accept as model.
-     * It expects items compatible with either QAction or Kirigami Action
+     * It expects items compatible with either QtQuick.Action or Kirigami.Action
+     *
+     * @see QtQuick.Action
+     * @see org::kde::kirigami::Action
+     * @property list<Action> actions
      */
     property var actions: page ? page.contextualActions : []
+
+    /**
+     * @brief Arbitrary content to show above the list view.
+     *
+     * default: `an Item containing a Kirigami.Heading that displays a title whose text is
+     * controlled by the title property.`
+     *
+     * @property Component header
+     * @since 2.7
+     */
+    property alias header: menu.header
+
+    /**
+     * @brief Arbitrary content to show below the list view.
+     * @property Component footer
+     * @since 2.7
+     */
+    property alias footer: menu.footer
 
     property Page page: {
         if (applicationWindow().pageStack.layers && applicationWindow().pageStack.layers.depth > 1 && applicationWindow().pageStack.layers.currentItem.hasOwnProperty("contextualActions")) {
@@ -87,46 +108,32 @@ OverlayDrawer {
     // Disable for empty menus or when we have a global toolbar
     enabled: menu.count > 0 &&
             (typeof applicationWindow() === "undefined" || !applicationWindow().pageStack.globalToolBar ||
-            (applicationWindow().pageStack.lastVisibleItem && applicationWindow().pageStack.lastVisibleItem.globalToolBarStyle !== ApplicationHeaderStyle.ToolBar) ||
-            (applicationWindow().pageStack.layers && applicationWindow().pageStack.layers.depth > 1 && applicationWindow().pageStack.layers.currentItem && applicationWindow().pageStack.layers.currentItem.globalToolBarStyle !== ApplicationHeaderStyle.ToolBar))
-    edge: Qt.application.layoutDirection == Qt.RightToLeft ? Qt.LeftEdge : Qt.RightEdge
+            (applicationWindow().pageStack.lastVisibleItem && applicationWindow().pageStack.lastVisibleItem.globalToolBarStyle !== Kirigami.ApplicationHeaderStyle.ToolBar) ||
+            (applicationWindow().pageStack.layers && applicationWindow().pageStack.layers.depth > 1 && applicationWindow().pageStack.layers.currentItem && applicationWindow().pageStack.layers.currentItem.globalToolBarStyle !== Kirigami.ApplicationHeaderStyle.ToolBar))
+    edge: Qt.application.layoutDirection === Qt.RightToLeft ? Qt.LeftEdge : Qt.RightEdge
     drawerOpen: false
 
-    /**
-     * header: Component
-     * Arbitrary content that will go on top of the list (by default is the title)
-     * @since 2.7
-     */
-    property alias header: menu.header
-
-    /**
-     * footer: Component
-     * Arbitrary content that will go to the bottom of the list (by default is empty)
-     * @since 2.7
-     */
-    property alias footer: menu.footer
-
-    //list items go to edges, have their own padding
+    // list items go to edges, have their own padding
     leftPadding: 0
     rightPadding: 0
     bottomPadding: 0
 
-    handleVisible: applicationWindow == undefined ? false : applicationWindow().controlsVisible
+    handleVisible: applicationWindow === undefined ? false : applicationWindow().controlsVisible
 
     onPeekingChanged: {
         if (page) {
             page.contextualActionsAboutToShow();
         }
     }
-    contentItem: ScrollView {
-        //this just to create the attached property
-        Theme.inherit: true
-        implicitWidth: Units.gridUnit * 20
+    contentItem: QQC2.ScrollView {
+        // this just to create the attached property
+        Kirigami.Theme.inherit: true
+        implicitWidth: Kirigami.Units.gridUnit * 20
         ListView {
             id: menu
             interactive: contentHeight > height
             model: {
-                if (typeof root.actions == "undefined") {
+                if (typeof root.actions === "undefined") {
                     return null;
                 }
                 if (root.actions.length === 0) {
@@ -134,8 +141,8 @@ OverlayDrawer {
                 } else {
 
                     // Check if at least one action is visible
-                    var somethingVisible = false;
-                    for (var i=0; i<root.actions.length; i++) {
+                    let somethingVisible = false;
+                    for (let i = 0; i < root.actions.length; i++) {
                         if (root.actions[i].visible) {
                             somethingVisible = true;
                             break;
@@ -156,12 +163,12 @@ OverlayDrawer {
             header: Item {
                 height: heading.height
                 width: menu.width
-                Heading {
+                Kirigami.Heading {
                     id: heading
                     anchors {
                         left: parent.left
                         right: parent.right
-                        margins: Units.largeSpacing
+                        margins: Kirigami.Units.largeSpacing
                     }
                     elide: Text.ElideRight
                     level: 2
@@ -170,14 +177,14 @@ OverlayDrawer {
             }
             delegate: Column {
                 width: parent.width
-                ContextDrawerActionItem {
+                P.ContextDrawerActionItem {
                     width: parent.width
                 }
                 Repeater {
                     model: modelData.hasOwnProperty("expandible") && modelData.expandible ? modelData.children : null
-                    delegate: ContextDrawerActionItem {
+                    delegate: P.ContextDrawerActionItem {
                         width: parent.width
-                        leftPadding: Units.largeSpacing * 2
+                        leftPadding: Kirigami.Units.largeSpacing * 2
                         opacity: !root.collapsed
                     }
                 }

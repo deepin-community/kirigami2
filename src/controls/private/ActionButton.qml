@@ -4,13 +4,10 @@
  *  SPDX-License-Identifier: LGPL-2.0-or-later
  */
 
-import QtQuick 2.1
-import QtQuick.Layouts 1.2
-import QtQuick.Controls 2.0 as Controls
-import QtGraphicalEffects 1.0
-import org.kde.kirigami 2.16
-
-import "../templates/private"
+import QtQuick 2.15
+import QtQuick.Controls 2.0 as QQC2
+import QtGraphicalEffects 1.0 as GE
+import org.kde.kirigami 2.16 as Kirigami
 
 Item {
     id: root
@@ -22,10 +19,10 @@ Item {
         bottomMargin: root.page.footer ? root.page.footer.height : 0
     }
     //smallSpacing for the shadow
-    implicitHeight: button.height + Units.smallSpacing
+    implicitHeight: button.height + Kirigami.Units.smallSpacing
     clip: true
 
-    readonly property Page page: root.parent.page
+    readonly property Kirigami.Page page: root.parent.page
     //either Action or QAction should work here
 
     function isActionAvailable(action) { return action && (action.hasOwnProperty("visible") ? action.visible === undefined || action.visible : !action.hasOwnProperty("visible")); }
@@ -40,11 +37,51 @@ Item {
 
     transform: Translate {
         id: translateTransform
-        y: mouseArea.internalVisibility ? 0 : button.height
-        Behavior on y {
+    }
+
+    states: [
+        State {
+            when: mouseArea.internalVisibility
+            PropertyChanges {
+                target: translateTransform
+                y: 0
+            }
+            PropertyChanges {
+                target: root
+                opacity: 1
+            }
+            PropertyChanges {
+                target: root
+                visible: true
+            }
+        },
+        State {
+            when: !mouseArea.internalVisibility
+            PropertyChanges {
+                target: translateTransform
+                y: button.height
+            }
+            PropertyChanges {
+                target: root
+                opacity: 0
+            }
+            PropertyChanges {
+                target: root
+                visible: false
+            }
+        }
+    ]
+    transitions: Transition {
+        ParallelAnimation {
             NumberAnimation {
-                duration: Units.longDuration
-                easing.type: mouseArea.internalVisibility == true ? Easing.InQuad : Easing.OutQuad
+                target: translateTransform
+                property: "y"
+                duration: Kirigami.Units.longDuration
+                easing.type: mouseArea.internalVisibility ? Easing.InQuad : Easing.OutQuad
+            }
+            OpacityAnimator {
+                duration: Kirigami.Units.longDuration
+                easing.type: Easing.InOutQuad
             }
         }
     }
@@ -54,15 +91,13 @@ Item {
         id: button
         x: root.width/2 - button.width/2
 
-        // We have a mismatch in releases in removing the mobile x1.5 sizing (kirigami is part of frameworks, but styles are part of plasma releases)
-        // Remove after Plasma 5.23 is released, and switch back to Units.iconSizes.medium/large
-        property int mediumIconSizing: Units.iconSizes.sizeForLabels * 2
-        property int largeIconSizing: Units.iconSizes.sizeForLabels * 3
-        
+        property int mediumIconSizing: Kirigami.Units.iconSizes.medium
+        property int largeIconSizing: Kirigami.Units.iconSizes.large
+
         anchors.bottom: edgeMouseArea.bottom
 
-        implicitWidth: implicitHeight + mediumIconSizing*2 + Units.gridUnit
-        implicitHeight: largeIconSizing + Units.largeSpacing*2
+        implicitWidth: implicitHeight + mediumIconSizing*2 + Kirigami.Units.gridUnit
+        implicitHeight: largeIconSizing + Kirigami.Units.largeSpacing*2
 
 
         onXChanged: {
@@ -92,7 +127,7 @@ Item {
             id: mouseArea
             anchors.fill: parent
 
-            visible: action != null || leftAction != null || rightAction != null
+            visible: action !== null || leftAction !== null || rightAction !== null
             property bool internalVisibility: (!root.hasApplicationWindow || (applicationWindow().controlsVisible && applicationWindow().height > root.height*2)) && (root.action === null || root.action.visible === undefined || root.action.visible)
             preventStealing: true
 
@@ -121,32 +156,32 @@ Item {
 
             hoverEnabled: true
 
-            Controls.ToolTip.visible: containsMouse && !Settings.tabletMode && actionUnderMouse
-            Controls.ToolTip.text: actionUnderMouse ? actionUnderMouse.text : ""
-            Controls.ToolTip.delay: Units.toolTipDelay
+            QQC2.ToolTip.visible: containsMouse && !Kirigami.Settings.tabletMode && actionUnderMouse
+            QQC2.ToolTip.text: actionUnderMouse ? actionUnderMouse.text : ""
+            QQC2.ToolTip.delay: Kirigami.Units.toolTipDelay
 
-            onPressed: {
-                //search if we have a page to set to current
-                if (root.hasApplicationWindow && applicationWindow().pageStack.currentIndex !== undefined && root.page.ColumnView.level !== undefined) {
-                    //search the button parent's parent, that is the page parent
-                    //this will make the context drawer open for the proper page
-                    applicationWindow().pageStack.currentIndex = root.page.ColumnView.level;
+            onPressed: mouse => {
+                // search if we have a page to set to current
+                if (root.hasApplicationWindow && applicationWindow().pageStack.currentIndex !== undefined && root.page.Kirigami.ColumnView.level !== undefined) {
+                    // search the button parent's parent, that is the page parent
+                    // this will make the context drawer open for the proper page
+                    applicationWindow().pageStack.currentIndex = root.page.Kirigami.ColumnView.level;
                 }
                 downTimestamp = (new Date()).getTime();
                 startX = button.x + button.width/2;
                 startMouseY = mouse.y;
                 drawerShowAdjust = 0;
             }
-            onReleased: {
+            onReleased: mouse => {
                 tooltipHider.restart();
                 if (root.hasGlobalDrawer) globalDrawer.peeking = false;
                 if (root.hasContextDrawer) contextDrawer.peeking = false;
-                //pixel/second
-                var x = button.x + button.width/2;
-                var speed = ((x - startX) / ((new Date()).getTime() - downTimestamp) * 1000);
+                // pixel/second
+                const x = button.x + button.width/2;
+                const speed = ((x - startX) / ((new Date()).getTime() - downTimestamp) * 1000);
                 drawerShowAdjust = 0;
 
-                //project where it would be a full second in the future
+                // project where it would be a full second in the future
                 if (root.hasContextDrawer && root.hasGlobalDrawer && globalDrawer.modal && x + speed > Math.min(root.width/4*3, root.width/2 + globalDrawer.contentItem.width/2)) {
                     globalDrawer.open();
                     contextDrawer.close();
@@ -165,12 +200,12 @@ Item {
                         contextDrawer.close();
                     }
                 }
-                //Don't rely on native onClicked, but fake it here:
-                //Qt.startDragDistance is not adapted to devices dpi in case
-                //of Android, so consider the button "clicked" when:
-                //*the button has been dragged less than a gridunit
-                //*the finger is still on the button
-                if (Math.abs((button.x + button.width/2) - startX) < Units.gridUnit &&
+                // Don't rely on native onClicked, but fake it here:
+                // Qt.startDragDistance is not adapted to devices dpi in case
+                // of Android, so consider the button "clicked" when:
+                // *the button has been dragged less than a gridunit
+                // *the finger is still on the button
+                if (Math.abs((button.x + button.width/2) - startX) < Kirigami.Units.gridUnit &&
                     mouse.y > 0) {
 
                     //if an action has been assigned, trigger it
@@ -179,7 +214,7 @@ Item {
                     }
 
                     if (actionUnderMouse && actionUnderMouse.hasOwnProperty("children") && actionUnderMouse.children.length > 0) {
-                        var subMenuUnderMouse;
+                        let subMenuUnderMouse;
                         switch (actionUnderMouse) {
                         case leftAction:
                             subMenuUnderMouse = leftActionSubMenu;
@@ -198,19 +233,19 @@ Item {
                 }
             }
 
-            onPositionChanged: {
-                drawerShowAdjust = Math.min(0.3, Math.max(0, (startMouseY - mouse.y)/(Units.gridUnit*15)));
+            onPositionChanged: mouse => {
+                drawerShowAdjust = Math.min(0.3, Math.max(0, (startMouseY - mouse.y)/(Kirigami.Units.gridUnit*15)));
                 button.xChanged();
             }
-            onPressAndHold: {
+            onPressAndHold: mouse => {
                 if (!actionUnderMouse) {
                     return;
                 }
 
-                //if an action has been assigned, show a message like a tooltip
-                if (actionUnderMouse && actionUnderMouse.text && Settings.tabletMode) {
+                // if an action has been assigned, show a message like a tooltip
+                if (actionUnderMouse && actionUnderMouse.text && Kirigami.Settings.tabletMode) {
                     tooltipHider.stop();
-                    Controls.ToolTip.show(actionUnderMouse.text);
+                    QQC2.ToolTip.show(actionUnderMouse.text);
                     // The tooltip is shown perpetually while we are pressed and held, and
                     // we start tooltipHider below when the press is released. This ensures
                     // that the user can have as much time as they want to read the tooltip,
@@ -220,9 +255,9 @@ Item {
             }
             Timer {
                 id: tooltipHider
-                interval: Units.humanMoment
+                interval: Kirigami.Units.humanMoment
                 onTriggered: {
-                    Controls.ToolTip.hide();
+                    QQC2.ToolTip.hide();
                 }
             }
             Connections {
@@ -260,12 +295,12 @@ Item {
                     id: buttonGraphics
                     radius: width/2
                     anchors.centerIn: parent
-                    height: parent.height - Units.smallSpacing*2
+                    height: parent.height - Kirigami.Units.smallSpacing*2
                     width: height
                     enabled: root.action && root.action.enabled
                     visible: root.action
-                    readonly property bool pressed: root.action && root.action.enabled && ((root.action == mouseArea.actionUnderMouse && mouseArea.pressed) || root.action.checked)
-                    property color baseColor: root.action && root.action.icon && root.action.icon.color && root.action.icon.color != undefined && root.action.icon.color.a > 0 ? root.action.icon.color : Theme.highlightColor
+                    readonly property bool pressed: root.action && root.action.enabled && ((root.action === mouseArea.actionUnderMouse && mouseArea.pressed) || root.action.checked)
+                    property color baseColor: root.action && root.action.icon && root.action.icon.color && root.action.icon.color !== undefined && root.action.icon.color.a > 0 ? root.action.icon.color : Kirigami.Theme.highlightColor
                     color: pressed ? Qt.darker(baseColor, 1.3) : baseColor
 
                     ActionsMenu {
@@ -277,49 +312,49 @@ Item {
                             ActionsMenu {}
                         }
                     }
-                    Icon {
+                    Kirigami.Icon {
                         id: icon
                         anchors.centerIn: parent
                         width: button.mediumIconSizing
                         height: width
                         source: root.action && root.action.icon.name ? root.action.icon.name : ""
                         selected: true
-                        color: root.action && root.action.icon && root.action.icon.color && root.action.icon.color.a > 0 ? root.action.icon.color : (selected ? Theme.highlightedTextColor : Theme.textColor)
+                        color: root.action && root.action.icon && root.action.icon.color && root.action.icon.color.a > 0 ? root.action.icon.color : (selected ? Kirigami.Theme.highlightedTextColor : Kirigami.Theme.textColor)
                     }
                     Behavior on color {
                         ColorAnimation {
-                            duration: Units.shortDuration
+                            duration: Kirigami.Units.shortDuration
                             easing.type: Easing.InOutQuad
                         }
                     }
                     Behavior on x {
                         NumberAnimation {
-                            duration: Units.longDuration
+                            duration: Kirigami.Units.longDuration
                             easing.type: Easing.InOutQuad
                         }
                     }
                 }
-                //left button
+                // left button
                 Rectangle {
                     id: leftButtonGraphics
                     z: -1
                     anchors {
                         left: parent.left
                         bottom: parent.bottom
-                        bottomMargin: Units.smallSpacing
+                        bottomMargin: Kirigami.Units.smallSpacing
                     }
                     enabled: root.leftAction && root.leftAction.enabled
                     radius: 2
-                    height: button.mediumIconSizing + Units.smallSpacing * 2
-                    width: height + (root.action ? Units.gridUnit*2 : 0)
+                    height: button.mediumIconSizing + Kirigami.Units.smallSpacing * 2
+                    width: height + (root.action ? Kirigami.Units.gridUnit*2 : 0)
                     visible: root.leftAction
 
-                    readonly property bool pressed: root.leftAction && root.leftAction.enabled && ((mouseArea.actionUnderMouse == root.leftAction && mouseArea.pressed) || root.leftAction.checked)
-                    property color baseColor: root.leftAction && root.leftAction.icon && root.leftAction.icon.color && root.leftAction.icon.color != undefined && root.leftAction.icon.color.a > 0 ? root.leftAction.icon.color : Theme.highlightColor
-                    color: pressed ? baseColor : Theme.backgroundColor
+                    readonly property bool pressed: root.leftAction && root.leftAction.enabled && ((mouseArea.actionUnderMouse === root.leftAction && mouseArea.pressed) || root.leftAction.checked)
+                    property color baseColor: root.leftAction && root.leftAction.icon && root.leftAction.icon.color && root.leftAction.icon.color !== undefined && root.leftAction.icon.color.a > 0 ? root.leftAction.icon.color : Kirigami.Theme.highlightColor
+                    color: pressed ? baseColor : Kirigami.Theme.backgroundColor
                     Behavior on color {
                         ColorAnimation {
-                            duration: Units.shortDuration
+                            duration: Kirigami.Units.shortDuration
                             easing.type: Easing.InOutQuad
                         }
                     }
@@ -332,16 +367,16 @@ Item {
                             ActionsMenu {}
                         }
                     }
-                    Icon {
+                    Kirigami.Icon {
                         source: root.leftAction && root.leftAction.icon.name ? root.leftAction.icon.name : ""
                         width: button.mediumIconSizing
                         height: width
                         selected: leftButtonGraphics.pressed
-                        color: root.leftAction && root.leftAction.icon && root.leftAction.icon.color && root.leftAction.icon.color.a > 0 ? root.leftAction.icon.color : (selected ? Theme.highlightedTextColor : Theme.textColor)
+                        color: root.leftAction && root.leftAction.icon && root.leftAction.icon.color && root.leftAction.icon.color.a > 0 ? root.leftAction.icon.color : (selected ? Kirigami.Theme.highlightedTextColor : Kirigami.Theme.textColor)
                         anchors {
                             left: parent.left
                             verticalCenter: parent.verticalCenter
-                            margins: Units.smallSpacing * 2
+                            margins: root.action ? Kirigami.Units.smallSpacing * 2 : Kirigami.Units.smallSpacing
                         }
                     }
                 }
@@ -351,21 +386,21 @@ Item {
                     z: -1
                     anchors {
                         right: parent.right
-                        //verticalCenter: parent.verticalCenter
+                        // verticalCenter: parent.verticalCenter
                         bottom: parent.bottom
-                        bottomMargin: Units.smallSpacing
+                        bottomMargin: Kirigami.Units.smallSpacing
                     }
                     enabled: root.rightAction && root.rightAction.enabled
                     radius: 2
-                    height: button.mediumIconSizing + Units.smallSpacing * 2
-                    width: height + (root.action ? Units.gridUnit*2 : 0)
+                    height: button.mediumIconSizing + Kirigami.Units.smallSpacing * 2
+                    width: height + (root.action ? Kirigami.Units.gridUnit*2 : 0)
                     visible: root.rightAction
-                    readonly property bool pressed: root.rightAction && root.rightAction.enabled && ((mouseArea.actionUnderMouse == root.rightAction && mouseArea.pressed) || root.rightAction.checked)
-                    property color baseColor: root.rightAction && root.rightAction.icon && root.rightAction.icon.color && root.rightAction.icon.color != undefined && root.rightAction.icon.color.a > 0 ? root.rightAction.icon.color : Theme.highlightColor
-                    color: pressed ? baseColor : Theme.backgroundColor
+                    readonly property bool pressed: root.rightAction && root.rightAction.enabled && ((mouseArea.actionUnderMouse === root.rightAction && mouseArea.pressed) || root.rightAction.checked)
+                    property color baseColor: root.rightAction && root.rightAction.icon && root.rightAction.icon.color && root.rightAction.icon.color !== undefined && root.rightAction.icon.color.a > 0 ? root.rightAction.icon.color : Kirigami.Theme.highlightColor
+                    color: pressed ? baseColor : Kirigami.Theme.backgroundColor
                     Behavior on color {
                         ColorAnimation {
-                            duration: Units.shortDuration
+                            duration: Kirigami.Units.shortDuration
                             easing.type: Easing.InOutQuad
                         }
                     }
@@ -378,26 +413,26 @@ Item {
                             ActionsMenu {}
                         }
                     }
-                    Icon {
+                    Kirigami.Icon {
                         source: root.rightAction && root.rightAction.icon.name ? root.rightAction.icon.name : ""
                         width: button.mediumIconSizing
                         height: width
                         selected: rightButtonGraphics.pressed
-                        color: root.rightAction && root.rightAction.icon && root.rightAction.icon.color && root.rightAction.icon.color.a > 0 ? root.rightAction.icon.color : (selected ? Theme.highlightedTextColor : Theme.textColor)
+                        color: root.rightAction && root.rightAction.icon && root.rightAction.icon.color && root.rightAction.icon.color.a > 0 ? root.rightAction.icon.color : (selected ? Kirigami.Theme.highlightedTextColor : Kirigami.Theme.textColor)
                         anchors {
                             right: parent.right
                             verticalCenter: parent.verticalCenter
-                            margins: Units.smallSpacing * 2
+                            margins: root.action ? Kirigami.Units.smallSpacing * 2 : Kirigami.Units.smallSpacing
                         }
                     }
                 }
             }
 
-            DropShadow {
+            GE.DropShadow {
                 anchors.fill: background
                 horizontalOffset: 0
                 verticalOffset: 1
-                radius: Units.gridUnit /2
+                radius: Kirigami.Units.gridUnit /2
                 samples: 16
                 color: Qt.rgba(0, 0, 0, mouseArea.pressed ? 0.6 : 0.4)
                 source: background
@@ -410,7 +445,7 @@ Item {
         anchors {
             right: edgeMouseArea.right
             bottom: parent.bottom
-            margins: Units.smallSpacing
+            margins: Kirigami.Units.smallSpacing
         }
         drag {
             target: button
@@ -418,19 +453,19 @@ Item {
             minimumX: root.hasContextDrawer && contextDrawer.enabled && contextDrawer.modal ? 0 : root.width/2 - button.width/2
             maximumX: root.hasGlobalDrawer && globalDrawer.enabled && globalDrawer.modal ? root.width : root.width/2 - button.width/2
         }
-        visible: root.page.actions && root.page.actions.contextualActions.length > 0 && (applicationWindow === undefined || applicationWindow().wideScreen)
-            //using internal pagerow api
-            && (root.page && root.page.parent ? root.page.ColumnView.level < applicationWindow().pageStack.depth-1 : false)
+        visible: root.page.actions && root.page.actions.contextualActions.length > 0 && ((typeof applicationWindow === "undefined") || applicationWindow().wideScreen)
+            // using internal pagerow api
+            && ((typeof applicationWindow !== "undefined") && root.page && root.page.parent ? root.page.Kirigami.ColumnView.level < applicationWindow().pageStack.depth-1 : (typeof applicationWindow === "undefined"))
 
-        width: button.mediumIconSizing + Units.smallSpacing*2
+        width: button.mediumIconSizing + Kirigami.Units.smallSpacing*2
         height: width
 
 
-        DropShadow {
+        GE.DropShadow {
             anchors.fill: handleGraphics
             horizontalOffset: 0
             verticalOffset: 1
-            radius: Units.gridUnit /2
+            radius: Kirigami.Units.gridUnit /2
             samples: 16
             color: Qt.rgba(0, 0, 0, fakeContextMenuButton.pressed ? 0.6 : 0.4)
             source: handleGraphics
@@ -438,9 +473,9 @@ Item {
         Rectangle {
             id: handleGraphics
             anchors.fill: parent
-            color: fakeContextMenuButton.pressed ? Theme.highlightColor : Theme.backgroundColor
+            color: fakeContextMenuButton.pressed ? Kirigami.Theme.highlightColor : Kirigami.Theme.backgroundColor
             radius: 1
-            Icon {
+            Kirigami.Icon {
                 anchors.centerIn: parent
                 width: button.mediumIconSizing
                 selected: fakeContextMenuButton.pressed
@@ -449,39 +484,39 @@ Item {
             }
             Behavior on color {
                 ColorAnimation {
-                    duration: Units.shortDuration
+                    duration: Kirigami.Units.shortDuration
                     easing.type: Easing.InOutQuad
                 }
             }
         }
 
-        onPressed: {
+        onPressed: mouse => {
             mouseArea.onPressed(mouse)
         }
-        onReleased: {
-            if (globalDrawer) {
-                globalDrawer.peeking = false;
-            }
-            if (contextDrawer) {
+        onReleased: mouse => {
+            const pos = root.mapFromItem(fakeContextMenuButton, mouse.x, mouse.y);
+
+            if ((typeof contextDrawer !== "undefined") && contextDrawer) {
                 contextDrawer.peeking = false;
-            }
-            var pos = root.mapFromItem(fakeContextMenuButton, mouse.x, mouse.y);
-            if (contextDrawer) {
+
                 if (pos.x < root.width/2) {
                     contextDrawer.open();
                 } else if (contextDrawer.drawerOpen && mouse.x > 0 && mouse.x < width) {
                     contextDrawer.close();
                 }
             }
-            if (globalDrawer) {
+
+            if ((typeof globalDrawer !== "undefined") && globalDrawer) {
+                globalDrawer.peeking = false;
+
                 if (globalDrawer.position > 0.5) {
                     globalDrawer.open();
                 } else {
                     globalDrawer.close();
                 }
             }
-            if (containsMouse && (!globalDrawer || !globalDrawer.drawerOpen || !globalDrawer.modal) &&
-                (!contextDrawer || !contextDrawer.drawerOpen || !contextDrawer.modal)) {
+            if (containsMouse && ((typeof globalDrawer === "undefined") || !globalDrawer || !globalDrawer.drawerOpen || !globalDrawer.modal) &&
+                ((typeof contextDrawer === "undefined") || !contextDrawer || !contextDrawer.drawerOpen || !contextDrawer.modal)) {
                 contextMenu.visible = !contextMenu.visible;
             }
         }
@@ -511,10 +546,10 @@ Item {
             minimumX: root.hasContextDrawer && contextDrawer.enabled && contextDrawer.modal ? 0 : root.width/2 - button.width/2
             maximumX: root.hasGlobalDrawer && globalDrawer.enabled && globalDrawer.modal ? root.width : root.width/2 - button.width/2
         }
-        height: Units.smallSpacing * 3
+        height: Kirigami.Units.smallSpacing * 3
 
-        onPressed: mouseArea.onPressed(mouse)
-        onPositionChanged: mouseArea.positionChanged(mouse)
-        onReleased: mouseArea.released(mouse)
+        onPressed: mouse => mouseArea.onPressed(mouse)
+        onPositionChanged: mouse => mouseArea.positionChanged(mouse)
+        onReleased: mouse => mouseArea.released(mouse)
     }
 }

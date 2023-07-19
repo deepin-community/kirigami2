@@ -8,12 +8,12 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15 as QQC2
 import QtQuick.Layouts 1.15
 import org.kde.kirigami 2.19 as Kirigami
-import "../../templates/private" as TemplatesPrivate
-import "../" as Private
+import "../../templates/private" as TP
+import "../" as P
 
 Kirigami.AbstractApplicationHeader {
     id: header
-    readonly property int leftReservedSpace: (buttonsLayout.visible && buttonsLayout.visibleChildren.length > 0 ? buttonsLayout.width : 0)
+    readonly property int leftReservedSpace: (buttonsLayout.visible && buttonsLayout.visibleChildren.length > 0 ? buttonsLayout.width + Kirigami.Units.smallSpacing : 0) // Take into account the layout margins the nav buttons have
         + (leftHandleAnchor.visible ? leftHandleAnchor.width : 0)
         + (menuButton.visible ? menuButton.width : 0)
     readonly property int rightReservedSpace: rightHandleAnchor.visible ? backButton.background.implicitHeight : 0
@@ -55,7 +55,7 @@ Kirigami.AbstractApplicationHeader {
             Layout.preferredWidth: height
         }
 
-        Private.PrivateActionToolButton {
+        P.PrivateActionToolButton {
             id: menuButton
             visible: !Kirigami.Settings.isMobile && applicationWindow().globalDrawer && "isMenu" in applicationWindow().globalDrawer && applicationWindow().globalDrawer.isMenu
             icon.name: "open-menu-symbolic"
@@ -67,7 +67,9 @@ Kirigami.AbstractApplicationHeader {
 
             action: Kirigami.Action {
                 children: applicationWindow().globalDrawer && applicationWindow().globalDrawer.actions ? applicationWindow().globalDrawer.actions : []
+                tooltip: checked ? qsTr("Close menu") : qsTr("Open menu")
             }
+            Accessible.name: action.tooltip
         }
 
         RowLayout {
@@ -78,19 +80,19 @@ Kirigami.AbstractApplicationHeader {
             Layout.leftMargin: leftHandleAnchor.visible ? Kirigami.Units.smallSpacing : 0
 
             // TODO KF6: make showNavigationButtons an int, and replace with strict === equality
-            visible: (globalToolBar.showNavigationButtons != Kirigami.ApplicationHeaderStyle.NoNavigationButtons || applicationWindow().pageStack.layers.depth > 1)
+            visible: (globalToolBar.showNavigationButtons !== Kirigami.ApplicationHeaderStyle.NoNavigationButtons || applicationWindow().pageStack.layers.depth > 1 && !(applicationWindow().pageStack.layers.currentItem instanceof Kirigami.PageRow))
                 && globalToolBar.actualStyle !== Kirigami.ApplicationHeaderStyle.None
 
             Layout.maximumWidth: visibleChildren.length > 0 ? Layout.preferredWidth : 0
 
-            TemplatesPrivate.BackButton {
+            TP.BackButton {
                 id: backButton
                 Layout.leftMargin: leftHandleAnchor.visible ? 0 : Kirigami.Units.smallSpacing
                 Layout.minimumWidth: implicitHeight
                 Layout.minimumHeight: implicitHeight
                 Layout.maximumHeight: buttonsLayout.height
             }
-            TemplatesPrivate.ForwardButton {
+            TP.ForwardButton {
                 id: forwardButton
                 Layout.minimumWidth: implicitHeight
                 Layout.minimumHeight: implicitHeight
@@ -114,7 +116,7 @@ Kirigami.AbstractApplicationHeader {
 
             active: (globalToolBar.actualStyle === Kirigami.ApplicationHeaderStyle.TabBar || globalToolBar.actualStyle === Kirigami.ApplicationHeaderStyle.Breadcrumb) && currentItem && currentItem.globalToolBarStyle !== Kirigami.ApplicationHeaderStyle.None
 
-            //TODO: different implementation?
+            // TODO: different implementation?
             source: globalToolBar.actualStyle === Kirigami.ApplicationHeaderStyle.TabBar ? Qt.resolvedUrl("TabBarControl.qml") : Qt.resolvedUrl("BreadcrumbControl.qml")
         }
 

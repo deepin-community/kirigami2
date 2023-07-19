@@ -63,7 +63,7 @@ class ColumnViewAttached : public QObject
 
     /**
      * If true the page will never go out of view, but will stay either
-     * at the right or left side of the Columnview
+     * at the right or left side of the ColumnView
      */
     Q_PROPERTY(bool pinned READ isPinned WRITE setPinned NOTIFY pinnedChanged)
 
@@ -139,7 +139,7 @@ private:
  * when not all items fit in the ColumnView, it will behave like a Flickable and will be a scrollable view which shows only a determined number of columns.
  * The columns can either all have the same fixed size (recommended),
  * size themselves with implicitWidth, or automatically expand to take all the available width: by default the last column will always be the expanding one.
- * Items inside the Columnview can access info of the view and set layouting hints via the Columnview attached property.
+ * Items inside the ColumnView can access info of the view and set layouting hints via the ColumnView attached property.
  *
  * This is the base for the implementation of PageRow
  * @since 2.7
@@ -400,7 +400,11 @@ protected:
     void componentComplete() override;
     void updatePolish() override;
     void itemChange(QQuickItem::ItemChange change, const QQuickItem::ItemChangeData &value) override;
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     void geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry) override;
+#else
+    void geometryChange(const QRectF &newGeometry, const QRectF &oldGeometry) override;
+#endif
     bool childMouseEventFilter(QQuickItem *item, QEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
@@ -444,13 +448,23 @@ Q_SIGNALS:
 
 private:
     static void contentChildren_append(QQmlListProperty<QQuickItem> *prop, QQuickItem *object);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     static int contentChildren_count(QQmlListProperty<QQuickItem> *prop);
     static QQuickItem *contentChildren_at(QQmlListProperty<QQuickItem> *prop, int index);
+#else
+    static qsizetype contentChildren_count(QQmlListProperty<QQuickItem> *prop);
+    static QQuickItem *contentChildren_at(QQmlListProperty<QQuickItem> *prop, qsizetype index);
+#endif
     static void contentChildren_clear(QQmlListProperty<QQuickItem> *prop);
 
     static void contentData_append(QQmlListProperty<QObject> *prop, QObject *object);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     static int contentData_count(QQmlListProperty<QObject> *prop);
     static QObject *contentData_at(QQmlListProperty<QObject> *prop, int index);
+#else
+    static qsizetype contentData_count(QQmlListProperty<QObject> *prop);
+    static QObject *contentData_at(QQmlListProperty<QObject> *prop, qsizetype index);
+#endif
     static void contentData_clear(QQmlListProperty<QObject> *prop);
 
     QList<QObject *> m_contentData;
@@ -458,7 +472,6 @@ private:
     ContentItem *m_contentItem;
     QPointer<QQuickItem> m_currentItem;
 
-    static QHash<QObject *, ColumnViewAttached *> m_attachedObjects;
     qreal m_oldMouseX = -1.0;
     qreal m_startMouseX = -1.0;
     qreal m_oldMouseY = -1.0;

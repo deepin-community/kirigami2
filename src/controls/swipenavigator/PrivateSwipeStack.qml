@@ -5,11 +5,10 @@
  */
 
 import QtQuick 2.12
-import QtQuick.Layouts 1.12
-import QtQuick.Controls 2.12
+import QtQuick.Controls 2.12 as QQC2
 import org.kde.kirigami 2.12 as Kirigami
 
-StackView {
+QQC2.StackView {
     popEnter: Transition {
         OpacityAnimator {
             from: 0
@@ -37,7 +36,7 @@ StackView {
 
     pushEnter: Transition {
         ParallelAnimation {
-            //NOTE: It's a PropertyAnimation instead of an Animator because with an animator the item will be visible for an instant before starting to fade
+            // NOTE: It's a PropertyAnimation instead of an Animator because with an animator the item will be visible for an instant before starting to fade
             PropertyAnimation {
                 property: "opacity"
                 from: 0

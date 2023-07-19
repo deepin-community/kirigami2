@@ -7,22 +7,20 @@
 import QtQuick 2.0
 import QtQuick.Layouts 1.12
 import QtQuick.Controls 2.12 as QQC2
-
 import org.kde.kirigami 2.12 as Kirigami
-
-import "private"
+import "private" as P
 
 /**
- * A placeholder message indicating that a list view is empty. The message
- * comprises a label with lightened text, an optional icon above the text, and
- * an optional button below the text which can be used to easily show the user
- * what to do next to add content to the view.
+ * @brief A placeholder message indicating that a view is empty.
+ *
+ * The message comprises a label with text, an optional explanation below the main text,
+ * an optional icon above all the text, and an optional button below all the text which
+ * can be used to easily show the user what to do next to add content to the view.
  *
  * The top-level component is a ColumnLayout, so additional components items can
  * simply be added as child items and they will be positioned sanely.
  *
  * Example usage:
- *
  * @code{.qml}
  ** used as a "this view is empty" message
  * import org.kde.kirigami 2.12 as Kirigami
@@ -36,7 +34,7 @@ import "private"
  *         anchors.centerIn: parent
  *         width: parent.width - (Kirigami.Units.largeSpacing * 4)
  *
- *         visible: listView.count == 0
+ *         visible: listView.count === 0
  *
  *         text: "There are no items in this list"
  *     }
@@ -55,7 +53,7 @@ import "private"
  *         anchors.centerIn: parent
  *         width: parent.width - (Kirigami.Units.largeSpacing * 4)
  *
- *         visible: listView.count == 0
+ *         visible: listView.count === 0
  *
  *         text: "Add an item to proceed"
  *
@@ -146,9 +144,27 @@ import "private"
 ColumnLayout {
     id: root
 
+    enum Type {
+        Actionable,
+        Informational
+    }
+
+//BEGIN properties
     /**
-     * text: string
-     * The text to show as a placeholder label
+     * @brief This property holds the PlaceholderMessage type.
+     *
+     * The type of the message. This can be:
+     * * ``Kirigami.PlaceholderMessage.Type.Actionable``: Makes it more attention-getting. Useful when the user is expected to interact with the message.
+     * * ``Kirigami.PlaceholderMessage.Type.Informational``: Makes it less prominent. Useful when the message in only informational.
+     *
+     * default: `if a helpfulAction is provided this will be of type Actionable otherwise of type Informational.`
+     *
+     * @since 5.94
+     */
+    property int type: actionButton.action && actionButton.action.enabled ? PlaceholderMessage.Type.Actionable : PlaceholderMessage.Type.Informational
+
+    /**
+     * @brief This property holds the text to show in the placeholder label.
      *
      * Optional; if not defined, the message will have no large text label
      * text. If both text: and explanation: are omitted, the message will have
@@ -159,10 +175,9 @@ ColumnLayout {
     property string text
 
     /**
-     * explanation: string
-     * Smaller explanatory text to show below the larger title-style text
+     * @brief This property holds the smaller explanatory text to show below the larger title-style text
      *
-     * Useful for providing a user-friendly explanation for how to proceed.
+     * Useful for providing a user-friendly explanation on how to proceed.
      *
      * Optional; if not defined, the message will have no supplementary
      * explanatory text.
@@ -172,60 +187,64 @@ ColumnLayout {
     property string explanation
 
     /**
-     * icon: QVariant
-     * The icon to show above the text label. Accepts "icon.name" and
-     * "icon.source"
+     * @brief This property provides an icon to display above the top text label.
+     * @note It accepts ``icon.name`` and ``icon.source`` to set the icon source.
+     * It is suggested to use ``icon.name``.
      *
      * Optional; if undefined, the message will have no icon.
      * Falls back to `undefined` if the specified icon is not valid or cannot
      * be loaded.
      *
+     * @see org::kde::kirigami::private::ActionIconGroup
      * @since 5.70
-     * @see Icon::source
      */
-    property ActionIconGroup icon: ActionIconGroup {}
+    property P.ActionIconGroup icon: P.ActionIconGroup {}
 
     /**
-     * helpfulAction: QtQuickControls2 Action
-     * An action that helps the user proceed. Typically used to guide the user
-     * to the next step for adding content or items to an empty view.
+     * @brief This property holds an action that helps the user proceed.
+     *
+     * Typically used to guide the user to the next step for adding
+     * content or items to an empty view.
      *
      * Optional; if undefined, no button will appear below the text label.
      *
+     * @property QtQuick.Controls.Action helpfulAction
      * @since 5.70
      */
     property alias helpfulAction: actionButton.action
+//END properties
 
     spacing: Kirigami.Units.largeSpacing
 
     Kirigami.Icon {
+        visible: source !== undefined
+        opacity: 0.5
 
         Layout.alignment: Qt.AlignHCenter
-        Layout.preferredWidth: Kirigami.Units.iconSizes.huge
-        Layout.preferredHeight: Kirigami.Units.iconSizes.huge
+        Layout.preferredWidth: Math.round(Kirigami.Units.iconSizes.huge * 1.5)
+        Layout.preferredHeight: Math.round(Kirigami.Units.iconSizes.huge * 1.5)
 
         source: {
-            if (root.icon.source && root.icon.source.length > 0) {
+            if (root.icon.source.length > 0) {
                 return root.icon.source
-            } else if (root.icon.name && root.icon.name.length > 0) {
+            } else if (root.icon.name.length > 0) {
                 return root.icon.name
             }
             return undefined
         }
-
-        visible: source != undefined
-        opacity: 0.5
     }
 
     Kirigami.Heading {
         text: root.text
-        visible: root.text !== ""
+        visible: text.length > 0
 
-        level: 2
-        opacity: 0.5
+        type: Kirigami.Heading.Primary
+        opacity: root.type === PlaceholderMessage.Type.Actionable ? 1 : 0.65
+
 
         Layout.fillWidth: true
         horizontalAlignment: Qt.AlignHCenter
+        verticalAlignment: Qt.AlignVCenter
 
         wrapMode: Text.WordWrap
     }
@@ -233,8 +252,7 @@ ColumnLayout {
     QQC2.Label {
         text: root.explanation
         visible:  root.explanation !== ""
-
-        opacity: 0.5
+        opacity: root.type === PlaceholderMessage.Type.Actionable ? 1 : 0.65
 
         horizontalAlignment: Qt.AlignHCenter
         wrapMode: Text.WordWrap
@@ -246,6 +264,7 @@ ColumnLayout {
         id: actionButton
 
         Layout.alignment: Qt.AlignHCenter
+        Layout.topMargin: Kirigami.Units.gridUnit
 
         visible: action && action.enabled
     }

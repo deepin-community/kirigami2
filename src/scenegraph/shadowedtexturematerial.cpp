@@ -16,7 +16,11 @@ ShadowedTextureMaterial::ShadowedTextureMaterial()
     setFlag(QSGMaterial::Blending, true);
 }
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 QSGMaterialShader *ShadowedTextureMaterial::createShader() const
+#else
+QSGMaterialShader *ShadowedTextureMaterial::createShader(QSGRendererInterface::RenderMode) const
+#endif
 {
     return new ShadowedTextureShader{shaderType};
 }
@@ -48,6 +52,7 @@ ShadowedTextureShader::ShadowedTextureShader(ShadowedRectangleMaterial::ShaderTy
     setShader(shaderType, QStringLiteral("shadowedtexture"));
 }
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 void ShadowedTextureShader::initialize()
 {
     ShadowedRectangleShader::initialize();
@@ -63,3 +68,17 @@ void ShadowedTextureShader::updateState(const QSGMaterialShader::RenderState &st
         texture->bind();
     }
 }
+#else
+void ShadowedTextureShader::updateSampledImage(QSGMaterialShader::RenderState &state,
+                                               int binding,
+                                               QSGTexture **texture,
+                                               QSGMaterial *newMaterial,
+                                               QSGMaterial *oldMaterial)
+{
+    Q_UNUSED(state);
+    Q_UNUSED(oldMaterial);
+    if (binding == 1) {
+        *texture = static_cast<ShadowedTextureMaterial *>(newMaterial)->textureSource;
+    }
+}
+#endif

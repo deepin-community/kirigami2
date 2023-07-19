@@ -7,17 +7,32 @@
 #ifndef KIRIGAMI_TABLETMODEWATCHER
 #define KIRIGAMI_TABLETMODEWATCHER
 
+#include <QEvent>
 #include <QObject>
 
-#ifndef KIRIGAMI_BUILD_TYPE_STATIC
-#include <kirigami2_export.h>
-#endif
+#include "kirigami2_export.h"
 
 namespace Kirigami
 {
 class TabletModeWatcherPrivate;
 
+class KIRIGAMI2_EXPORT TabletModeChangedEvent : public QEvent
+{
+public:
+    TabletModeChangedEvent(bool tablet)
+        : QEvent(TabletModeChangedEvent::type)
+        , tabletMode(tablet)
+    {
+    }
+
+    bool tabletMode = false;
+
+    static QEvent::Type type;
+};
+
 /**
+ * @class TabletModeWatcher tabletmodewatcher.h <Kirigami/TabletModeWatcher>
+ *
  * This class reports on the status of certain transformable
  * devices which can be both tablets and laptops at the same time,
  * with a detachable keyboard.
@@ -58,6 +73,17 @@ public:
      * or KDE_KIRIGAMI_TABLET_MODE are set to true, isTabletMode will be true
      */
     bool isTabletMode() const;
+
+    /**
+     * Register an arbitrary QObject to send events from this.
+     * At the moment only one event will be sent: TabletModeChangedEvent
+     */
+    void addWatcher(QObject *watcher);
+
+    /*
+     * Unsubscribe watcher from receiving events from TabletModeWatcher.
+     */
+    void removeWatcher(QObject *watcher);
 
 Q_SIGNALS:
     void tabletModeAvailableChanged(bool tabletModeAvailable);

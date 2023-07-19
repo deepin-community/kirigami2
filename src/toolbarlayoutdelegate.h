@@ -74,6 +74,8 @@ public:
 
     qreal width() const;
     qreal height() const;
+    qreal implicitWidth() const;
+    qreal implicitHeight() const;
     qreal maxHeight() const;
     qreal iconWidth() const;
     qreal fullWidth() const;

@@ -8,8 +8,6 @@
 
 import QtQuick 2.7
 import org.kde.kirigami 2.5 as Kirigami
-import "private"
-
 import "templates" as T
 
 /**
@@ -32,7 +30,7 @@ import "templates" as T
  * Actions are added from left to right. If more actions are set than
  * can fit, an overflow menu is provided.
  *
- * Example:
+ * Example usage:
  * @code
  * InlineMessage {
  *     type: Kirigami.MessageType.Error
@@ -63,19 +61,17 @@ import "templates" as T
 T.InlineMessage {
     id: root
 
+    // a rectangle padded with anchors.margins is used to simulate a border
+    padding: bgFillRect.anchors.margins + Kirigami.Units.smallSpacing
+
     background: Rectangle {
         id: bgBorderRect
 
-        color: {
-            if (root.type == Kirigami.MessageType.Positive) {
-                return Kirigami.Theme.positiveTextColor;
-            } else if (root.type == Kirigami.MessageType.Warning) {
-                return Kirigami.Theme.neutralTextColor;
-            } else if (root.type == Kirigami.MessageType.Error) {
-                return Kirigami.Theme.negativeTextColor;
-            }
-
-            return Kirigami.Theme.activeTextColor;
+        color: switch (root.type) {
+            case Kirigami.MessageType.Positive: return Kirigami.Theme.positiveTextColor;
+            case Kirigami.MessageType.Warning: return Kirigami.Theme.neutralTextColor;
+            case Kirigami.MessageType.Error: return Kirigami.Theme.negativeTextColor;
+            default: return Kirigami.Theme.activeTextColor;
         }
 
         radius: Kirigami.Units.smallSpacing / 2

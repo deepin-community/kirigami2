@@ -53,15 +53,15 @@ KirigamiPluginFactory *KirigamiPluginFactory::findPlugin()
             #ifdef Q_OS_ANDROID
             QDir dir(path);
             #else
-            QDir dir(path + QStringLiteral("/kf5/kirigami"));
+            QDir dir(path + QStringLiteral("/kf" QT_STRINGIFY(QT_VERSION_MAJOR) "/kirigami"));
             #endif
             const auto fileNames = dir.entryList(QDir::Files);
 
             for (const QString &fileName : fileNames) {
 
-                #ifdef Q_OS_ANDROID
-                if (fileName.startsWith(QStringLiteral("libplugins_kf5_kirigami_")) && QLibrary::isLibrary(fileName)) {
-                    #endif
+#ifdef Q_OS_ANDROID
+                if (fileName.startsWith(QStringLiteral("libplugins_kf" QT_STRINGIFY(QT_VERSION_MAJOR) "_kirigami_")) && QLibrary::isLibrary(fileName)) {
+#endif
                     // TODO: env variable?
                     if (!QQuickStyle::name().isEmpty() && fileName.contains(QQuickStyle::name())) {
                         QPluginLoader loader(dir.absoluteFilePath(fileName));
@@ -76,9 +76,9 @@ KirigamiPluginFactory *KirigamiPluginFactory::findPlugin()
                             break;
                         }
                     }
-                    #ifdef Q_OS_ANDROID
+#ifdef Q_OS_ANDROID
                 }
-                #endif
+#endif
             }
 
             // Ensure we only load the first plugin from the first plugin location.
@@ -88,7 +88,7 @@ KirigamiPluginFactory *KirigamiPluginFactory::findPlugin()
                 break;
             }
         }
-        #endif
+#endif
     }
 
     return pluginFactory;

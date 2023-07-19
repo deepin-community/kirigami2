@@ -5,12 +5,11 @@
  */
 
 import QtQuick 2.6
-import QtQuick.Controls 2.0 as Controls
 import QtQuick.Layouts 1.2
 import org.kde.kirigami 2.4 as Kirigami
 
 /**
- * A GridLayout optimized for showing one or two columns of cards,
+ * @brief A GridLayout optimized for showing one or two columns of cards,
  * depending on the available space.
  *
  * It Should be used when the cards are not instantiated by a model or by a
@@ -24,8 +23,8 @@ import org.kde.kirigami 2.4 as Kirigami
  *
  * A CardsLayout should always be contained within a ColumnLayout.
  *
- * @inherit QtQuick.GridLayout
  * @since 2.4
+ * @inherit QtQuick.Layouts.GridLayout
  */
 GridLayout {
     /**
@@ -33,7 +32,7 @@ GridLayout {
      *
      * This layout will never lay out the items in more columns than maximumColumns
      *
-     * By default the maximum number of columns is 2.
+     * default: ``2``
      *
      * @since 2.5
      */
@@ -49,7 +48,7 @@ GridLayout {
      * it is advised to express this unit as a multiple
      * of Kirigami.Units.gridUnit.
      *
-     * By default this is `20 * Kirigami.Units.gridUnit`.
+     * default: ``20 * Kirigami.Units.gridUnit``
      */
     property int maximumColumnWidth: Kirigami.Units.gridUnit * 20
 
@@ -59,7 +58,7 @@ GridLayout {
      * The layout will try to dispose of items
      * in a number of columns that will respect this size constraint.
      *
-     * By default this is `12 * Kirigami.Units.gridUnit`.
+     * default: ``12 * Kirigami.Units.gridUnit``
      *
      * @since 2.5
      */
@@ -73,9 +72,9 @@ GridLayout {
     columnSpacing: Kirigami.Units.largeSpacing * columns
 
 
-    //NOTE: this default width which defaults to 2 columns is just to remove a binding loop on columns
+    // NOTE: this default width which defaults to 2 columns is just to remove a binding loop on columns
     width: maximumColumnWidth*2 + Kirigami.Units.largeSpacing
-    //same computation of columns, but on the parent size
+    // same computation of columns, but on the parent size
     Layout.preferredWidth: maximumColumnWidth * Math.max(1, Math.min(maximumColumns > 0 ? maximumColumns : Infinity,
                                   Math.floor(parent.width/minimumColumnWidth),
                                   Math.ceil(parent.width/maximumColumnWidth))) + Kirigami.Units.largeSpacing * (columns - 1)
@@ -85,7 +84,7 @@ GridLayout {
 
     Component.onCompleted: childrenChanged()
     onChildrenChanged: {
-        for (var i = 0; i < children.length; ++i) {
+        for (let i = 0; i < children.length; ++i) {
             children[i].Layout.fillHeight = true;
         }
     }

@@ -5,13 +5,14 @@
  */
 
 import QtQuick 2.7
+import QtQml 2.15
 import QtQuick.Layouts 1.2
-import QtQuick.Controls 2.4 as Controls
+import QtQuick.Controls 2.4 as QQC2
 import org.kde.kirigami 2.14 as Kirigami
-import "private"
+import "private" as P
 
 /**
- * A toolbar built out of a list of actions.
+ * @brief A toolbar built out of a list of actions.
  *
  * The default representation for visible actions is a QtQuick.Controls.ToolButton, but
  * it can be changed by setting the `Action.displayComponent` for an action.
@@ -26,77 +27,88 @@ import "private"
  * @inherit QtQuick.Controls.Control
  * @since 2.5
  */
-Controls.Control {
+QQC2.Control {
     id: root
+
+//BEGIN properties
     /**
-     * @brief This property holds a list of action that will appear in the ActionToolBar.
+     * @brief This property holds a list of visible actions.
+     *
      * The ActionToolBar will try to display as many actions as possible.
      * Those that won't fit will go into an overflow menu.
      *
-     * @property list<Action> ActionToolBar::actions
+     * @property list<Action> actions
      */
     property alias actions: layout.actions
 
     /**
-     * This property holds a list of actions that will always be displayed in the overflow
-     * menu even if there is enough place.
+     * @brief This property holds a list of hidden actions.
      *
-     * @since 2.6
-     * @property list<Action> ActionToolBar::hiddenActions
+     * These actions will always be displayed in the overflow menu, even if there is enough space.
+     *
      * @deprecated since 2.14, use the AlwaysHide hint on actions instead.
+     * @property list<Action> hiddenActions
+     * @since 2.6
      */
     property list<QtObject> hiddenActions
     onHiddenActionsChanged: print("ActionToolBar::hiddenActions is deprecated, use the AlwaysHide hint on your actions instead")
 
     /**
-     * This property holds whether the buttons will have a flat appearance.
+     * @brief This property holds whether the buttons will have a flat appearance.
      *
-     * The default value is true.
+     * default: ``true``
      */
     property bool flat: true
 
     /**
-     * This property determines how the icon and text are displayed within the button.
+     * @brief This property determines how the icon and text are displayed within the button.
      *
-     * * `Button.IconOnly`
-     * * `Button.TextOnly`
-     * * `Button.TextBesideIcon`
-     * * `Button.TextUnderIcon`
+     * Permitted values are:
+     * * ``Button.IconOnly``
+     * * ``Button.TextOnly``
+     * * ``Button.TextBesideIcon``
+     * * ``Button.TextUnderIcon``
      *
-     * By default the text is display beside the icon.
+     * default: ``Controls.Button.TextBesideIcon``
      *
-     * \sa QtQuick.Controls.AbstractButton
+     * @see QtQuick.Controls.AbstractButton
+     * @property int display
      */
-    property int display: Controls.Button.TextBesideIcon
+    property int display: QQC2.Button.TextBesideIcon
 
     /**
-     * This property holds the alignment of the buttons.
+     * @brief This property holds the alignment of the buttons.
      *
      * When there is more space available than required by the visible delegates,
      * we need to determine how to place the delegates.
      *
-     * The default value is right-aligned buttons (`Qt.AlignRight`).
+     * When there is more space available than required by the visible action delegates,
+     * we need to determine where to position them.
      *
-     * @property Qt::Alignment alignment
+     * default: ``Qt.AlignRight``
+     *
+     * @see Qt::AlignmentFlag
+     * @property int alignment
      */
     property alias alignment: layout.alignment
 
     /**
-     * This property holds the position of the toolbar.
+     * @brief This property holds the position of the toolbar.
      *
      * If this ActionToolBar is the contentItem of a QQC2 Toolbar, the position is bound to the ToolBar's position
      *
      * Permitted values are:
+     * * ``ToolBar.Header``: The toolbar is at the top, as a window or page header.
+     * * ``ToolBar.Footer``: The toolbar is at the bottom, as a window or page footer.
      *
-     * * ToolBar.Header: The toolbar is at the top, as a window or page header.
-     * * ToolBar.Footer: The toolbar is at the bottom, as a window or page footer.
+     * @property int position
      */
     property int position: parent && parent.hasOwnProperty("position")
             ? parent.position
-            : Controls.ToolBar.Header
+            : QQC2.ToolBar.Header
 
     /**
-     * This property holds the maximum width of the content of this ToolBar.
+     * @brief This property holds the maximum width of the content of this ToolBar.
      *
      * If the toolbar's width is larger than this value, empty space will
      * be added on the sides, according to the Alignment property.
@@ -108,9 +120,9 @@ Controls.Control {
     readonly property alias maximumContentWidth: layout.implicitWidth
 
     /**
-     * This property holds the name of the icon to use for the overflow menu button.
+     * @brief This property holds the name of the icon to use for the overflow menu button.
      *
-     * By default this is "overflow-menu".
+     * default: ``"overflow-menu"``
      *
      * @since 5.65
      * @since 2.12
@@ -118,25 +130,30 @@ Controls.Control {
     property string overflowIconName: "overflow-menu"
 
     /**
-     * This property holds the combined width of the visible delegates.
-     *
+     * @brief This property holds the combined width of all visible delegates.
      * @property int visibleWidth
      */
     property alias visibleWidth: layout.visibleWidth
 
     /**
-     * This propery holds how to handle items that do not match the toolbar's height.
+     * @brief This property sets the handling method for items that do not match the toolbar's height.
      *
      * When toolbar items do not match the height of the toolbar, there are
      * several ways we can deal with this. This property sets the preferred way.
      *
-     * The default is HeightMode::ConstrainIfLarger .
+     * Permitted values are:
+     * * ``HeightMode.AlwaysCenter``
+     * * ``HeightMode.AlwaysFill``
+     * * ``AlwaysFill.ConstrainIfLarger``
      *
-     * \sa ToolBarLayout::heightMode
+     * default: ``HeightMode::ConstrainIfLarger``
      *
-     * \sa ToolBarLayout::HeightMode
+     * @see ToolBarLayout::heightMode
+     * @see ToolBarLayout::HeightMode
+     * @property ToolBarLayout::HeightMode heightMode
      */
     property alias heightMode: layout.heightMode
+//END properties
 
     implicitHeight: layout.implicitHeight
     implicitWidth: layout.implicitWidth
@@ -155,15 +172,15 @@ Controls.Control {
         spacing: Kirigami.Units.smallSpacing
         layoutDirection: root.LayoutMirroring.enabled ? Qt.RightToLeft : Qt.LeftToRight
 
-        fullDelegate: PrivateActionToolButton {
+        fullDelegate: P.PrivateActionToolButton {
             flat: root.flat
             display: root.display
             action: Kirigami.ToolBarLayout.action
         }
 
-        iconDelegate: PrivateActionToolButton {
+        iconDelegate: P.PrivateActionToolButton {
             flat: root.flat
-            display: Controls.Button.IconOnly
+            display: QQC2.Button.IconOnly
             action: Kirigami.ToolBarLayout.action
 
             showMenuArrow: false
@@ -173,7 +190,7 @@ Controls.Control {
                     return [action]
                 }
 
-                if (action.children) {
+                if (action.hasOwnProperty("children") && action.children.length > 0) {
                     return Array.prototype.map.call(action.children, i => i)
                 }
 
@@ -181,7 +198,7 @@ Controls.Control {
             }
         }
 
-        moreButton: PrivateActionToolButton {
+        moreButton: P.PrivateActionToolButton {
             flat: root.flat
 
             action: Kirigami.Action {
@@ -191,27 +208,28 @@ Controls.Control {
             }
 
             menuActions: {
-                if (root.hiddenActions.length == 0) {
+                if (root.hiddenActions.length === 0) {
                     return root.actions
                 } else {
-                    result = []
-                    result.concat(Array.prototype.map.call(root.actions, (i) => i))
-                    result.concat(Array.prototype.map.call(hiddenActions, (i) => i))
+                    const result = []
+                    result.concat(Array.prototype.map.call(root.actions, i => i))
+                    result.concat(Array.prototype.map.call(hiddenActions, i => i))
                     return result
                 }
             }
 
-            menuComponent: ActionsMenu {
-                submenuComponent: ActionsMenu {
+            menuComponent: P.ActionsMenu {
+                submenuComponent: P.ActionsMenu {
                     Binding {
                         target: parentItem
                         property: "visible"
                         value: layout.hiddenActions.includes(parentAction)
                                && (parentAction.visible === undefined || parentAction.visible)
+                        restoreMode: Binding.RestoreBinding
                     }
                 }
 
-                itemDelegate: ActionMenuItem {
+                itemDelegate: P.ActionMenuItem {
                     visible: layout.hiddenActions.includes(action)
                              && (action.visible === undefined || action.visible)
                 }
@@ -223,7 +241,7 @@ Controls.Control {
                              && (action.visible === undefined || action.visible)
                 }
 
-                separatorDelegate: Controls.MenuSeparator {
+                separatorDelegate: QQC2.MenuSeparator {
                     property var action
                     visible: layout.hiddenActions.includes(action)
                              && (action.visible === undefined || action.visible)

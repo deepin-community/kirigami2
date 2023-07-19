@@ -16,12 +16,20 @@ void SizeGroup::appendItem(QQmlListProperty<QQuickItem> *prop, QQuickItem *value
     pThis->connectItem(value);
 }
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 int SizeGroup::itemCount(QQmlListProperty<QQuickItem> *prop)
+#else
+qsizetype SizeGroup::itemCount(QQmlListProperty<QQuickItem> *prop)
+#endif
 {
     return pThis->m_items.count();
 }
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 QQuickItem *SizeGroup::itemAt(QQmlListProperty<QQuickItem> *prop, int index)
+#else
+QQuickItem *SizeGroup::itemAt(QQmlListProperty<QQuickItem> *prop, qsizetype index)
+#endif
 {
     return pThis->m_items[index];
 }

@@ -16,7 +16,11 @@ ShadowedBorderTextureMaterial::ShadowedBorderTextureMaterial()
     setFlag(QSGMaterial::Blending, true);
 }
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 QSGMaterialShader *ShadowedBorderTextureMaterial::createShader() const
+#else
+QSGMaterialShader *ShadowedBorderTextureMaterial::createShader(QSGRendererInterface::RenderMode) const
+#endif
 {
     return new ShadowedBorderTextureShader{shaderType};
 }
@@ -48,6 +52,7 @@ ShadowedBorderTextureShader::ShadowedBorderTextureShader(ShadowedRectangleMateri
     setShader(shaderType, QStringLiteral("shadowedbordertexture"));
 }
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 void ShadowedBorderTextureShader::initialize()
 {
     ShadowedBorderRectangleShader::initialize();
@@ -63,3 +68,17 @@ void ShadowedBorderTextureShader::updateState(const QSGMaterialShader::RenderSta
         texture->bind();
     }
 }
+#else
+void ShadowedBorderTextureShader::updateSampledImage(QSGMaterialShader::RenderState &state,
+                                                     int binding,
+                                                     QSGTexture **texture,
+                                                     QSGMaterial *newMaterial,
+                                                     QSGMaterial *oldMaterial)
+{
+    Q_UNUSED(state);
+    Q_UNUSED(oldMaterial);
+    if (binding == 1) {
+        *texture = static_cast<ShadowedBorderTextureMaterial *>(newMaterial)->textureSource;
+    }
+}
+#endif

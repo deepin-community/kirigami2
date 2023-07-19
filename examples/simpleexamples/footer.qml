@@ -4,18 +4,18 @@
  *  SPDX-License-Identifier: LGPL-2.0-or-later
  */
 
-import QtQuick 2.1
-import QtQuick.Layouts 1.2
-import QtQuick.Controls 2.0 as Controls
-import org.kde.kirigami 2.4 as Kirigami
+import QtQuick 2.15
+import QtQuick.Layouts 1.15
+import QtQuick.Controls 2.15 as QQC2
+import org.kde.kirigami 2.20 as Kirigami
 
 Kirigami.ApplicationWindow {
     id: root
 
-    footer: Controls.ToolBar {
+    footer: QQC2.ToolBar {
         //height: Kirigami.Units.gridUnit * 3
         RowLayout {
-            Controls.ToolButton {
+            QQC2.ToolButton {
                 text: "text"
             }
         }

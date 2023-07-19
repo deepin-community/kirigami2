@@ -43,7 +43,7 @@ class MnemonicAttached : public QObject
 
     /**
      * The label with an "&" mnemonic in the place which will have the shortcut
-     * assigned, regardless the & wasassigned by the user or automatically generated.
+     * assigned, regardless of whether the & was assigned by the user or automatically generated.
      */
     Q_PROPERTY(QString mnemonicLabel READ mnemonicLabel NOTIFY mnemonicLabelChanged)
 
@@ -54,7 +54,7 @@ class MnemonicAttached : public QObject
     Q_PROPERTY(bool enabled READ enabled WRITE setEnabled NOTIFY enabledChanged)
 
     /**
-     * the type of control this mnemonic is attached: different types of controls have different importance and priority for shortcut assignment.
+     * The type of control this mnemonic is attached: different types of controls have different importance and priority for shortcut assignment.
      * @see ControlType
      */
     Q_PROPERTY(MnemonicAttached::ControlType controlType READ controlType WRITE setControlType NOTIFY controlTypeChanged)

@@ -8,12 +8,11 @@
 import QtQuick 2.12
 import QtQuick.Layouts 1.2
 import QtQuick.Window 2.2
-import QtQuick.Controls 2.15
-import org.kde.kirigami 2.14
-import QtGraphicalEffects 1.0
+import QtQuick.Controls 2.15 as QQC2
+import org.kde.kirigami 2.14 as Kirigami
 import QtQuick.Templates 2.0 as T2
-import "private"
-import "../private"
+import "private" as P
+import "../private" as PP
 
 /**
  * @brief An overlay sheet that covers the current Page content.
@@ -25,19 +24,19 @@ import "../private"
  * are taller than the screen space.
  *
  * @since 2.0
- * @inherit QtQml.QtObject
+ * @inherit QtQuick.QtObject
  */
 QtObject {
     id: root
 
-    Theme.colorSet: Theme.View
-    Theme.inherit: false
+    Kirigami.Theme.colorSet: Kirigami.Theme.View
+    Kirigami.Theme.inherit: false
 
     /**
-     * This property holds the visual content item.
+     * @brief This property holds the visual content item.
+     * @note The content item is automatically resized to fill the
+     * sheet's view area.
      *
-     * Note: The content item is automatically resized inside the
-     * padding of the control.
      * Conversely, the Sheet will be sized based on the size hints
      * of the contentItem, so if you need a custom size sheet,
      * redefine contentWidth and contentHeight of your contentItem
@@ -45,90 +44,109 @@ QtObject {
     default property Item contentItem
 
     /**
-     * If true the sheet is open showing the contents of the OverlaySheet
-     * component.
+     * @brief This property tells whether the sheet is open and displaying its contents.
      */
     property bool sheetOpen
 
     /**
-     * This property holds the left padding. Unless explicitly set,
-     * the value is equal to Units::largeSpacing
+     * @brief This property holds the left padding.
+     *
+     * default: ``Kirigami.Units.largeSpacing``
      */
-    property int leftPadding: Units.largeSpacing
+    property int leftPadding: Kirigami.Units.largeSpacing
 
     /**
-     * This property holds the top padding. Unless explicitly set,
-     * the value is equal to Units::largeSpacing
+     * @brief This property holds the top padding.
+     *
+     * default: ``Kirigami.Units.largeSpacing``
      */
-    property int topPadding: Units.largeSpacing
+    property int topPadding: Kirigami.Units.largeSpacing
 
     /**
-     * This property holds the right padding. Unless explicitly set,
-     * the value is equal to Units::largeSpacing
+     * @brief This property holds the right padding.
+     *
+     * default: ``Kirigami.Units.largeSpacing``
      */
-    property int rightPadding: Units.largeSpacing
+    property int rightPadding: Kirigami.Units.largeSpacing
 
     /**
-     * This property holds the bottom padding. Unless explicitly set,
-     * the value is equal to Units::largeSpacing
+     * @brief This property holds the bottom padding.
+     *
+     * default: ``Kirigami.Units.largeSpacing``
      */
-    property int bottomPadding: Units.largeSpacing
+    property int bottomPadding: Kirigami.Units.largeSpacing
 
     /**
-     * This property holds the left inset for the background. The
-     * inset gets applied to both the content *and* the background.
+     * @brief This property holds the left inset for the background.
+     *
+     * The inset gets applied to both the content and the background.
+     *
+     * default: ``0``
+     *
      * @since 2.12
      */
     property real leftInset: 0
 
     /**
-     * This property holds the top inset for the background. The
-     * inset gets applied to both the content *and* the background.
+     * @brief This property holds the top inset for the background.
+     *
+     * The inset gets applied to both the content and the background.
+     *
+     * default: ``0``
+     *
      * @since 2.12
      */
     property real topInset: 0
 
     /**
-     * This property holds the right inset for the background. The
-     * inset gets applied to both the content *and* the background.
+     * @brief This property holds the right inset for the background.
+     *
+     * The inset gets applied to both the content and the background.
+     *
+     * default: ``0``
+     *
      * @since 2.12
      */
     property real rightInset: 0
 
     /**
-     * This property holds the bottom inset for the background. The
-     * inset gets applied to both the content *and* the background.
+     * @brief This property holds the bottom inset for the background.
+     *
+     * The inset gets applied to both the content and the background.
+     *
+     * default: ``0``
+     *
      * @since 2.12
      */
     property real bottomInset: 0
 
     /**
-     * An optional item which will be used as the sheet's header,
-     * always kept on screen.
+     * @brief This property holds an optional item which will be used as the sheet's header,
+     * and will always be displayed.
      * @since 5.43
      */
-    property Item header: Heading {
-        level: 1
+    property Item header: Kirigami.Heading {
+        level: 2
         text: root.title
         elide: Text.ElideRight
 
         // use tooltip for long text that is elided
-        ToolTip.visible: truncated && titleHoverHandler.hovered
-        ToolTip.text: root.title
+        QQC2.ToolTip.visible: truncated && titleHoverHandler.hovered
+        QQC2.ToolTip.text: root.title
         HoverHandler {
             id: titleHoverHandler
         }
     }
 
     /**
-     * An optional item which will be used as the sheet's footer,
+     * @brief An optional item which will be used as the sheet's footer,
      * always kept on screen.
      * @since 5.43
      */
     property Item footer
 
     /**
-     * This property holds the background item.
+     * @brief This property holds the background item.
      *
      * @note If the background item has no explicit size specified,
      * it automatically follows the control's size. In most cases,
@@ -137,17 +155,17 @@ QtObject {
     property Item background
 
     /**
-     * Whether to show the close button in the top-right corner.
-     * By default only show on desktop.
+     * @brief This property sets the visibility of the close button in the top-right corner.
+     *
+     * default: `Only shown in desktop mode`
+     *
      * @since 5.44
      */
-    property bool showCloseButton: !Settings.isMobile
+    property bool showCloseButton: !Kirigami.Settings.isMobile
 
     /**
-     * title: string
-     * This property holds the sheet title.
-     *
-     * Note: If the header property is set, this will have no effect as the heading will be replaced by the header.
+     * @brief This property holds the sheet's title.
+     * @note If the header property is set, this will have no effect as the heading will be replaced by the header.
      * @since 5.84
      */
     property string title
@@ -155,7 +173,7 @@ QtObject {
     property Item parent
 
     /**
-     * Open the overlay sheet.
+     * @brief This function opens the overlay sheet.
      */
     function open() {
         openAnimation.running = true;
@@ -166,7 +184,7 @@ QtObject {
     }
 
     /**
-     * Close the overlay sheet.
+     * @brief This function closes the overlay sheet.
      */
     function close() {
         if (root.sheetOpen) {
@@ -184,11 +202,15 @@ QtObject {
         if (contentItem instanceof Flickable) {
             scrollView.flickableItem = contentItem;
             contentItem.parent = scrollView;
-            contentItem.anchors.fill = scrollView;
             scrollView.contentItem = contentItem;
+            scrollView.viewContent = contentItem.contentItem;
         } else {
             contentItem.parent = contentItemParent;
-            scrollView.contentItem = flickableContents;
+            flickableContents.parent = scrollView.flickableItem.contentItem;
+            flickableContents.anchors.top = scrollView.flickableItem.contentItem.top;
+            flickableContents.anchors.left = scrollView.flickableItem.contentItem.left;
+            flickableContents.anchors.right = scrollView.flickableItem.contentItem.right;
+            scrollView.viewContent = flickableContents;
             contentItem.anchors.left = contentItemParent.left;
             contentItem.anchors.right = contentItemParent.right;
         }
@@ -211,23 +233,27 @@ QtObject {
     }
 
     Component.onCompleted: {
-        if (!root.parent && typeof applicationWindow !== "undefined") {
-            root.parent = applicationWindow().overlay
-        }
-        headerItem.initHeader();
+        // ScrollablePage must do things related to parenting of OverlaySheets in its conCompleted, so this must execute later
+        // TODO KF6: port the root object to Popup template?
+        Qt.callLater(() => {
+            if (!root.parent && typeof applicationWindow !== "undefined") {
+                root.parent = applicationWindow().overlay
+            }
+            headerItem.initHeader();
+        });
     }
 
     readonly property Item rootItem: FocusScope {
         id: mainItem
-        Theme.colorSet: root.Theme.colorSet
-        Theme.inherit: root.Theme.inherit
+        Kirigami.Theme.colorSet: root.Kirigami.Theme.colorSet
+        Kirigami.Theme.inherit: root.Kirigami.Theme.inherit
         z: 101
-        //we want to be over any possible OverlayDrawers, including handles
+        // we want to be over any possible OverlayDrawers, including handles
         parent: {
-            if (root.parent && root.parent.ColumnView.view && (root.parent.ColumnView.view == root.parent || root.parent.ColumnView.view == root.parent.parent)) {
-                return root.parent.ColumnView.view.parent;
+            if (root.parent && root.parent.Kirigami.ColumnView.view && (root.parent.Kirigami.ColumnView.view === root.parent || root.parent.Kirigami.ColumnView.view === root.parent.parent)) {
+                return root.parent.Kirigami.ColumnView.view.parent;
             } else if (root.parent && root.parent.overlay) {
-                root.parent.overlay;
+                return root.parent.overlay;
             } else {
                 return root.parent;
             }
@@ -244,7 +270,7 @@ QtObject {
             acceptedDevices: PointerDevice.Mouse
         }
 
-        Keys.onEscapePressed: {
+        Keys.onEscapePressed: event => {
             if (root.sheetOpen) {
                 root.close();
             } else {
@@ -254,22 +280,20 @@ QtObject {
 
         readonly property int contentItemPreferredWidth: root.contentItem.Layout.preferredWidth > 0 ? root.contentItem.Layout.preferredWidth : root.contentItem.implicitWidth
 
-        readonly property int absoluteContentItemMaximumWidth: Math.round(width - Units.largeSpacing * 2)
-        readonly property int contentItemMaximumWidth: root.contentItem.Layout.maximumWidth > 0 ? Math.min(root.contentItem.Layout.maximumWidth, absoluteContentItemMaximumWidth) : width > Units.gridUnit * 30 ? width * 0.95 : absoluteContentItemMaximumWidth
+        readonly property int absoluteContentItemMaximumWidth: width <= 0 ? contentItemPreferredWidth : Math.round(width - Kirigami.Units.largeSpacing * 2)
+        readonly property int contentItemMaximumWidth: root.contentItem.Layout.maximumWidth > 0 ? Math.min(root.contentItem.Layout.maximumWidth, absoluteContentItemMaximumWidth) : width > Kirigami.Units.gridUnit * 30 ? width * 0.95 : absoluteContentItemMaximumWidth
 
         onHeightChanged: {
-            var focusItem;
-
-            focusItem = Window.activeFocusItem;
+            const focusItem = Window.activeFocusItem;
 
             if (!focusItem) {
                 return;
             }
 
-            //NOTE: there is no function to know if an item is descended from another,
-            //so we have to walk the parent hierarchy by hand
-            var isDescendent = false;
-            var candidate = focusItem.parent;
+            // NOTE: there is no function to know if an item is descended from another,
+            // so we have to walk the parent hierarchy by hand
+            let isDescendent = false;
+            let candidate = focusItem.parent;
             while (candidate) {
                 if (candidate === root) {
                     isDescendent = true;
@@ -281,15 +305,15 @@ QtObject {
                 return;
             }
 
-            var cursorY = 0;
+            let cursorY = 0;
             if (focusItem.cursorPosition !== undefined) {
                 cursorY = focusItem.positionToRectangle(focusItem.cursorPosition).y;
             }
 
 
-            var pos = focusItem.mapToItem(flickableContents, 0, cursorY - Units.gridUnit*3);
-            //focused item already visible? add some margin for the space of the action buttons
-            if (pos.y >= scrollView.flickableItem.contentY && pos.y <= scrollView.flickableItem.contentY + scrollView.flickableItem.height - Units.gridUnit * 8) {
+            const pos = focusItem.mapToItem(flickableContents, 0, cursorY - Units.gridUnit*3);
+            // focused item already visible? add some margin for the space of the action buttons
+            if (pos.y >= scrollView.flickableItem.contentY && pos.y <= scrollView.flickableItem.contentY + scrollView.flickableItem.height - Kirigami.Units.gridUnit * 8) {
                 return;
             }
             scrollView.flickableItem.contentY = pos.y;
@@ -297,20 +321,20 @@ QtObject {
 
         ParallelAnimation {
             id: openAnimation
-            property int margins: Units.gridUnit * 5
+            property int margins: Kirigami.Units.gridUnit * 5
             NumberAnimation {
                 target: outerFlickable
                 properties: "contentY"
                 from: -outerFlickable.height
                 to: outerFlickable.openPosition
-                duration: Units.longDuration
+                duration: Kirigami.Units.longDuration
                 easing.type: Easing.OutQuad
             }
             OpacityAnimator {
                 target: mainItem
                 from: 0
                 to: 1
-                duration: Units.longDuration
+                duration: Kirigami.Units.longDuration
                 easing.type: Easing.InQuad
             }
         }
@@ -323,7 +347,7 @@ QtObject {
             to: outerFlickable.visibleArea.yPosition < (1 - outerFlickable.visibleArea.heightRatio)/2 || scrollView.flickableItem.contentHeight < outerFlickable.height
                 ? outerFlickable.openPosition
                 : outerFlickable.contentHeight - outerFlickable.height + outerFlickable.topEmptyArea + headerItem.height + footerItem.height
-            duration: Units.longDuration
+            duration: Kirigami.Units.longDuration
             easing.type: Easing.OutQuad
         }
 
@@ -335,14 +359,14 @@ QtObject {
                     properties: "contentY"
                     from: outerFlickable.contentY + (contentLayout.initialHeight - contentLayout.height)
                     to: outerFlickable.visibleArea.yPosition < (1 - outerFlickable.visibleArea.heightRatio)/2 ? -mainItem.height : outerFlickable.contentHeight
-                    duration: Units.longDuration
+                    duration: Kirigami.Units.longDuration
                     easing.type: Easing.InQuad
                 }
                 OpacityAnimator {
                     target: mainItem
                     from: 1
                     to: 0
-                    duration: Units.longDuration
+                    duration: Kirigami.Units.longDuration
                     easing.type: Easing.InQuad
                 }
             }
@@ -367,15 +391,15 @@ QtObject {
             drag.filterChildren: true
             hoverEnabled: true
 
-            onPressed: {
-                let pos = mapToItem(contentLayout, mouse.x, mouse.y);
+            onPressed: mouse => {
+                const pos = mapToItem(contentLayout, mouse.x, mouse.y);
                 if (contentLayout.contains(pos) && mouseHover.hovered) { // only on mouse event, not touch
                     // disable dragging the sheet with a mouse
                     outerFlickable.interactive = false
                 }
             }
-            onReleased: {
-                let pos = mapToItem(contentLayout, mouse.x, mouse.y);
+            onReleased: mouse => {
+                const pos = mapToItem(contentLayout, mouse.x, mouse.y);
                 if (!contentLayout.contains(pos)) {
                     root.close();
                 }
@@ -389,11 +413,13 @@ QtObject {
 
                 readonly property real listHeaderHeight: scrollView.flickableItem ? -scrollView.flickableItem.originY : 0
 
-                y: (scrollView.contentItem != flickableContents ? -scrollView.flickableItem.contentY - listHeaderHeight  - (headerItem.visible ? headerItem.height : 0): 0)
+                y: (scrollView.contentItem !== flickableContents ? -scrollView.flickableItem.contentY - listHeaderHeight  - (headerItem.visible ? headerItem.height : 0): 0)
 
-                width: mainItem.contentItemPreferredWidth <= 0 ? mainItem.width : (mainItem.contentItemMaximumWidth > 0 ? Math.min( mainItem.contentItemMaximumWidth, Math.max( mainItem.width/2, mainItem.contentItemPreferredWidth ) ) : Math.max( mainItem.width / 2, mainItem.contentItemPreferredWidth ) )
+                width: mainItem.contentItemPreferredWidth <= 0 ? mainItem.width : (mainItem.contentItemMaximumWidth > 0 ? Math.min( mainItem.contentItemMaximumWidth, Math.max( mainItem.width/2, mainItem.contentItemPreferredWidth ) ) : Math.max( mainItem.width / 2, mainItem.contentItemPreferredWidth ) ) + leftPadding + rightPadding
 
-                implicitHeight: scrollView.contentItem == flickableContents ? root.contentItem.height + topPadding + bottomPadding : 0
+
+                implicitHeight: scrollView.viewContent === flickableContents ? root.contentItem.height + topPadding + bottomPadding : 0
+
                 Connections {
                     target: enabled ? flickableContents.Window.activeFocusItem : null
                     enabled: flickableContents.focus && flickableContents.Window.activeFocusItem && flickableContents.Window.activeFocusItem.hasOwnProperty("text")
@@ -446,8 +472,8 @@ QtObject {
                 // +1: we need the flickable to be always interactive
                 contentHeight: Math.max(height+1, scrollView.animatedContentHeight + topEmptyArea)
 
-                //readonly property int topEmptyArea: Math.max(height-scrollView.animatedContentHeight, Units.gridUnit * 3)
-                readonly property int topEmptyArea: Math.max(height-scrollView.animatedContentHeight, Units.gridUnit * 3)
+                // readonly property int topEmptyArea: Math.max(height-scrollView.animatedContentHeight, Kirigami.Units.gridUnit * 3)
+                readonly property int topEmptyArea: Math.max(height-scrollView.animatedContentHeight, Kirigami.Units.gridUnit * 3)
 
                 readonly property real openPosition: Math.max(0, outerFlickable.height - outerFlickable.contentHeight + headerItem.height + footerItem.height) + height/2 - contentLayout.height/2;
 
@@ -460,32 +486,39 @@ QtObject {
                     }
                 }
 
-                property int oldContentY: NaN
-                property int oldContentHeight: 0
+                property real oldContentY: NaN
+                property real oldContentHeight: 0
                 property bool lastMovementWasDown: false
                 property real startDraggingPos
                 property bool layoutMovingGuard: false
-                WheelHandler {
+                Kirigami.WheelHandler {
                     target: outerFlickable
                     scrollFlickableTarget: false
                 }
 
                 function adjustPosition() {
                     if(layoutMovingGuard) return;
-                    openAnimation.running = false;
-                    resetAnimation.running = false;
-                    contentY = openPosition;
+
+                    if (openAnimation.running) {
+                        openAnimation.running = false;
+                        open()
+                    } else {
+                        resetAnimation.running = false;
+                        contentY = openPosition;
+                    }
                 }
 
                 // disable dragging the sheet with a mouse on header bar
                 MouseArea {
                     anchors.fill: parent
-                    onPressed: {
+                    onPressed: mouse => {
                         if (mouseHover.hovered) { // only on mouse event, not touch
                             outerFlickable.interactive = false
                         }
                     }
-                    onReleased: outerFlickable.interactive = true
+                    onReleased: mouse => {
+                        outerFlickable.interactive = true
+                    }
                 }
 
                 onContentYChanged: {
@@ -493,15 +526,15 @@ QtObject {
                         return;
                     }
 
-                    let startPos = -scrollView.flickableItem.topMargin - flickableContents.listHeaderHeight;
-                    let pos = contentY - topEmptyArea - flickableContents.listHeaderHeight;
-                    let endPos = scrollView.animatedContentHeight - scrollView.flickableItem.height + scrollView.flickableItem.bottomMargin - flickableContents.listHeaderHeight;
+                    const startPos = -scrollView.flickableItem.topMargin - flickableContents.listHeaderHeight;
+                    const pos = contentY - topEmptyArea - flickableContents.listHeaderHeight;
+                    const endPos = scrollView.animatedContentHeight - scrollView.flickableItem.height + scrollView.flickableItem.bottomMargin - flickableContents.listHeaderHeight;
 
                     layoutMovingGuard = true;
                     if (endPos - pos > 0) {
                         contentLayout.y = Math.round(Math.max(root.topInset, scrollView.flickableItem.topMargin - pos - flickableContents.listHeaderHeight));
                     } else if (scrollView.flickableItem.topMargin - pos < 0) {
-                    contentLayout.y = Math.round(endPos - pos + root.topInset);
+                        contentLayout.y = Math.round(endPos - pos + root.topInset);
                     }
                     layoutMovingGuard = false;
 
@@ -531,16 +564,16 @@ QtObject {
 
                     // close
                     if (scrollView.flickableItem.atYBeginning) {
-                        if (startDraggingPos - contentY > Units.gridUnit * 4 &&
-                            contentY < -Units.gridUnit * 4 &&
+                        if (startDraggingPos - contentY > Kirigami.Units.gridUnit * 4 &&
+                            contentY < -Kirigami.Units.gridUnit * 4 &&
                             lastMovementWasDown) {
                             shouldClose = true;
                         }
                     }
 
                     if (scrollView.flickableItem.atYEnd) {
-                        if (contentY - startDraggingPos > Units.gridUnit * 4 &&
-                            contentY > contentHeight - height + Units.gridUnit * 4  &&
+                        if (contentY - startDraggingPos > Kirigami.Units.gridUnit * 4 &&
+                            contentY > contentHeight - height + Kirigami.Units.gridUnit * 4  &&
                             !lastMovementWasDown) {
                             shouldClose = true;
                         }
@@ -573,13 +606,13 @@ QtObject {
                     // Its events should be filtered but not scrolled
                     parent: outerFlickable
                     anchors.horizontalCenter: parent.horizontalCenter
-                    width: mainItem.contentItemPreferredWidth <= 0 ? mainItem.width : (mainItem.contentItemMaximumWidth > 0 ? Math.min( mainItem.contentItemMaximumWidth, Math.max( mainItem.width/2, mainItem.contentItemPreferredWidth ) ) : Math.max( mainItem.width / 2, mainItem.contentItemPreferredWidth ) ) - root.leftInset - root.rightInset
+                    width: mainItem.contentItemPreferredWidth <= 0 ? mainItem.width : (mainItem.contentItemMaximumWidth > 0 ? Math.min( mainItem.contentItemMaximumWidth, Math.max( mainItem.width/2, mainItem.contentItemPreferredWidth ) ) : Math.max( mainItem.width / 2, mainItem.contentItemPreferredWidth ) ) - root.leftInset - root.rightInset + root.leftPadding + root.rightPadding
                     height: Math.min(implicitHeight, parent.height) - root.topInset - root.bottomInset
                     property real initialHeight
 
                     Behavior on height {
                         NumberAnimation {
-                            duration: Units.shortDuration
+                            duration: Kirigami.Units.shortDuration
                             easing.type: Easing.InOutCubic
                         }
                     }
@@ -588,26 +621,26 @@ QtObject {
                     // we're using a ShadowedRectangle instead of a regular
                     // rectangle because it allows fine-grained control over which
                     // corners to round, which we need here
-                    ShadowedRectangle {
+                    Kirigami.ShadowedRectangle {
                         id: headerItem
                         Layout.fillWidth: true
                         Layout.alignment: Qt.AlignTop
                         //Layout.margins: 1
                         visible: root.header || root.showCloseButton
-                        implicitHeight: Math.max(headerParent.implicitHeight, closeIcon.height) + Units.smallSpacing * 2
+                        implicitHeight: Math.max(headerParent.implicitHeight, closeIcon.height) + Kirigami.Units.smallSpacing * 2
                         z: 2
-                        corners.topLeftRadius: Units.smallSpacing
-                        corners.topRightRadius: Units.smallSpacing
-                        Theme.colorSet: Theme.Header
-                        Theme.inherit: false
-                        color: Theme.backgroundColor
+                        corners.topLeftRadius: Kirigami.Units.smallSpacing
+                        corners.topRightRadius: Kirigami.Units.smallSpacing
+                        Kirigami.Theme.colorSet: Kirigami.Theme.Header
+                        Kirigami.Theme.inherit: false
+                        color: Kirigami.Theme.backgroundColor
 
                         function initHeader() {
                             if (header) {
                                 header.parent = headerParent;
                                 header.anchors.fill = headerParent;
 
-                                //TODO: special case for actual ListViews
+                                // TODO: special case for actual ListViews
                             }
                         }
 
@@ -616,21 +649,21 @@ QtObject {
                             implicitHeight: header ? header.implicitHeight : 0
                             anchors {
                                 fill: parent
-                                leftMargin: Units.largeSpacing
-                                margins: Units.smallSpacing
-                                rightMargin: (root.showCloseButton ? closeIcon.width : 0) + Units.smallSpacing
+                                leftMargin: Kirigami.Units.largeSpacing
+                                margins: Kirigami.Units.smallSpacing
+                                rightMargin: (root.showCloseButton ? closeIcon.width : 0) + Kirigami.Units.smallSpacing
                             }
                         }
-                        Icon {
+                        Kirigami.Icon {
                             id: closeIcon
 
-                            readonly property bool tallHeader: headerItem.height > (Units.iconSizes.smallMedium + Units.largeSpacing + Units.largeSpacing)
+                            readonly property bool tallHeader: headerItem.height > (Kirigami.Units.iconSizes.smallMedium + Kirigami.Units.largeSpacing + Kirigami.Units.largeSpacing)
 
                             anchors {
                                 right: parent.right
-                                rightMargin: Units.largeSpacing
+                                rightMargin: Kirigami.Units.largeSpacing
                                 verticalCenter: headerItem.verticalCenter
-                                margins: Units.smallSpacing
+                                margins: Kirigami.Units.smallSpacing
                             }
 
                             // Apply the changes to the anchors imperatively, to first disable an anchor point
@@ -639,7 +672,7 @@ QtObject {
                                 if (tallHeader) {
                                     // We want to position the close button in the top-right corner if the header is very tall
                                     anchors.verticalCenter = undefined
-                                    anchors.topMargin = Units.largeSpacing
+                                    anchors.topMargin = Kirigami.Units.largeSpacing
                                     anchors.top = headerItem.top
                                 } else {
                                     // but we want to vertically center it in a short header
@@ -652,7 +685,7 @@ QtObject {
 
                             z: 3
                             visible: root.showCloseButton
-                            width: Units.iconSizes.smallMedium
+                            width: Kirigami.Units.iconSizes.smallMedium
                             height: width
                             source: closeMouseArea.containsMouse ? "window-close" : "window-close-symbolic"
                             active: closeMouseArea.containsMouse
@@ -660,10 +693,10 @@ QtObject {
                                 id: closeMouseArea
                                 hoverEnabled: true
                                 anchors.fill: parent
-                                onClicked: root.close();
+                                onClicked: mouse => root.close();
                             }
                         }
-                        Separator {
+                        Kirigami.Separator {
                             anchors {
                                 right: parent.right
                                 left: parent.left
@@ -672,15 +705,17 @@ QtObject {
                         }
                     }
 
-                    ScrollView {
+                    QQC2.ScrollView {
                         id: scrollView
 
-                        //Don't do the automatic interactive enable/disable
-                        canFlickWithMouse: true
-                        property real animatedContentHeight: contentItem ? flickableItem.contentHeight : 0
+                        // Don't do the automatic interactive enable/disable
+                        // canFlickWithMouse: true
+                        property Item viewContent
+                        property real animatedContentHeight: flickableItem.contentHeight
                         property bool userInteracting: false
                         Layout.fillWidth: true
                         Layout.fillHeight: true
+                        property alias flickableItem: scrollView.contentItem
 
                         focus: false
 
@@ -689,9 +724,12 @@ QtObject {
 
                         Layout.alignment: Qt.AlignTop
 
+                        // HACK: Hide unnecessary horizontal scrollbar (https://bugreports.qt.io/browse/QTBUG-83890)
+                        QQC2.ScrollBar.horizontal.policy: QQC2.ScrollBar.AlwaysOff
+
                         Behavior on animatedContentHeight {
                             NumberAnimation {
-                                duration: Units.shortDuration
+                                duration: Kirigami.Units.shortDuration
                                 easing.type: Easing.InOutCubic
                             }
                         }
@@ -709,16 +747,15 @@ QtObject {
                             }
                             scrollView.userInteracting = true;
 
-                            let diff = scrollView.flickableItem.contentY - oldContentY
+                            const diff = scrollView.flickableItem.contentY - oldContentY
 
                             outerFlickable.contentY = outerFlickable.contentY + diff;
 
                             if (diff > 0) {
                                 contentLayout.y = Math.max(root.topInset,  contentLayout.y - diff);
                             } else if (scrollView.flickableItem.contentY < outerFlickable.topEmptyArea + headerItem.height) {
-                                contentLayout.y = Math.min(outerFlickable.topEmptyArea,  contentLayout.y + (contentLayout.y - diff)) + root.topInset;
+                                contentLayout.y = Math.min(outerFlickable.topEmptyArea + root.topInset,  contentLayout.y - diff);
                             }
-
                             oldContentY = scrollView.flickableItem.contentY;
                             scrollView.userInteracting = false;
                         }
@@ -735,31 +772,33 @@ QtObject {
                 // we're using a ShadowedRectangle instead of a regular
                 // rectangle because it allows fine-grained control over which
                 // corners to round, which we need here
-                ShadowedRectangle {
+                Kirigami.ShadowedRectangle {
                     id: footerItem
-                    width: contentLayout.width - 2
-                    corners.bottomLeftRadius: Units.smallSpacing
-                    corners.bottomRightRadius: Units.smallSpacing
+                    width: contentLayout.width
+                    corners.bottomLeftRadius: Kirigami.Units.smallSpacing
+                    corners.bottomRightRadius: Kirigami.Units.smallSpacing
                     parent: outerFlickable
-                    x: contentLayout.x + 1
-                    y: Math.min(parent.height, contentLayout.y + contentLayout.height  -1) - height
+                    x: contentLayout.x
+                    y: Math.min(parent.height, contentLayout.y + contentLayout.height) - height
                     visible: root.footer
-                    implicitHeight: footerParent.implicitHeight + Units.smallSpacing * 2 + extraMargin
-                    Theme.colorSet: Theme.Window
-                    Theme.inherit: false
-                    color: Theme.backgroundColor
+                    implicitHeight: footerParent.implicitHeight + Kirigami.Units.smallSpacing * 2 + extraMargin
+                    Kirigami.Theme.colorSet: Kirigami.Theme.Window
+                    Kirigami.Theme.inherit: false
+                    color: Kirigami.Theme.backgroundColor
 
-                    //Show an extra margin when:
-                    //* the application is in mobile mode (no toolbarapplicationheader)
-                    //* the bottom screen controls are visible
-                    //* the sheet is displayed *under* the controls
+                    // Show an extra margin when:
+                    // * the application is in mobile mode
+                    // * it doesn't use toolbarapplicationheader
+                    // * the bottom screen controls are visible
+                    // * the sheet is displayed *under* the controls
                     property int extraMargin: (!root.parent ||
+                        !Kirigami.Settings.isMobile ||
                         typeof applicationWindow === "undefined" ||
                         (root.parent === applicationWindow().overlay) ||
                         !applicationWindow().controlsVisible ||
-                        (applicationWindow().pageStack && applicationWindow().pageStack.globalToolBar && applicationWindow().pageStack.globalToolBar.actualStyle === ApplicationHeaderStyle.ToolBar) ||
+                        (applicationWindow().pageStack && applicationWindow().pageStack.globalToolBar && applicationWindow().pageStack.globalToolBar.actualStyle === Kirigami.ApplicationHeaderStyle.ToolBar) ||
                         (applicationWindow().header && applicationWindow().header.toString().indexOf("ToolBarApplicationHeader") === 0))
-                            ? 0 : Units.gridUnit * 3
+                            ? 0 : Kirigami.Units.gridUnit * 3
 
                     z: 2
                     Item {
@@ -769,17 +808,15 @@ QtObject {
                             top: parent.top
                             left: parent.left
                             right: parent.right
-                            margins: Units.smallSpacing
+                            margins: Kirigami.Units.smallSpacing
                         }
                     }
 
-                    Separator {
+                    Kirigami.Separator {
                         anchors {
                             right: parent.right
                             left: parent.left
                             bottom: parent.top
-                            leftMargin: -1
-                            rightMargin: -1
                         }
                     }
                 }

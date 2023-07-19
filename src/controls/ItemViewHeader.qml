@@ -6,9 +6,9 @@
 
 import QtQuick 2.5
 import QtQuick.Templates 2.0 as T2
-import QtGraphicalEffects 1.0
+import QtGraphicalEffects 1.0 as GE
 import org.kde.kirigami 2.4 as Kirigami
-import "private"
+import "private" as P
 
 /**
  * An item that can be used as an header for a ListView.
@@ -18,6 +18,9 @@ import "private"
  * It provides some default content: a title and an optional background image
  * @since 2.1
  * @inherit org::kde::kirigami::AbstractItemViewHeader
+ * @deprecated since 5.97; Don't use ItemViewHeader in your views anymore.
+ *
+ * TODO KF6 remove
  */
 Kirigami.AbstractItemViewHeader {
     id: root
@@ -25,6 +28,8 @@ Kirigami.AbstractItemViewHeader {
     property alias color: heading.color
 
     property alias backgroundImage: image
+
+    Component.onCompleted: console.warn( "ItemViewHeader is deprecated (since 5.97): No replacemant is available.", (new Error).stack)
 
     maximumHeight: (backgroundImage.hasImage ? 10 : 6) * Kirigami.Units.gridUnit - (applicationWindow().header ? applicationWindow().header.height : 0) - bottomPadding
     bottomPadding: Kirigami.Units.smallSpacing
@@ -40,18 +45,18 @@ Kirigami.AbstractItemViewHeader {
             fillMode: Image.PreserveAspectCrop
             asynchronous: true
         }
-        EdgeShadow {
-            edge: root.view.headerPositioning == ListView.InlineHeader ? Qt.BottomEdge : Qt.TopEdge
+        P.EdgeShadow {
+            edge: root.view.headerPositioning === ListView.InlineHeader ? Qt.BottomEdge : Qt.TopEdge
             anchors {
                 right: parent.right
                 left: parent.left
-                top: root.view.headerPositioning == ListView.InlineHeader ? undefined : parent.bottom
-                bottom: root.view.headerPositioning == ListView.InlineHeader ? parent.top : undefined
+                top: root.view.headerPositioning === ListView.InlineHeader ? undefined : parent.bottom
+                bottom: root.view.headerPositioning === ListView.InlineHeader ? parent.top : undefined
             }
         }
 
         readonly property Page page: {
-            var obj = root.view;
+            let obj = root.view;
             while(obj && !obj.hasOwnProperty("title") && !obj.hasOwnProperty("isCurrentPage")) {
                 obj = obj.parent
             }
@@ -90,7 +95,7 @@ Kirigami.AbstractItemViewHeader {
             elide: Text.ElideRight
 
             layer.enabled: root.backgroundImage.hasImage
-            layer.effect: DropShadow {
+            layer.effect: GE.DropShadow {
                 horizontalOffset: 0
                 verticalOffset: 2
                 radius: Kirigami.Units.smallSpacing*2
@@ -100,4 +105,3 @@ Kirigami.AbstractItemViewHeader {
         }
     }
 }
-

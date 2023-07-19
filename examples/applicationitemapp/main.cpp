@@ -3,17 +3,24 @@
  *
  *  SPDX-License-Identifier: LGPL-2.0-or-later
  */
-
-#include <QApplication>
 #include <QQuickView>
 #include <QUrl>
 #include <QtQml>
+#ifdef Q_OS_ANDROID
+#include <QGuiApplication>
+#else
+#include <QApplication>
+#endif
 
 Q_DECL_EXPORT int main(int argc, char *argv[])
 {
     QGuiApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 
+#ifdef Q_OS_ANDROID
+    QGuiApplication app(argc, argv);
+#else
     QApplication app(argc, argv);
+#endif
 
     QQuickView view;
     view.setResizeMode(QQuickView::SizeRootObjectToView);

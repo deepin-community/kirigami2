@@ -22,6 +22,6 @@ add_executable(minimal ${minimal_SRCS} ${RESOURCES})
 #kirigamiplugin is the static library built by us
 target_link_libraries(minimal kirigamiplugin Qt5::Core  Qt5::Qml Qt5::Quick Qt5::QuickControls2 ${minimal_EXTRA_LIBS})
 
-#install(TARGETS minimal ${KF5_INSTALL_TARGETS_DEFAULT_ARGS})
+#install(TARGETS minimal ${KDE_INSTALL_TARGETS_DEFAULT_ARGS})
 
 kirigami_package_breeze_icons(ICONS open-menu-symbolic document-decrypt folder-sync go-next go-previous go-up handle-left handle-right view-list-icons applications-graphics media-record-symbolic)

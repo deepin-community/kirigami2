@@ -4,79 +4,78 @@
  *  SPDX-License-Identifier: LGPL-2.0-or-later
  */
 
-import QtQuick 2.0
-import QtQuick.Controls 2.0 as Controls
-import QtQuick.Layouts 1.2
-import org.kde.kirigami 2.8
+import QtQuick 2.15
+import QtQuick.Controls 2.15 as QQC2
+import QtQuick.Layouts 1.15
+import org.kde.kirigami 2.20 as Kirigami
 
-ScrollablePage {
+Kirigami.ScrollablePage {
     id: page
+
     Layout.fillWidth: true
-    implicitWidth: Units.gridUnit * (Math.floor(Math.random() * 35) + 8)
+    implicitWidth: Kirigami.Units.gridUnit * (Math.floor(Math.random() * 35) + 8)
 
     title: "Multiple Columns"
 
-    actions {
-        contextualActions: [
-            Action {
-                text:"Action for buttons"
-                icon.name: "bookmarks"
-                onTriggered: print("Action 1 clicked")
-            },
-            Action {
-                text:"Action 2"
-                icon.name: "folder"
-                enabled: false
-            }
-        ]
-    }
+    actions.contextualActions: [
+        Kirigami.Action {
+            text:"Action for buttons"
+            icon.name: "bookmarks"
+            onTriggered: print("Action 1 clicked")
+        },
+        Kirigami.Action {
+            text:"Action 2"
+            icon.name: "folder"
+            enabled: false
+        }
+    ]
 
     ColumnLayout {
         width: page.width
-        spacing: Units.smallSpacing
+        spacing: Kirigami.Units.smallSpacing
 
-        Controls.Label {
+        QQC2.Label {
             Layout.fillWidth: true
             wrapMode: Text.WordWrap
             text: "This page is used to test multiple columns: you can push and pop an arbitrary number of pages, each new page will have a random implicit width between 8 and 35 grid units.\nIf you enlarge the window enough, you can test how the application behaves with multiple columns."
         }
         Item {
-            Layout.minimumWidth: Units.gridUnit *2
+            Layout.minimumWidth: Kirigami.Units.gridUnit *2
             Layout.minimumHeight: Layout.minimumWidth
         }
-        Controls.Label {
+        QQC2.Label {
             Layout.alignment: Qt.AlignHCenter
             text: "Page implicitWidth: " + page.implicitWidth
         }
-        Controls.Button {
+        QQC2.Button {
             text: "Push Another Page"
             Layout.alignment: Qt.AlignHCenter
             onClicked: pageStack.push(Qt.resolvedUrl("MultipleColumnsGallery.qml"));
         }
-        Controls.Button {
+        QQC2.Button {
             text: "Pop A Page"
             Layout.alignment: Qt.AlignHCenter
             onClicked: pageStack.pop();
         }
         RowLayout {
             Layout.alignment: Qt.AlignHCenter
-            Controls.TextField {
+            QQC2.TextField {
                 id: edit
                 text: page.title
             }
-            Controls.Button {
+            QQC2.Button {
                 text: "Rename Page"
                 onClicked: page.title = edit.text;
             }
         }
-        SearchField {
-            Layout.alignment: Qt.AlignHCenter
+        Kirigami.SearchField {
             id: searchField
-            onAccepted: console.log("Search text is " + searchField.text);
-        }
-        PasswordField {
             Layout.alignment: Qt.AlignHCenter
+            onAccepted: console.log("Search text is " + text);
+        }
+        Kirigami.PasswordField {
             id: passwordField
+            Layout.alignment: Qt.AlignHCenter
             onAccepted: console.log("Password")
         }
     }

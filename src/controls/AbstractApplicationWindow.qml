@@ -5,12 +5,11 @@
  */
 
 import QtQuick 2.12
+import QtQml 2.15
 import QtQuick.Controls 2.0 as QQC2
 import QtQuick.Window 2.5
-import "templates/private"
-import org.kde.kirigami 2.4
-import QtGraphicalEffects 1.0
-
+import org.kde.kirigami 2.4 as Kirigami
+import "templates/private" as TP
 /**
  * A window that provides some basic features needed for all apps
  * Use this class only if you need a custom content for your application,
@@ -28,7 +27,7 @@ import QtGraphicalEffects 1.0
  * will set its initial size, but it won't set it as an automatically binding.
  * to resize programmatically the ApplicationWindow they need to
  * be assigned again in an imperative fashion
- * 
+ *
  *
  * Example usage:
  * @code
@@ -74,96 +73,51 @@ import QtGraphicalEffects 1.0
 QQC2.ApplicationWindow {
     id: root
 
+//BEGIN properties
     /**
-     * This property holds the stack used to allocate the pages and to manage the
+     * @brief This property holds the stack used to allocate the pages and to manage the
      * transitions between them.
-     * 
+     *
      * Put a container here, such as QtQuick.Controls.StackView.
      */
     property Item pageStack
-    LayoutMirroring.enabled: Qt.application.layoutDirection == Qt.RightToLeft
-    LayoutMirroring.childrenInherit: true
 
     /**
-     * Shows a little passive notification at the bottom of the app window
-     * lasting for few seconds, with an optional action button.
+     * @brief This property sets whether the standard chrome of the app is visible.
      *
-     * @param message The text message to be shown to the user.
-     * @param timeout How long to show the message:
-     *            possible values: "short", "long" or the number of milliseconds
-     * @param actionText Text in the action button, if any.
-     * @param callBack A JavaScript function that will be executed when the
-     *            user clicks the button.
-     */
-    function showPassiveNotification(message, timeout, actionText, callBack) {
-        if (!internal.__passiveNotification) {
-            var component = Qt.createComponent("templates/private/PassiveNotification.qml");
-            internal.__passiveNotification = component.createObject(overlay.parent);
-        }
-
-        internal.__passiveNotification.showNotification(message, timeout, actionText, callBack);
-    }
-
-   /**
-    * Hide the passive notification, if any is shown
-    */
-    function hidePassiveNotification() {
-        if(internal.__passiveNotification) {
-           internal.__passiveNotification.hideNotification();
-        }
-    }
-
-
-    /**
-     * @returns a pointer to this application window
-     * can be used anywhere in the application.
-     */
-    function applicationWindow() {
-        return root;
-    }
-
-   /**
-    * header: ApplicationHeader
-    * An item that can be used as a title for the application.
-    * Scrolling the main page will make it taller or shorter (through the point of going away)
-    * It's a behavior similar to the typical mobile web browser addressbar
-    * the minimum, preferred and maximum heights of the item can be controlled with
-    * * Layout.minimumHeight: default is 0, i.e. hidden
-    * * Layout.preferredHeight: default is Units.gridUnit * 1.6
-    * * Layout.maximumHeight: default is Units.gridUnit * 3
-    *
-    * To achieve a titlebar that stays completely fixed just set the 3 sizes as the same
-    * //FIXME: this should become an actual ApplicationHeader
-    */
-    //header: undefined
-
-    /**
-     * This property controls whether the standard chrome of the app, such
-     * as the Action button, the drawer handles and the application
-     * header should be visible or not.
+     * These are the action button, the drawer handles, and the application header.
+     *
+     * default: ``true``
      */
     property bool controlsVisible: true
 
     /**
-     * This property holds the drawer for global actions, that will be opened by sliding from the
-     * left screen edge or by dragging the ActionButton to the right.
+     * @brief This property holds the drawer for global actions.
      *
-     * It is recommended to use the GlobalDrawer class here.
+     * This drawer can be opened by sliding from the left screen edge
+     * or by dragging the ActionButton to the right.
+     *
+     * @note It is recommended to use the GlobalDrawer here.
+     * @property org::kde::kirigami::OverlayDrawer globalDrawer
      */
     property OverlayDrawer globalDrawer
 
     /**
-     * This property holds whether the application is considered to be in "widescreen" mode, such
-     * as on desktops or horizontal tablets.
+     * @brief This property tells whether the application is in "widescreen" mode.
      *
-     * Different styles can have an own logic for deciding this.
+     * This is enabled on desktops or horizontal tablets.
+     *
+     * @note Different styles can have their own logic for deciding this.
      */
-    property bool wideScreen: width >= Units.gridUnit * 60
+    property bool wideScreen: width >= Kirigami.Units.gridUnit * 60
 
     /**
-     * The drawer for context-dependent actions, that will be opened by sliding from the
-     * right screen edge or by dragging the ActionButton to the left.
-     * It is recommended to use the ContextDrawer class here.
+     * @brief This property holds the drawer for context-dependent actions.
+     *
+     * The drawer that will be opened by sliding from the right screen edge
+     * or by dragging the ActionButton to the left.
+     *
+     * @note It is recommended to use the ContextDrawer class here.
      *
      * The contents of the context drawer should depend from what page is
      * loaded in the main pageStack
@@ -208,19 +162,23 @@ QQC2.ApplicationWindow {
      *
      * When this page will be the current one, the context drawer will visualize
      * contextualActions defined as property in that page.
+     * @property org::kde::kirigami::ContextDrawer contextDrawer
      */
     property OverlayDrawer contextDrawer
 
     /**
-     * This property holds whether the application is in reachable mode for single hand use.
-     * the whole content of the application is moved down the screen to be
-     * reachable with the thumb. if wideScreen is true, or reachableModeEnabled is false,
-     * tis property has no effect.
+     * @brief This property tells whether the application is in reachable mode for single hand use.
+     *
+     * The whole content of the application is moved down the screen to be
+     * reachable with the thumb. If wideScreen is true, or reachableModeEnabled is false,
+     * this property has no effect.
+     *
+     * default: ``false``
      */
     property bool reachableMode: false
 
     /**
-     * This property holds whether the application will go into reachable mode on pull down.
+     * @brief This property sets whether the application will go into reachable mode on pull down.
      */
     property bool reachableModeEnabled: true
 
@@ -238,23 +196,70 @@ QQC2.ApplicationWindow {
      * @since 5.76
      */
     readonly property Action quitAction: _quitAction
+//END properties
 
-    color: Theme.backgroundColor
+//BEGIN functions
+    /**
+     * @brief This function shows a little passive notification at the bottom of the app window
+     * lasting for few seconds, with an optional action button.
+     *
+     * @param message The text message to be shown to the user.
+     * @param timeout How long to show the message:
+     *            possible values: "short", "long" or the number of milliseconds
+     * @param actionText Text in the action button, if any.
+     * @param callBack A JavaScript function that will be executed when the
+     *            user clicks the button.
+     */
+    function showPassiveNotification(message, timeout, actionText, callBack) {
+        notificationsObject.showNotification(message, timeout, actionText, callBack);
+    }
+
+   /**
+    * @brief This function hides the passive notification at specified index, if any is shown.
+    * @param index Index of the notification to hide. Default is 0 (oldest notification).
+    */
+    function hidePassiveNotification(index = 0) {
+        notificationsObject.hideNotification(index);
+    }
+
+    /**
+     * @brief This function returns application window's object anywhere in the application.
+     * @returns a pointer to this application window
+     * can be used anywhere in the application.
+     */
+    function applicationWindow() {
+        return root;
+    }
+//END functions
+
+    LayoutMirroring.enabled: Qt.application.layoutDirection === Qt.RightToLeft
+    LayoutMirroring.childrenInherit: true
+
+    color: Kirigami.Theme.backgroundColor
+
+    TP.PassiveNotificationsManager {
+        id: notificationsObject
+        anchors.bottom: parent.bottom
+        anchors.horizontalCenter: parent.horizontalCenter
+        z: 1
+    }
 
     MouseArea {
         parent: contentItem.parent
         z: 0
         anchors.fill: parent
-        onClicked: root.reachableMode = false;
+        onClicked: mouse => {
+            root.reachableMode = false;
+        }
         visible: root.reachableMode && root.reachableModeEnabled
         Rectangle {
             anchors.fill: parent
             color: Qt.rgba(0, 0, 0, 0.3)
             opacity: 0.15
-            Icon {
+            Kirigami.Icon {
                 anchors.horizontalCenter: parent.horizontalCenter
                 y: x
-                width: Units.iconSizes.large
+                width: Kirigami.Units.iconSizes.large
                 height: width
                 source: "go-up"
             }
@@ -273,24 +278,27 @@ QQC2.ApplicationWindow {
         target: menuBar
         property: "x"
         value: -contentItem.x
+        restoreMode: Binding.RestoreBinding
     }
     Binding {
         when: header !== undefined
         target: header
         property: "x"
         value: -contentItem.x
+        restoreMode: Binding.RestoreBinding
     }
     Binding {
         when: footer !== undefined
         target: footer
         property: "x"
         value: -contentItem.x
+        restoreMode: Binding.RestoreBinding
     }
 
     contentItem.transform: Translate {
         Behavior on y {
             NumberAnimation {
-                duration: Units.longDuration
+                duration: Kirigami.Units.longDuration
                 easing.type: Easing.InOutQuad
             }
         }
@@ -308,17 +316,19 @@ QQC2.ApplicationWindow {
         target: globalDrawer
         property: "parent"
         value: overlay
+        restoreMode: Binding.RestoreBinding
     }
     Binding {
         when: contextDrawer !== undefined && root.visible
         target: contextDrawer
         property: "parent"
         value: overlay
+        restoreMode: Binding.RestoreBinding
     }
     onPageStackChanged: pageStack.parent = contentItem;
 
-    width: Settings.isMobile ? Units.gridUnit * 30 : Units.gridUnit * 55
-    height: Settings.isMobile ? Units.gridUnit * 45 : Units.gridUnit * 40
+    width: Kirigami.Settings.isMobile ? Kirigami.Units.gridUnit * 30 : Kirigami.Units.gridUnit * 55
+    height: Kirigami.Settings.isMobile ? Kirigami.Units.gridUnit * 45 : Kirigami.Units.gridUnit * 40
     visible: true
 
     Component.onCompleted: {
@@ -331,16 +341,16 @@ QQC2.ApplicationWindow {
         root.height = root.height;
     }
 
-    QtObject {
-        id: internal
-        property QtObject __passiveNotification
-    }
-
     Action {
         id: _quitAction
         text: qsTr("Quit")
         icon.name: "application-exit";
         shortcut: StandardKey.Quit
-        onTriggered: root.close()
+        onTriggered: source => root.close()
+    }
+    Shortcut {
+        sequence: _quitAction.shortcut
+        context: Qt.ApplicationShortcut
+        onActivated: root.close()
     }
 }

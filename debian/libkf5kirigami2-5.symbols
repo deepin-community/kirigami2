@@ -1,4 +1,4 @@
-# SymbolsHelper-Confirmed: 5.81.0 armel armhf hurd-i386 i386 m68k mips64el mipsel powerpc ppc64 ppc64el riscv64 s390x
+# SymbolsHelper-Confirmed: 5.96.0 alpha amd64 i386 mipsel powerpc ppc64 s390x
 libKF5Kirigami2.so.5 libkf5kirigami2-5 #MINVER#
 * Build-Depends-Package: kirigami2-dev
  _ZN8Kirigami13PlatformTheme10setInheritEb@Base 5.69.0
@@ -78,8 +78,10 @@ libKF5Kirigami2.so.5 libkf5kirigami2-5 #MINVER#
  _ZN8Kirigami13StyleSelector15resolveFilePathERK7QString@Base 5.80.0
  _ZN8Kirigami13StyleSelector5styleEv@Base 5.80.0
  _ZN8Kirigami13StyleSelector9s_baseUrlE@Base 5.80.0
+ _ZN8Kirigami17TabletModeWatcher10addWatcherEP7QObject@Base 5.94.0
  _ZN8Kirigami17TabletModeWatcher11qt_metacallEN11QMetaObject4CallEiPPv@Base 5.69.0
  _ZN8Kirigami17TabletModeWatcher11qt_metacastEPKc@Base 5.69.0
+ _ZN8Kirigami17TabletModeWatcher13removeWatcherEP7QObject@Base 5.94.0
  _ZN8Kirigami17TabletModeWatcher16staticMetaObjectE@Base 5.69.0
  _ZN8Kirigami17TabletModeWatcher17tabletModeChangedEb@Base 5.69.0
  _ZN8Kirigami17TabletModeWatcher26tabletModeAvailableChangedEb@Base 5.69.0
@@ -111,6 +113,23 @@ libKF5Kirigami2.so.5 libkf5kirigami2-5 #MINVER#
  _ZN8Kirigami21KirigamiPluginFactoryD0Ev@Base 5.69.0
  _ZN8Kirigami21KirigamiPluginFactoryD1Ev@Base 5.69.0
  _ZN8Kirigami21KirigamiPluginFactoryD2Ev@Base 5.69.0
+ _ZN8Kirigami22TabletModeChangedEvent4typeE@Base 5.94.0
+ _ZN8Kirigami22VirtualKeyboardWatcher10setEnabledEb@Base 5.93.0
+ _ZN8Kirigami22VirtualKeyboardWatcher11qt_metacallEN11QMetaObject4CallEiPPv@Base 5.93.0
+ _ZN8Kirigami22VirtualKeyboardWatcher11qt_metacastEPKc@Base 5.93.0
+ _ZN8Kirigami22VirtualKeyboardWatcher13activeChangedEv@Base 5.93.0
+ _ZN8Kirigami22VirtualKeyboardWatcher14enabledChangedEv@Base 5.93.0
+ _ZN8Kirigami22VirtualKeyboardWatcher14visibleChangedEv@Base 5.93.0
+ _ZN8Kirigami22VirtualKeyboardWatcher16availableChangedEv@Base 5.93.0
+ _ZN8Kirigami22VirtualKeyboardWatcher16staticMetaObjectE@Base 5.93.0
+ _ZN8Kirigami22VirtualKeyboardWatcher23willShowOnActiveChangedEv@Base 5.93.0
+ _ZN8Kirigami22VirtualKeyboardWatcher4selfEv@Base 5.93.0
+ _ZN8Kirigami22VirtualKeyboardWatcher9setActiveEb@Base 5.93.0
+ _ZN8Kirigami22VirtualKeyboardWatcherC1EP7QObject@Base 5.93.0
+ _ZN8Kirigami22VirtualKeyboardWatcherC2EP7QObject@Base 5.93.0
+ _ZN8Kirigami22VirtualKeyboardWatcherD0Ev@Base 5.93.0
+ _ZN8Kirigami22VirtualKeyboardWatcherD1Ev@Base 5.93.0
+ _ZN8Kirigami22VirtualKeyboardWatcherD2Ev@Base 5.93.0
  _ZN8Kirigami23KirigamiPluginFactoryV211qt_metacallEN11QMetaObject4CallEiPPv@Base 5.90.0
  _ZN8Kirigami23KirigamiPluginFactoryV211qt_metacastEPKc@Base 5.90.0
  _ZN8Kirigami23KirigamiPluginFactoryV216staticMetaObjectE@Base 5.90.0
@@ -128,6 +147,7 @@ libKF5Kirigami2.so.5 libkf5kirigami2-5 #MINVER#
  _ZN8Kirigami5Units15setLongDurationEi@Base 5.90.0
  _ZN8Kirigami5Units15setSmallSpacingEi@Base 5.90.0
  _ZN8Kirigami5Units15setToolTipDelayEi@Base 5.90.0
+ _ZN8Kirigami5Units16setMediumSpacingEi@Base 5.93.0
  _ZN8Kirigami5Units16setShortDurationEi@Base 5.90.0
  _ZN8Kirigami5Units16staticMetaObjectE@Base 5.90.0
  _ZN8Kirigami5Units18humanMomentChangedEv@Base 5.90.0
@@ -137,6 +157,7 @@ libKF5Kirigami2.so.5 libkf5kirigami2-5 #MINVER#
  _ZN8Kirigami5Units19setWheelScrollLinesEi@Base 5.90.0
  _ZN8Kirigami5Units19smallSpacingChangedEv@Base 5.90.0
  _ZN8Kirigami5Units19toolTipDelayChangedEv@Base 5.90.0
+ _ZN8Kirigami5Units20mediumSpacingChangedEv@Base 5.93.0
  _ZN8Kirigami5Units20setVeryShortDurationEi@Base 5.90.0
  _ZN8Kirigami5Units20shortDurationChangedEv@Base 5.90.0
  _ZN8Kirigami5Units23devicePixelRatioChangedEv@Base 5.90.0
@@ -193,6 +214,12 @@ libKF5Kirigami2.so.5 libkf5kirigami2-5 #MINVER#
  _ZNK8Kirigami17TabletModeWatcher21isTabletModeAvailableEv@Base 5.69.0
  _ZNK8Kirigami20BasicThemeDefinition10metaObjectEv@Base 5.80.0
  _ZNK8Kirigami21KirigamiPluginFactory10metaObjectEv@Base 5.69.0
+ _ZNK8Kirigami22VirtualKeyboardWatcher10metaObjectEv@Base 5.93.0
+ _ZNK8Kirigami22VirtualKeyboardWatcher16willShowOnActiveEv@Base 5.93.0
+ _ZNK8Kirigami22VirtualKeyboardWatcher6activeEv@Base 5.93.0
+ _ZNK8Kirigami22VirtualKeyboardWatcher7enabledEv@Base 5.93.0
+ _ZNK8Kirigami22VirtualKeyboardWatcher7visibleEv@Base 5.93.0
+ _ZNK8Kirigami22VirtualKeyboardWatcher9availableEv@Base 5.93.0
  _ZNK8Kirigami23KirigamiPluginFactoryV210metaObjectEv@Base 5.90.0
  _ZNK8Kirigami5Units10metaObjectEv@Base 5.90.0
  _ZNK8Kirigami5Units11fontMetricsEv@Base 5.90.0
@@ -201,7 +228,9 @@ libKF5Kirigami2.so.5 libkf5kirigami2-5 #MINVER#
  _ZNK8Kirigami5Units12longDurationEv@Base 5.90.0
  _ZNK8Kirigami5Units12smallSpacingEv@Base 5.90.0
  _ZNK8Kirigami5Units12toolTipDelayEv@Base 5.90.0
+ _ZNK8Kirigami5Units13mediumSpacingEv@Base 5.93.0
  _ZNK8Kirigami5Units13shortDurationEv@Base 5.90.0
+ _ZNK8Kirigami5Units14maximumIntegerEv@Base 5.101.0
  _ZNK8Kirigami5Units16devicePixelRatioEv@Base 5.90.0
  _ZNK8Kirigami5Units16veryLongDurationEv@Base 5.90.0
  _ZNK8Kirigami5Units16wheelScrollLinesEv@Base 5.90.0
@@ -217,9 +246,9 @@ libKF5Kirigami2.so.5 libkf5kirigami2-5 #MINVER#
  _ZNK8Kirigami9IconSizes5smallEv@Base 5.90.0
  _ZNK8Kirigami9IconSizes6mediumEv@Base 5.90.0
  _ZNK8Kirigami9IconSizes8enormousEv@Base 5.90.0
- _ZNSt10_HashtableIjSt4pairIKj6QColorESaIS3_ENSt8__detail10_Select1stESt8equal_toIjESt4hashIjENS5_18_Mod_range_hashingENS5_20_Default_ranged_hashENS5_20_Prime_rehash_policyENS5_17_Hashtable_traitsILb0ELb0ELb1EEEE4findERS1_@Base 5.80.0
- _ZNSt10_HashtableIjSt4pairIKj6QColorESaIS3_ENSt8__detail10_Select1stESt8equal_toIjESt4hashIjENS5_18_Mod_range_hashingENS5_20_Default_ranged_hashENS5_20_Prime_rehash_policyENS5_17_Hashtable_traitsILb0ELb0ELb1EEEE5eraseENS5_20_Node_const_iteratorIS3_Lb0ELb0EEE@Base 5.80.0
- _ZNSt8__detail9_Map_baseIjSt4pairIKj6QColorESaIS4_ENS_10_Select1stESt8equal_toIjESt4hashIjENS_18_Mod_range_hashingENS_20_Default_ranged_hashENS_20_Prime_rehash_policyENS_17_Hashtable_traitsILb0ELb0ELb1EEELb1EEixEOj@Base 5.90.0
+ (optional=templinst)_ZNSt10_HashtableIjSt4pairIKj6QColorESaIS3_ENSt8__detail10_Select1stESt8equal_toIjESt4hashIjENS5_18_Mod_range_hashingENS5_20_Default_ranged_hashENS5_20_Prime_rehash_policyENS5_17_Hashtable_traitsILb0ELb0ELb1EEEE4findERS1_@Base 5.80.0
+ (optional=templinst)_ZNSt10_HashtableIjSt4pairIKj6QColorESaIS3_ENSt8__detail10_Select1stESt8equal_toIjESt4hashIjENS5_18_Mod_range_hashingENS5_20_Default_ranged_hashENS5_20_Prime_rehash_policyENS5_17_Hashtable_traitsILb0ELb0ELb1EEEE5eraseENS5_20_Node_const_iteratorIS3_Lb0ELb0EEE@Base 5.80.0
+ (optional=templinst)_ZNSt8__detail9_Map_baseIjSt4pairIKj6QColorESaIS4_ENS_10_Select1stESt8equal_toIjESt4hashIjENS_18_Mod_range_hashingENS_20_Default_ranged_hashENS_20_Prime_rehash_policyENS_17_Hashtable_traitsILb0ELb0ELb1EEELb1EEixEOj@Base 5.90.0
  _ZTIN8Kirigami13PlatformThemeE@Base 5.69.0
  _ZTIN8Kirigami17TabletModeWatcherE@Base 5.69.0
  _ZTIN8Kirigami19PlatformThemeEvents20PropertyChangedEventI5QFontEE@Base 5.80.0
@@ -228,6 +257,8 @@ libKF5Kirigami2.so.5 libkf5kirigami2-5 #MINVER#
  _ZTIN8Kirigami19PlatformThemeEvents20PropertyChangedEventINS_13PlatformTheme8ColorSetEEE@Base 5.80.0
  _ZTIN8Kirigami20BasicThemeDefinitionE@Base 5.80.0
  _ZTIN8Kirigami21KirigamiPluginFactoryE@Base 5.69.0
+ _ZTIN8Kirigami22TabletModeChangedEventE@Base 5.94.0
+ _ZTIN8Kirigami22VirtualKeyboardWatcherE@Base 5.93.0
  _ZTIN8Kirigami23KirigamiPluginFactoryV2E@Base 5.90.0
  _ZTIN8Kirigami5UnitsE@Base 5.90.0
  _ZTIN8Kirigami9IconSizesE@Base 5.90.0
@@ -245,6 +276,8 @@ libKF5Kirigami2.so.5 libkf5kirigami2-5 #MINVER#
  _ZTSN8Kirigami19PlatformThemeEvents20PropertyChangedEventINS_13PlatformTheme8ColorSetEEE@Base 5.80.0
  _ZTSN8Kirigami20BasicThemeDefinitionE@Base 5.80.0
  _ZTSN8Kirigami21KirigamiPluginFactoryE@Base 5.69.0
+ _ZTSN8Kirigami22TabletModeChangedEventE@Base 5.94.0
+ _ZTSN8Kirigami22VirtualKeyboardWatcherE@Base 5.93.0
  _ZTSN8Kirigami23KirigamiPluginFactoryV2E@Base 5.90.0
  _ZTSN8Kirigami5UnitsE@Base 5.90.0
  _ZTSN8Kirigami9IconSizesE@Base 5.90.0
@@ -262,6 +295,8 @@ libKF5Kirigami2.so.5 libkf5kirigami2-5 #MINVER#
  _ZTVN8Kirigami19PlatformThemeEvents20PropertyChangedEventINS_13PlatformTheme8ColorSetEEE@Base 5.80.0
  _ZTVN8Kirigami20BasicThemeDefinitionE@Base 5.80.0
  _ZTVN8Kirigami21KirigamiPluginFactoryE@Base 5.69.0
+ _ZTVN8Kirigami22TabletModeChangedEventE@Base 5.94.0
+ _ZTVN8Kirigami22VirtualKeyboardWatcherE@Base 5.93.0
  _ZTVN8Kirigami23KirigamiPluginFactoryV2E@Base 5.90.0
  _ZTVN8Kirigami5UnitsE@Base 5.90.0
  _ZTVN8Kirigami9IconSizesE@Base 5.90.0

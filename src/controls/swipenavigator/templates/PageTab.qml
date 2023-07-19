@@ -8,7 +8,6 @@ import QtQuick 2.12
 import QtQuick.Layouts 1.12
 import QtQuick.Controls 2.12 as QQC2
 import org.kde.kirigami 2.12 as Kirigami
-
 import "../../private" as Private
 
 // TODO?: refactor into abstractbutton
@@ -58,8 +57,8 @@ QQC2.Control {
     Accessible.focusable: true
     Accessible.onPressAction: control.clicked()
 
-    Keys.onPressed: {
-        if (event.key == Qt.Key_Enter || event.key == Qt.Key_Return) {
+    Keys.onPressed: event => {
+        if (event.key === Qt.Key_Enter || event.key === Qt.Key_Return) {
             control.clicked()
         }
     }

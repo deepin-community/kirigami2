@@ -4,10 +4,11 @@
  *  SPDX-License-Identifier: LGPL-2.0-or-later
  */
 
-import QtQuick 2.1
-import QtQuick.Templates 2.2 as T2
-import org.kde.kirigami 2.11
-import "private"
+import QtQuick 2.15
+import QtQuick.Templates 2.15 as T2
+import QtQuick.Controls 2.15 as QQC2
+import org.kde.kirigami 2.11 as Kirigami
+import "private" as P
 
 /**
  * Overlay Drawers are used to expose additional UI elements needed for
@@ -15,36 +16,36 @@ import "private"
  * For example in Okular Mobile, an Overlay Drawer is used to display
  * thumbnails of all pages within a document along with a search field.
  * This is used for the distinct task of navigating to another page.
+ *
  * @inherit QtQuick.Controls.Drawer
  */
 T2.Drawer {
     id: root
 
-    z: modal ? (Math.round((position * 10000000)) ): 100
+    z: modal ? 0 : applicationWindow().overlay.z - 1
 
-//BEGIN Properties
+//BEGIN properties
     /**
-     * This property holds whether the drawer is open and visible.
+     * @brief This property tells whether the drawer is open and visible.
+     *
+     * default: ``false``
      */
     property bool drawerOpen: false
 
     /**
-     * This property holds whether the item receives mouse and keyboard events. By default this is true.
-     */
-    property bool enabled: true
-
-    /**
-     * @brief This property holds whether the drawer is in a state between open
+     * @brief This property tells whether the drawer is in a state between open
      * and closed.
      *
      * The drawer is visible but not completely open. This is usually the case when
      * the user is dragging the drawer from a screen edge, so the user is "peeking"
-     * what's in the drawer.
+     * at what's in the drawer.
+     *
+     * default: ``false``
      */
     property bool peeking: false
 
     /**
-     * This property holds whether the drawer is currently opening or closing itself.
+     * @brief This property tells whether the drawer is currently opening or closing itself.
      */
     readonly property bool animating : enterAnimation.animating || exitAnimation.animating || positionResetAnim.running
 
@@ -54,36 +55,41 @@ T2.Drawer {
      *
      * Only modal drawers are collapsible. Collapsible is not supported in
      * the mobile mode.
+     *
      * @since 2.5
      */
     property bool collapsible: false
 
     /**
-     * @brief This property holds whether the drawer is collapsed to a
+     * @brief This property tells whether the drawer is collapsed to a
      * very thin sidebar, usually icon only.
      *
      * When true, the drawer will be collapsed to a very thin sidebar,
      * usually icon only.
+     *
+     * default: ``false``
+     *
      * @see collapsible Only collapsible drawers can be collapsed.
      */
     property bool collapsed: false
 
     /**
-     * This property holds the size of the collapsed drawer.
+     * @brief This property holds the size of the collapsed drawer.
      *
      * For vertical drawers this will be the width of the drawer and for horizontal
      * drawers this will be the height of the drawer.
      *
-     * By default it's just enough to accommodate medium sized icons
+     * default: ``Units.iconSizes.medium``, just enough to accommodate medium sized icons
      */
-    property int collapsedSize: Units.iconSizes.medium
+    property int collapsedSize: Kirigami.Units.iconSizes.medium
 
     /**
-     * This property holds the options for handle's open icon. This is a grouped
-     * property with following components:
+     * @brief This property holds the options for handle's open icon.
      *
-     * * source: The source of the icon, a freedesktop-compatible icon name is recommended.
-     * * color: An optional tint color for the icon.
+     * This is a grouped property with following components:
+     *
+     * * ``source: var``: The name of a freedesktop-compatible icon.
+     * * ``color: color``: An optional tint color for the icon.
      *
      * If no custom icon is set, a menu icon is shown for the application globalDrawer
      * and an overflow menu icon is shown for the contextDrawer.
@@ -91,68 +97,89 @@ T2.Drawer {
      *
      * For OverlayDrawer the default is view-right-close or view-left-close depending on
      * the drawer location
+     *
      * @since 2.5
      */
-    readonly property IconPropertiesGroup handleOpenIcon: IconPropertiesGroup {
+    readonly property P.IconPropertiesGroup handleOpenIcon: P.IconPropertiesGroup {
         source: root.edge === Qt.RightEdge ? "view-right-close" : "view-left-close"
     }
 
     /**
-     * This property holds the options for the handle's close icon. This is a
-     * grouped property with the following components:
+     * @brief This property holds the options for the handle's close icon.
      *
-     * * source: The source of the icon, a freedesktop-compatible icon name is recommended.
-     * * color: An optional tint color for the icon.
+     * This is a grouped property with the following components:
+     * * ``source: var``: The name of a freedesktop-compatible icon.
+     * * ``color: color``: An optional tint color for the icon.
      *
      * If no custom icon is set, an X icon is shown,
      * which will morph into the Menu or overflow icons.
      *
      * For OverlayDrawer the default is view-right-new or view-left-new depending on
      * the drawer location.
+     *
      * @since 2.5
      */
-    property IconPropertiesGroup handleClosedIcon: IconPropertiesGroup {
-        id: handleClosedIconGroup
+    property P.IconPropertiesGroup handleClosedIcon: P.IconPropertiesGroup {
         source: root.edge === Qt.RightEdge ? "view-right-new" : "view-left-new"
     }
 
     /**
-     * This property holds the tooltip displayed when the drawer is open.
+     * @brief This property holds the tooltip displayed when the drawer is open.
      * @since 2.15
      */
-    property string handleOpenToolTip: qsTr("Close")
+    property string handleOpenToolTip: qsTr("Close drawer")
 
     /**
-     * This property holds the tooltip displayed when the drawer is closed.
+     * @brief This property holds the tooltip displayed when the drawer is closed.
      * @since 2.15
      */
-    property string handleClosedToolTip: qsTr("Open")
+    property string handleClosedToolTip: qsTr("Open drawer")
 
     /**
-     * This property holds whether the handle is visible, to make opening the
-     * drawer easier. Currently supported only on left and right drawers.
+     * @brief This property holds whether the handle is visible, to make opening the
+     * drawer easier.
+     *
+     * Currently supported only on left and right drawers.
      */
     property bool handleVisible: typeof(applicationWindow)===typeof(Function) && applicationWindow() ? applicationWindow().controlsVisible : true
 
     /**
-     * Readonly property that points to the item that will act as a physical
-     * handle for the Drawer
+     * @brief Readonly property that points to the item that will act as a physical
+     * handle for the Drawer.
      * @property MouseArea handle
      **/
     readonly property Item handle: MouseArea {
         id: drawerHandle
+
+        /*
+         * This property is used to set when the tooltip is visible.
+         * It exists because the text is changed while the tooltip is still visible.
+         */
+        property bool displayToolTip: true
+
         z: root.modal ? applicationWindow().overlay.z + (root.position > 0 ? +1 : -1) : root.background.parent.z + 1
         preventStealing: true
         hoverEnabled: handleAnchor && handleAnchor.visible
         parent: applicationWindow().overlay.parent
 
-        T2.ToolTip.visible: containsMouse
+        QQC2.ToolButton {
+            anchors.centerIn: parent
+            width: parent.height - Kirigami.Units.smallSpacing * 1.5
+            height: parent.height - Kirigami.Units.smallSpacing * 1.5
+            onClicked: {
+                drawerHandle.displayToolTip = false
+                Qt.callLater(() => root.drawerOpen = !root.drawerOpen)
+            }
+            Accessible.name: root.drawerOpen ? root.handleOpenToolTip : root.handleClosedToolTip
+            visible: !Kirigami.SettingstabletMode && !Kirigami.SettingshasTransientTouchInput
+        }
+        T2.ToolTip.visible: drawerHandle.displayToolTip && containsMouse
         T2.ToolTip.text: root.drawerOpen ? handleOpenToolTip : handleClosedToolTip
-        T2.ToolTip.delay: Units.toolTipDelay
+        T2.ToolTip.delay: Kirigami.Units.toolTipDelay
 
         property Item handleAnchor: (applicationWindow().pageStack && applicationWindow().pageStack.globalToolBar)
-                ? ((root.edge === Qt.LeftEdge && Qt.application.layoutDirection == Qt.LeftToRight)
-                   || (root.edge === Qt.RightEdge && Qt.application.layoutDirection == Qt.RightToLeft)
+                ? ((root.edge === Qt.LeftEdge && Qt.application.layoutDirection === Qt.LeftToRight)
+                   || (root.edge === Qt.RightEdge && Qt.application.layoutDirection === Qt.RightToLeft)
                    ? applicationWindow().pageStack.globalToolBar.leftHandleAnchor
                    : applicationWindow().pageStack.globalToolBar.rightHandleAnchor)
                 : (applicationWindow().header && applicationWindow().header.toString().indexOf("ToolBarApplicationHeader") !== -1 ? applicationWindow().header : null)
@@ -162,16 +189,16 @@ T2.Drawer {
 
         enabled: root.handleVisible
 
-        onPressed: {
+        onPressed: mouse => {
             root.peeking = true;
             startX = mouse.x;
             mappedStartX = mapToItem(parent, startX, 0).x
         }
-        onPositionChanged: {
+        onPositionChanged: mouse => {
             if (!pressed) {
                 return;
             }
-            var pos = mapToItem(parent, mouse.x - startX, mouse.y);
+            const pos = mapToItem(parent, mouse.x - startX, mouse.y);
             switch(root.edge) {
             case Qt.LeftEdge:
                 root.position = pos.x/root.contentItem.width;
@@ -182,7 +209,7 @@ T2.Drawer {
             default:
             }
         }
-        onReleased: {
+        onReleased: mouse => {
             root.peeking = false;
             if (Math.abs(mapToItem(parent, mouse.x, 0).x - mappedStartX) < Qt.styleHints.startDragDistance) {
                 if (!root.drawerOpen) {
@@ -197,14 +224,14 @@ T2.Drawer {
         x: {
             switch(root.edge) {
             case Qt.LeftEdge:
-                return root.background.width * root.position + Units.smallSpacing;
+                return root.background.width * root.position + Kirigami.Units.smallSpacing;
             case Qt.RightEdge:
-                return drawerHandle.parent.width - (root.background.width * root.position) - width - Units.smallSpacing;
+                return drawerHandle.parent.width - (root.background.width * root.position) - width - Kirigami.Units.smallSpacing;
             default:
                 return 0;
             }
         }
-        y: handleAnchor && anchors.bottom ? handleAnchor.ScenePosition.y : 0
+        y: handleAnchor && anchors.bottom ? handleAnchor.Kirigami.ScenePosition.y : 0
 
         anchors {
             bottom: drawerHandle.handleAnchor && drawerHandle.handleAnchor.visible ? undefined : parent.bottom
@@ -213,13 +240,13 @@ T2.Drawer {
                     return;
                 }
 
-                var margin = Units.smallSpacing;
+                let margin = Kirigami.Units.smallSpacing;
                 if (applicationWindow().footer) {
-                    margin = applicationWindow().footer.height + Units.smallSpacing;
+                    margin = applicationWindow().footer.height + Kirigami.Units.smallSpacing;
                 }
 
                 if(root.parent && root.height < root.parent.height) {
-                    margin = root.parent.height - root.height - root.y + Units.smallSpacing;
+                    margin = root.parent.height - root.height - root.y + Kirigami.Units.smallSpacing;
                 }
 
                 if (!applicationWindow() || !applicationWindow().pageStack ||
@@ -228,19 +255,19 @@ T2.Drawer {
                     return margin;
                 }
 
-                var item;
+                let item;
                 if (applicationWindow().pageStack.layers.depth > 1) {
                     item = applicationWindow().pageStack.layers.currentItem;
                 } else {
                     item = applicationWindow().pageStack.contentItem.itemAt(applicationWindow().pageStack.contentItem.contentX + drawerHandle.x, 0);
                 }
 
-                //try to take the last item
+                // try to take the last item
                 if (!item) {
                     item = applicationWindow().pageStack.lastItem;
                 }
 
-                var pageFooter = item && item.page ? item.page.footer : (item ? item.footer : undefined);
+                let pageFooter = item && item.page ? item.page.footer : (item ? item.footer : undefined);
                 if (pageFooter && root.parent) {
                     margin = root.height < root.parent.height ? margin : margin + pageFooter.height
                 }
@@ -249,19 +276,19 @@ T2.Drawer {
             }
             Behavior on bottomMargin {
                 NumberAnimation {
-                    duration: Units.shortDuration
+                    duration: Kirigami.Units.shortDuration
                     easing.type: Easing.InOutQuad
                 }
             }
         }
 
-        visible: root.enabled && (root.edge === Qt.LeftEdge || root.edge === Qt.RightEdge)
-        width: handleAnchor && handleAnchor.visible ? handleAnchor.width : Units.iconSizes.smallMedium + Units.smallSpacing*2
+        visible: root.enabled && (root.edge === Qt.LeftEdge || root.edge === Qt.RightEdge) && opacity > 0
+        width: handleAnchor && handleAnchor.visible ? handleAnchor.width : Kirigami.Units.iconSizes.smallMedium + Kirigami.Units.smallSpacing*2
         height: handleAnchor && handleAnchor.visible ? handleAnchor.height : width
         opacity: root.handleVisible ? 1 : 0
         Behavior on opacity {
             NumberAnimation {
-                duration: Units.longDuration
+                duration: Kirigami.Units.longDuration
                 easing.type: Easing.InOutQuad
             }
         }
@@ -270,41 +297,40 @@ T2.Drawer {
             x: root.handleVisible ? 0 : (root.edge === Qt.LeftEdge ? -drawerHandle.width : drawerHandle.width)
             Behavior on x {
                 NumberAnimation {
-                    duration: Units.longDuration
+                    duration: Kirigami.Units.longDuration
                     easing.type: !root.handleVisible ? Easing.OutQuad : Easing.InQuad
                 }
             }
         }
     }
+//END properties
 
     interactive: modal
 
-    Theme.inherit: false
-    Theme.colorSet: modal ? Theme.View : Theme.Window
-    Theme.onColorSetChanged: {
-        contentItem.Theme.colorSet = Theme.colorSet
-        background.Theme.colorSet = Theme.colorSet
+    Kirigami.Theme.inherit: false
+    Kirigami.Theme.colorSet: modal ? Kirigami.Theme.View : Kirigami.Theme.Window
+    Kirigami.Theme.onColorSetChanged: {
+        contentItem.Kirigami.Theme.colorSet = Kirigami.Theme.colorSet
+        background.Kirigami.Theme.colorSet = Kirigami.Theme.colorSet
     }
-//END Properties
-
 
 //BEGIN reassign properties
     //default paddings
-    leftPadding: Units.smallSpacing
-    topPadding: Units.smallSpacing
-    rightPadding: Units.smallSpacing
-    bottomPadding: Units.smallSpacing
+    leftPadding: Kirigami.Units.smallSpacing
+    topPadding: Kirigami.Units.smallSpacing
+    rightPadding: Kirigami.Units.smallSpacing
+    bottomPadding: Kirigami.Units.smallSpacing
 
     y: modal ? 0 : ((T2.ApplicationWindow.menuBar ? T2.ApplicationWindow.menuBar.height : 0) + (T2.ApplicationWindow.header ? T2.ApplicationWindow.header.height : 0))
 
-    height: parent && (root.edge == Qt.LeftEdge || root.edge == Qt.RightEdge) ? (modal ? parent.height : (parent.height - y - (T2.ApplicationWindow.footer ? T2.ApplicationWindow.footer.height : 0))) : implicitHeight
+    height: parent && (root.edge === Qt.LeftEdge || root.edge === Qt.RightEdge) ? (modal ? parent.height : (parent.height - y - (T2.ApplicationWindow.footer ? T2.ApplicationWindow.footer.height : 0))) : implicitHeight
 
     parent: modal || edge === Qt.LeftEdge || edge === Qt.RightEdge ? T2.ApplicationWindow.overlay : T2.ApplicationWindow.contentItem
 
     edge: Qt.LeftEdge
     modal: true
 
-    dragMargin: enabled && (edge === Qt.LeftEdge || edge === Qt.RightEdge) ? Math.min(Units.gridUnit, Qt.styleHints.startDragDistance) : 0
+    dragMargin: enabled && (edge === Qt.LeftEdge || edge === Qt.RightEdge) ? Math.min(Kirigami.Units.gridUnit, Qt.styleHints.startDragDistance) : 0
 
     contentWidth: contentItem.implicitWidth || (contentChildren.length === 1 ? contentChildren[0].implicitWidth : 0)
     contentHeight: contentItem.implicitHeight || (contentChildren.length === 1 ? contentChildren[0].implicitHeight : 0)
@@ -312,27 +338,10 @@ T2.Drawer {
     implicitWidth: contentWidth + leftPadding + rightPadding
     implicitHeight: contentHeight + topPadding + bottomPadding
 
-    //this is a workaround for the height not being propagated automatically only sometimes
-    // see https://bugs.kde.org/show_bug.cgi?id=398163
-    //NOTE: this is NOT a binding, otherwise it causes a binding loop in implicitHeight
-    Connections {
-        target: parent
-        function onWidthChanged() {
-            if (edge === Qt.TopEdge || edge === Qt.BottomEdge) {
-                width = parent.width;
-            }
-        }
-        function onHeightChanged() {
-            if (edge === Qt.LeftEdge || edge === Qt.RightEdge) {
-                height = parent.height;
-            }
-        }
-    }
-
     enter: Transition {
         SequentialAnimation {
             id: enterAnimation
-            /*NOTE: why this? the running status of the enter transition is not relaible and
+            /* NOTE: why this? the running status of the enter transition is not relaible and
              * the SmoothedAnimation is always marked as non running,
              * so the only way to get to a reliable animating status is with this
              */
@@ -340,7 +349,7 @@ T2.Drawer {
             ScriptAction {
                 script: {
                     enterAnimation.animating = true
-                    //on non modal dialog we don't want drawers in the overlay
+                    // on non modal dialog we don't want drawers in the overlay
                     if (!root.modal) {
                         root.background.parent.parent = applicationWindow().overlay.parent
                     }
@@ -375,7 +384,7 @@ T2.Drawer {
 
 //BEGIN signal handlers
     onCollapsedChanged: {
-        if (Settings.isMobile) {
+        if (Kirigami.SettingsisMobile) {
             collapsed = false;
         }
         if (!__internal.completed) {
@@ -386,7 +395,7 @@ T2.Drawer {
         }
     }
     onCollapsibleChanged: {
-        if (Settings.isMobile) {
+        if (Kirigami.SettingsisMobile) {
             collapsible = false;
         }
         if (!__internal.completed) {
@@ -431,7 +440,7 @@ T2.Drawer {
         }
     }
     onDrawerOpenChanged: {
-        //sync this property only when the component is properly loaded
+        // sync this property only when the component is properly loaded
         if (!__internal.completed) {
             return;
         }
@@ -441,10 +450,11 @@ T2.Drawer {
         } else {
             close();
         }
+        Qt.callLater(() => drawerHandle.displayToolTip = true)
     }
 
     Component.onCompleted: {
-        //if defined as drawerOpen by default in QML, don't animate
+        // if defined as drawerOpen by default in QML, don't animate
         if (root.drawerOpen) {
             root.enter.enabled = false;
             root.visible = true;
@@ -452,12 +462,12 @@ T2.Drawer {
             root.enter.enabled = true;
         }
         __internal.completed = true;
-        contentItem.Theme.colorSet = Theme.colorSet;
-        background.Theme.colorSet = Theme.colorSet;
+        contentItem.Kirigami.Theme.colorSet = Kirigami.Theme.colorSet;
+        background.Kirigami.Theme.colorSet = Kirigami.Theme.colorSet;
     }
 //END signal handlers
 
-    //this is as hidden as it can get here
+    // this is as hidden as it can get here
     property QtObject __internal: QtObject {
         //here in order to not be accessible from outside
         property bool completed: false
@@ -469,11 +479,11 @@ T2.Drawer {
                 target: root
                 to: drawerOpen ? 1 : 0
                 property: "position"
-                duration: (root.position)*Units.longDuration
+                duration: (root.position)*Kirigami.Units.longDuration
             }
             ScriptAction {
                 script: {
-                    root.drawerOpen = internalAnim.to != 0;
+                    root.drawerOpen = internalAnim.to !== 0;
                 }
             }
         }
@@ -505,7 +515,7 @@ T2.Drawer {
                 reversible: true
                 NumberAnimation {
                     properties: root.edge === Qt.TopEdge || root.edge === Qt.BottomEdge ? "implicitHeight" : "implicitWidth"
-                    duration: Units.longDuration
+                    duration: Kirigami.Units.longDuration
                     easing.type: Easing.InOutQuad
                 }
             }

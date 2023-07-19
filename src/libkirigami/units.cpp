@@ -69,6 +69,7 @@ public:
         , fontMetrics(QFontMetricsF(QGuiApplication::font()))
         , gridUnit(fontMetrics.height())
         , smallSpacing(std::floor(gridUnit / 4))
+        , mediumSpacing(std::round(smallSpacing * 1.5))
         , largeSpacing(smallSpacing * 2)
         , veryLongDuration(400)
         , longDuration(200)
@@ -86,7 +87,7 @@ public:
     // Only stored for QML API compatiblity
     // TODO KF6 drop
 #if KIRIGAMI2_BUILD_DEPRECATED_SINCE(5, 86)
-    QObject *qmlFontMetrics;
+    std::unique_ptr<QObject> qmlFontMetrics = nullptr;
 #endif
 
     // Font metrics used for Units.
@@ -96,6 +97,7 @@ public:
     // units
     int gridUnit;
     int smallSpacing;
+    int mediumSpacing;
     int largeSpacing;
 
     // durations
@@ -117,7 +119,7 @@ public:
     bool customWheelScrollLinesSet = false;
 
 #if KIRIGAMI2_BUILD_DEPRECATED_SINCE(5, 86)
-    QObject *createQmlFontMetrics(QQmlEngine *engine)
+    std::unique_ptr<QObject> createQmlFontMetrics(QQmlEngine *engine)
     {
         QQmlComponent component(engine);
         component.setData(QByteArrayLiteral(
@@ -131,7 +133,7 @@ public:
             "}\n"
         ), QUrl(QStringLiteral("units.cpp")));
 
-        return component.create();
+        return std::unique_ptr<QObject>(component.create());
     }
 #endif
 };
@@ -160,6 +162,8 @@ Units::Units(QObject *parent)
         Q_EMIT gridUnitChanged();
         d->smallSpacing = std::floor(d->gridUnit / 4);
         Q_EMIT smallSpacingChanged();
+        d->mediumSpacing = std::round(d->smallSpacing * 1.5);
+        Q_EMIT mediumSpacingChanged();
         d->largeSpacing = d->smallSpacing * 2;
         Q_EMIT largeSpacingChanged();
         Q_EMIT d->iconSizes->sizeForLabelsChanged();
@@ -205,6 +209,22 @@ void Kirigami::Units::setSmallSpacing(int size)
     d->smallSpacing = size;
     d->customUnitsSet = true;
     Q_EMIT smallSpacingChanged();
+}
+
+int Units::mediumSpacing() const
+{
+    return d->mediumSpacing;
+}
+
+void Kirigami::Units::setMediumSpacing(int size)
+{
+    if (d->mediumSpacing == size) {
+        return;
+    }
+
+    d->mediumSpacing = size;
+    d->customUnitsSet = true;
+    Q_EMIT mediumSpacingChanged();
 }
 
 int Units::largeSpacing() const
@@ -270,16 +290,16 @@ void Units::setShortDuration(int duration)
 
 int Units::veryShortDuration() const
 {
-    return d->veryLongDuration;
+    return d->veryShortDuration;
 }
 
 void Units::setVeryShortDuration(int duration)
 {
-    if (d->veryLongDuration == duration) {
+    if (d->veryShortDuration == duration) {
         return;
     }
 
-    d->veryLongDuration = duration;
+    d->veryShortDuration = duration;
     Q_EMIT veryShortDurationChanged();
 }
 
@@ -313,6 +333,11 @@ void Units::setToolTipDelay(int delay)
     Q_EMIT toolTipDelayChanged();
 }
 
+int Units::maximumInteger() const
+{
+    return std::numeric_limits<int>::max();
+}
+
 #if KIRIGAMI2_BUILD_DEPRECATED_SINCE(5, 86)
 int Units::wheelScrollLines() const
 {
@@ -344,7 +369,7 @@ QObject *Units::fontMetrics() const
     if (!d->qmlFontMetrics) {
         d->qmlFontMetrics = d->createQmlFontMetrics(qmlEngine(this));
     }
-    return d->qmlFontMetrics;
+    return d->qmlFontMetrics.get();
 }
 #endif
 

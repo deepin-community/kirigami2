@@ -18,8 +18,6 @@
 
 #include "units.h"
 
-QHash<QObject *, ColumnViewAttached *> ColumnView::m_attachedObjects = QHash<QObject *, ColumnViewAttached *>();
-
 class QmlComponentsPoolSingleton
 {
 public:
@@ -69,23 +67,32 @@ import QtQuick 2.7
 import org.kde.kirigami 2.7 as Kirigami
 
 QtObject {
-    id: root
-    readonly property Kirigami.Units units: Kirigami.Units
-
-    readonly property Component separator: Kirigami.Separator {
+    readonly property Component leadingSeparator: Kirigami.Separator {
         property Item column
 
-        visible: column.Kirigami.ColumnView.view && column.Kirigami.ColumnView.view.contentX < column.x
+        // positioning trick to hide the very first separator
+        visible: {
+            const view = column.Kirigami.ColumnView.view;
+            return view && (LayoutMirroring.enabled
+                ? view.contentX + view.width > column.x + column.width
+                : view.contentX < column.x);
+        }
+
         anchors.top: column.top
+        anchors.left: column.left
         anchors.bottom: column.bottom
+        Kirigami.Theme.colorSet: Kirigami.Theme.Window
+        Kirigami.Theme.inherit: false
     }
 
-    readonly property Component rightSeparator: Kirigami.Separator {
+    readonly property Component trailingSeparator: Kirigami.Separator {
         property Item column
 
         anchors.top: column.top
         anchors.right: column.right
         anchors.bottom: column.bottom
+        Kirigami.Theme.colorSet: Kirigami.Theme.Window
+        Kirigami.Theme.inherit: false
     }
 }
 )"), QUrl(QStringLiteral("columnview.cpp")));
@@ -94,12 +101,13 @@ QtObject {
     m_instance = component->create();
     // qCWarning(KirigamiLog)<<component->errors();
     Q_ASSERT(m_instance);
+    m_instance->setParent(this);
 
-    m_separatorComponent = m_instance->property("separator").value<QQmlComponent *>();
-    Q_ASSERT(m_separatorComponent);
+    m_leadingSeparatorComponent = m_instance->property("leadingSeparator").value<QQmlComponent *>();
+    Q_ASSERT(m_leadingSeparatorComponent);
 
-    m_rightSeparatorComponent = m_instance->property("rightSeparator").value<QQmlComponent *>();
-    Q_ASSERT(m_rightSeparatorComponent);
+    m_trailingSeparatorComponent = m_instance->property("trailingSeparator").value<QQmlComponent *>();
+    Q_ASSERT(m_trailingSeparatorComponent);
 
     m_units = engine->singletonInstance<Kirigami::Units *>(qmlTypeId("org.kde.kirigami", 2, 0, "Units"));
     Q_ASSERT(m_units);
@@ -405,7 +413,7 @@ qreal ContentItem::childWidth(QQuickItem *child)
         return qRound(parentItem()->width());
 
     } else if (attached->fillWidth()) {
-        return qRound(qBound(m_columnWidth, (parentItem()->width() - attached->reservedSpace()), parentItem()->width()));
+        return qRound(qBound(m_columnWidth, (parentItem()->width() - attached->reservedSpace()), std::max(m_columnWidth, parentItem()->width())));
 
     } else if (m_columnResizeMode == ColumnView::FixedColumns) {
         return qRound(qMin(parentItem()->width(), m_columnWidth));
@@ -450,7 +458,7 @@ void ContentItem::layoutItems()
                 QQuickItem *sep = nullptr;
                 int sepWidth = 0;
                 if (m_view->separatorVisible()) {
-                    sep = ensureRightSeparator(child);
+                    sep = ensureTrailingSeparator(child);
                     sepWidth = (sep ? sep->width() : 0);
                 }
                 const qreal width = childWidth(child);
@@ -470,10 +478,10 @@ void ContentItem::layoutItems()
             } else {
                 child->setSize(QSizeF(childWidth(child), height()));
 
-                auto it = m_rightSeparators.find(child);
-                if (it != m_rightSeparators.end()) {
+                auto it = m_trailingSeparators.find(child);
+                if (it != m_trailingSeparators.end()) {
                     it.value()->deleteLater();
-                    m_rightSeparators.erase(it);
+                    m_trailingSeparators.erase(it);
                 }
                 child->setPosition(QPointF(partialWidth, 0.0));
                 child->setZ(0);
@@ -529,7 +537,7 @@ void ContentItem::layoutPinnedItems()
                 QQuickItem *sep = nullptr;
                 int sepWidth = 0;
                 if (m_view->separatorVisible()) {
-                    sep = ensureRightSeparator(child);
+                    sep = ensureTrailingSeparator(child);
                     sepWidth = (sep ? sep->width() : 0);
                 }
 
@@ -574,10 +582,10 @@ void ContentItem::updateVisibleItems()
     if (newItems != m_visibleItems) {
         m_visibleItems = newItems;
         Q_EMIT m_view->visibleItemsChanged();
-        if (!newItems.isEmpty() && m_visibleItems.first() != oldFirstVisibleItem) {
+        if (!m_visibleItems.isEmpty() && m_visibleItems.first() != oldFirstVisibleItem) {
             Q_EMIT m_view->firstVisibleItemChanged();
         }
-        if (!newItems.isEmpty() && m_visibleItems.last() != oldLastVisibleItem) {
+        if (!m_visibleItems.isEmpty() && m_visibleItems.last() != oldLastVisibleItem) {
             Q_EMIT m_view->lastVisibleItemChanged();
         }
     }
@@ -597,11 +605,11 @@ void ContentItem::forgetItem(QQuickItem *item)
     disconnect(item, nullptr, this, nullptr);
     disconnect(item, nullptr, m_view, nullptr);
 
-    QQuickItem *separatorItem = m_separators.take(item);
+    QQuickItem *separatorItem = m_leadingSeparators.take(item);
     if (separatorItem) {
         separatorItem->deleteLater();
     }
-    separatorItem = m_rightSeparators.take(item);
+    separatorItem = m_trailingSeparators.take(item);
     if (separatorItem) {
         separatorItem->deleteLater();
     }
@@ -614,43 +622,45 @@ void ContentItem::forgetItem(QQuickItem *item)
     m_view->polish();
 
     if (index <= m_view->currentIndex()) {
-        m_view->setCurrentIndex(qBound(0, index - 1, m_items.count() - 1));
+        m_view->setCurrentIndex(m_items.isEmpty() ? 0 : qBound(0, index - 1, m_items.count() - 1));
     }
     Q_EMIT m_view->countChanged();
 }
 
-QQuickItem *ContentItem::ensureSeparator(QQuickItem *item)
+QQuickItem *ContentItem::ensureLeadingSeparator(QQuickItem *item)
 {
-    QQuickItem *separatorItem = m_separators.value(item);
+    QQuickItem *separatorItem = m_leadingSeparators.value(item);
 
     if (!separatorItem) {
         separatorItem = qobject_cast<QQuickItem *>(
-            privateQmlComponentsPoolSelf->instance(qmlEngine(item))->m_separatorComponent->beginCreate(QQmlEngine::contextForObject(item)));
+            QmlComponentsPoolSingleton::instance(qmlEngine(item))->m_leadingSeparatorComponent->beginCreate(QQmlEngine::contextForObject(item)));
         if (separatorItem) {
+            separatorItem->setParent(this);
             separatorItem->setParentItem(item);
             separatorItem->setZ(9999);
             separatorItem->setProperty("column", QVariant::fromValue(item));
-            QmlComponentsPoolSingleton::instance(qmlEngine(item))->m_separatorComponent->completeCreate();
-            m_separators[item] = separatorItem;
+            QmlComponentsPoolSingleton::instance(qmlEngine(item))->m_leadingSeparatorComponent->completeCreate();
+            m_leadingSeparators[item] = separatorItem;
         }
     }
 
     return separatorItem;
 }
 
-QQuickItem *ContentItem::ensureRightSeparator(QQuickItem *item)
+QQuickItem *ContentItem::ensureTrailingSeparator(QQuickItem *item)
 {
-    QQuickItem *separatorItem = m_rightSeparators.value(item);
+    QQuickItem *separatorItem = m_trailingSeparators.value(item);
 
     if (!separatorItem) {
         separatorItem = qobject_cast<QQuickItem *>(
-            QmlComponentsPoolSingleton::instance(qmlEngine(item))->m_rightSeparatorComponent->beginCreate(QQmlEngine::contextForObject(item)));
+            QmlComponentsPoolSingleton::instance(qmlEngine(item))->m_trailingSeparatorComponent->beginCreate(QQmlEngine::contextForObject(item)));
         if (separatorItem) {
+            separatorItem->setParent(this);
             separatorItem->setParentItem(item);
             separatorItem->setZ(9999);
             separatorItem->setProperty("column", QVariant::fromValue(item));
-            QmlComponentsPoolSingleton::instance(qmlEngine(item))->m_rightSeparatorComponent->completeCreate();
-            m_rightSeparators[item] = separatorItem;
+            QmlComponentsPoolSingleton::instance(qmlEngine(item))->m_trailingSeparatorComponent->completeCreate();
+            m_trailingSeparators[item] = separatorItem;
         }
     }
 
@@ -682,7 +692,7 @@ void ContentItem::itemChange(QQuickItem::ItemChange change, const QQuickItem::It
         }
 
         if (m_view->separatorVisible()) {
-            ensureSeparator(value.item);
+            ensureLeadingSeparator(value.item);
         }
 
         m_shouldAnimate = true;
@@ -706,11 +716,19 @@ void ContentItem::itemChange(QQuickItem::ItemChange change, const QQuickItem::It
     QQuickItem::itemChange(change, value);
 }
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 void ContentItem::geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry)
 {
     updateVisibleItems();
     QQuickItem::geometryChanged(newGeometry, oldGeometry);
 }
+#else
+void ContentItem::geometryChange(const QRectF &newGeometry, const QRectF &oldGeometry)
+{
+    updateVisibleItems();
+    QQuickItem::geometryChange(newGeometry, oldGeometry);
+}
+#endif
 
 void ContentItem::syncItemsOrder()
 {
@@ -975,14 +993,14 @@ void ColumnView::setSeparatorVisible(bool visible)
 
     if (visible) {
         for (QQuickItem *item : std::as_const(m_contentItem->m_items)) {
-            QQuickItem *sep = m_contentItem->ensureSeparator(item);
+            QQuickItem *sep = m_contentItem->ensureLeadingSeparator(item);
             if (sep) {
                 sep->setVisible(true);
             }
 
             ColumnViewAttached *attached = qobject_cast<ColumnViewAttached *>(qmlAttachedPropertiesObject<ColumnView>(item, true));
             if (attached->isPinned()) {
-                QQuickItem *sep = m_contentItem->ensureRightSeparator(item);
+                QQuickItem *sep = m_contentItem->ensureTrailingSeparator(item);
                 if (sep) {
                     sep->setVisible(true);
                 }
@@ -990,10 +1008,10 @@ void ColumnView::setSeparatorVisible(bool visible)
         }
 
     } else {
-        for (QQuickItem *sep : std::as_const(m_contentItem->m_separators)) {
+        for (QQuickItem *sep : std::as_const(m_contentItem->m_leadingSeparators)) {
             sep->setVisible(false);
         }
-        for (QQuickItem *sep : std::as_const(m_contentItem->m_rightSeparators)) {
+        for (QQuickItem *sep : std::as_const(m_contentItem->m_trailingSeparators)) {
             sep->setVisible(false);
         }
     }
@@ -1233,6 +1251,7 @@ QQuickItem *ColumnView::removeItem(QQuickItem *item)
         item->setParentItem(attached ? attached->originalParent() : nullptr);
     }
 
+    Q_EMIT contentChildrenChanged();
     Q_EMIT itemRemoved(item);
 
     return item;
@@ -1286,7 +1305,11 @@ ColumnViewAttached *ColumnView::qmlAttachedProperties(QObject *object)
     return new ColumnViewAttached(object);
 }
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 void ColumnView::geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry)
+#else
+void ColumnView::geometryChange(const QRectF &newGeometry, const QRectF &oldGeometry)
+#endif
 {
     m_contentItem->setY(m_topPadding);
     m_contentItem->setHeight(newGeometry.height() - m_topPadding - m_bottomPadding);
@@ -1294,7 +1317,11 @@ void ColumnView::geometryChanged(const QRectF &newGeometry, const QRectF &oldGeo
     polish();
 
     m_contentItem->updateVisibleItems();
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     QQuickItem::geometryChanged(newGeometry, oldGeometry);
+#else
+    QQuickItem::geometryChange(newGeometry, oldGeometry);
+#endif
 }
 
 bool ColumnView::childMouseEventFilter(QQuickItem *item, QEvent *event)
@@ -1409,12 +1436,10 @@ bool ColumnView::childMouseEventFilter(QQuickItem *item, QEvent *event)
         me->setAccepted(m_dragging);
 
         return m_dragging && !verticalScrollIntercepted;
-        break;
     }
     case QEvent::MouseButtonRelease: {
         QMouseEvent *me = static_cast<QMouseEvent *>(event);
-
-        if (!m_acceptsMouse && me->source() == Qt::MouseEventNotSynthesized) {
+        if (item->property("preventStealing").toBool()) {
             return false;
         }
 
@@ -1426,6 +1451,10 @@ bool ColumnView::childMouseEventFilter(QQuickItem *item, QEvent *event)
             setCurrentIndex(m_currentIndex + 1);
             me->accept();
             return true;
+        }
+
+        if (!m_acceptsMouse && me->source() == Qt::MouseEventNotSynthesized) {
+            return false;
         }
 
         if (me->button() != Qt::LeftButton) {
@@ -1441,10 +1470,6 @@ bool ColumnView::childMouseEventFilter(QQuickItem *item, QEvent *event)
             Q_EMIT draggingChanged();
         }
 
-        if (item->property("preventStealing").toBool()) {
-            return false;
-        }
-
         event->accept();
 
         // if a drag happened, don't pass the event
@@ -1453,7 +1478,6 @@ bool ColumnView::childMouseEventFilter(QQuickItem *item, QEvent *event)
 
         me->setAccepted(block);
         return block;
-        break;
     }
     default:
         break;
@@ -1630,7 +1654,11 @@ void ColumnView::contentChildren_append(QQmlListProperty<QQuickItem> *prop, QQui
     item->setParentItem(view->m_contentItem);
 }
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 int ColumnView::contentChildren_count(QQmlListProperty<QQuickItem> *prop)
+#else
+qsizetype ColumnView::contentChildren_count(QQmlListProperty<QQuickItem> *prop)
+#endif
 {
     ColumnView *view = static_cast<ColumnView *>(prop->object);
     if (!view) {
@@ -1640,7 +1668,11 @@ int ColumnView::contentChildren_count(QQmlListProperty<QQuickItem> *prop)
     return view->m_contentItem->m_items.count();
 }
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 QQuickItem *ColumnView::contentChildren_at(QQmlListProperty<QQuickItem> *prop, int index)
+#else
+QQuickItem *ColumnView::contentChildren_at(QQmlListProperty<QQuickItem> *prop, qsizetype index)
+#endif
 {
     ColumnView *view = static_cast<ColumnView *>(prop->object);
     if (!view) {
@@ -1705,7 +1737,11 @@ void ColumnView::contentData_append(QQmlListProperty<QObject> *prop, QObject *ob
     }
 }
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 int ColumnView::contentData_count(QQmlListProperty<QObject> *prop)
+#else
+qsizetype ColumnView::contentData_count(QQmlListProperty<QObject> *prop)
+#endif
 {
     ColumnView *view = static_cast<ColumnView *>(prop->object);
     if (!view) {
@@ -1715,7 +1751,11 @@ int ColumnView::contentData_count(QQmlListProperty<QObject> *prop)
     return view->m_contentData.count();
 }
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 QObject *ColumnView::contentData_at(QQmlListProperty<QObject> *prop, int index)
+#else
+QObject *ColumnView::contentData_at(QQmlListProperty<QObject> *prop, qsizetype index)
+#endif
 {
     ColumnView *view = static_cast<ColumnView *>(prop->object);
     if (!view) {

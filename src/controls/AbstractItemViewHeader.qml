@@ -9,26 +9,30 @@ import QtQuick.Templates 2.0 as T2
 import org.kde.kirigami 2.4 as Kirigami
 
 /**
- * An item that can be used as an header for a ListView.
+ * @brief An item that can be used as an header for a ListView.
+ *
  * It will play nice with the margin policies of ScrollablePage and can
  * automatically shrink when the list is scrolled, like the behavior
  * of list headers in many mobile applications.
  * @since 2.1
  * @inherit QtQuick.Controls.Control
+ * @deprecated since 5.97; Don't use AbstractItemViewHeader in your views anymore.
+ *
+ * TODO KF6: remove
  */
 T2.Control {
     /**
-     * This property holds the minimum height of the AbstractItemViewHeader.
+     * @brief This property holds the minimum height of the AbstractItemViewHeader.
      */
     property int minimumHeight: Kirigami.Units.gridUnit * 2 + Kirigami.Units.smallSpacing * 2
 
     /**
-     * This property holds the maximum height of the AbstractItemViewHeader.
+     * @brief This property holds the maximum height of the AbstractItemViewHeader.
      */
     property int maximumHeight: Kirigami.Units.gridUnit * 6
 
     /**
-     * This property holds the ListView for which this item is the header.
+     * @brief This property holds the ListView for which this item is the header.
      *
      * By default automatically set to the attached property: `ListView.view`.
      */

@@ -11,7 +11,7 @@
 #include <QObject>
 
 #ifndef KIRIGAMI_BUILD_TYPE_STATIC
-#include <kirigami2_export.h>
+#include "kirigami2_export.h"
 #endif
 
 class QQmlEngine;
@@ -20,7 +20,7 @@ namespace Kirigami {
 class Units;
 
 /**
- * @class KirigamiPluginFactory kirigamipluginfactory.h KirigamiPluginFactory
+ * @class KirigamiPluginFactory kirigamipluginfactory.h <Kirigami/KirigamiPluginFactory>
  *
  * This class is reimpleented by plugins to provide different implementations
  * of PlatformTheme

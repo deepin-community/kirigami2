@@ -8,10 +8,11 @@ import QtQuick 2.1
 import QtQuick.Controls 2.4 as QQC2
 import QtQuick.Window 2.15
 import QtQuick.Layouts 1.3
-import org.kde.kirigami 2.18
+import org.kde.kirigami 2.20 as Kirigami
 
+//TODO: Kf6: move somewhere else which can depend from KAboutData?
 /**
- * An about item that displays the about data
+ * @brief An about item that displays the about data
  *
  * Allows to show the copyright notice of the application
  * together with the contributors and some information of which platform it's
@@ -20,13 +21,12 @@ import org.kde.kirigami 2.18
  * @since 5.87
  * @since org.kde.kirigami 2.19
  */
-Item
-{
+Item {
     id: aboutItem
     /**
-     * This property holds an object with the same shape as KAboutData.
+     * @brief This property holds an object with the same shape as KAboutData.
      *
-     * For example:
+     * Example usage:
      * @code{json}
      * aboutData: {
           "displayName" : "KirigamiApp",
@@ -65,14 +65,27 @@ Item
     property var aboutData
 
     /**
-     * This property holds a link to a "Get Involved" page. By default link to
-     * "https://community.kde.org/Get_Involved" when your application application
-     * id starts with "org.kde.", otherwise is empty.
+     * @brief This property holds a link to a "Get Involved" page.
+     *
+     * default: `"https://community.kde.org/Get_Involved" when application id starts with "org.kde.", otherwise it is empty.`
      */
     property url getInvolvedUrl: aboutData.desktopFileName.startsWith("org.kde.") ? "https://community.kde.org/Get_Involved" : ""
 
+    /**
+     * @brief This property holds a link to a "Donate" page.
+     *
+     * default: `"https://kde.org/community/donations" when application id starts with "org.kde.", otherwise it is empty.`
+     */
+    property url donateUrl: aboutData.desktopFileName.startsWith("org.kde.") ? "https://kde.org/community/donations" : ""
+
     /** @internal */
     property bool _usePageStack: false
+
+    /**
+     * @see org::kde::kirigami::FormLayout::wideMode
+     * @property bool wideMode
+     */
+    property alias wideMode: form.wideMode
 
     /** @internal */
     default property alias _content: form.data
@@ -87,25 +100,25 @@ Item
             Layout.fillWidth: true
             property bool hasRemoteAvatar: (typeof(modelData.ocsUsername) !== "undefined" && modelData.ocsUsername.length > 0)
 
-            spacing: Units.smallSpacing * 2
+            spacing: Kirigami.Units.smallSpacing * 2
 
-            Icon {
+            Kirigami.Icon {
                 id: avatarIcon
 
-                implicitWidth: Units.iconSizes.medium
+                implicitWidth: Kirigami.Units.iconSizes.medium
                 implicitHeight: implicitWidth
 
                 fallback: "user"
                 source: hasRemoteAvatar && remoteAvatars.checked ? "https://store.kde.org/avatar/%1?s=%2".arg(modelData.ocsUsername).arg(width) : "user"
-                visible: status !== Icon.Loading
+                visible: status !== Kirigami.Icon.Loading
             }
 
             // So it's clear that something is happening while avatar images are loaded
             QQC2.BusyIndicator {
-                implicitWidth: Units.iconSizes.medium
+                implicitWidth: Kirigami.Units.iconSizes.medium
                 implicitHeight: implicitWidth
 
-                visible: avatarIcon.status === Icon.Loading
+                visible: avatarIcon.status === Kirigami.Icon.Loading
                 running: visible
             }
 
@@ -119,7 +132,7 @@ Item
             QQC2.ToolButton {
                 visible: typeof(modelData.ocsUsername) !== "undefined" && modelData.ocsUsername.length > 0
                 icon.name: "get-hot-new-stuff"
-                QQC2.ToolTip.delay: Units.toolTipDelay
+                QQC2.ToolTip.delay: Kirigami.Units.toolTipDelay
                 QQC2.ToolTip.visible: hovered
                 QQC2.ToolTip.text: qsTr("Visit %1's KDE Store page").arg(modelData.name)
                 onClicked: Qt.openUrlExternally("https://store.kde.org/u/%1".arg(modelData.ocsUsername))
@@ -128,7 +141,7 @@ Item
             QQC2.ToolButton {
                 visible: typeof(modelData.emailAddress) !== "undefined" && modelData.emailAddress.length > 0
                 icon.name: "mail-sent"
-                QQC2.ToolTip.delay: Units.toolTipDelay
+                QQC2.ToolTip.delay: Kirigami.Units.toolTipDelay
                 QQC2.ToolTip.visible: hovered
                 QQC2.ToolTip.text: qsTr("Send an email to %1").arg(modelData.emailAddress)
                 onClicked: Qt.openUrlExternally("mailto:%1".arg(modelData.emailAddress))
@@ -137,7 +150,7 @@ Item
             QQC2.ToolButton {
                 visible: typeof(modelData.webAddress) !== "undefined" && modelData.webAddress.length > 0
                 icon.name: "globe"
-                QQC2.ToolTip.delay: Units.toolTipDelay
+                QQC2.ToolTip.delay: Kirigami.Units.toolTipDelay
                 QQC2.ToolTip.visible: hovered
                 QQC2.ToolTip.text: (typeof(modelData.webAddress) === "undefined" && modelData.webAddress.length > 0) ? "" : modelData.webAddress
                 onClicked: Qt.openUrlExternally(modelData.webAddress)
@@ -145,7 +158,7 @@ Item
         }
     }
 
-    FormLayout {
+    Kirigami.FormLayout {
         id: form
 
         anchors.fill: parent
@@ -154,32 +167,59 @@ Item
             columns: 2
             Layout.fillWidth: true
 
-            Icon {
+            Kirigami.Icon {
                 Layout.rowSpan: 3
-                Layout.preferredHeight: Units.iconSizes.huge
+                Layout.preferredHeight: Kirigami.Units.iconSizes.huge
                 Layout.preferredWidth: height
                 Layout.maximumWidth: aboutItem.width / 3;
-                Layout.rightMargin: Units.largeSpacing
-                source: Settings.applicationWindowIcon || aboutItem.aboutData.programLogo || aboutItem.aboutData.programIconName || aboutItem.aboutData.componentName
+                Layout.rightMargin: Kirigami.Units.largeSpacing
+                source: Kirigami.Settings.applicationWindowIcon || aboutItem.aboutData.programLogo || aboutItem.aboutData.programIconName || aboutItem.aboutData.componentName
             }
 
-            Heading {
+            Kirigami.Heading {
                 Layout.fillWidth: true
                 text: aboutItem.aboutData.displayName + " " + aboutItem.aboutData.version
                 wrapMode: Text.WordWrap
             }
 
-            Heading {
+            Kirigami.Heading {
                 Layout.fillWidth: true
                 level: 2
                 wrapMode: Text.WordWrap
                 text: aboutItem.aboutData.shortDescription
             }
 
-            UrlButton {
-                text: qsTr("Get Involved")
-                url: aboutItem.getInvolvedUrl
-                visible: url !== ""
+            RowLayout {
+                spacing: Kirigami.Units.largeSpacing * 2
+
+                UrlButton {
+                    text: qsTr("Get Involved")
+                    url: aboutItem.getInvolvedUrl
+                    visible: url !== ""
+                }
+
+                UrlButton {
+                    text: qsTr("Donate")
+                    url: aboutItem.donateUrl
+                    visible: url !== ""
+                }
+
+                UrlButton {
+                    readonly property string theUrl: {
+                        if (page.aboutData.bugAddress !== "submit@bugs.kde.org") {
+                            return page.aboutData.bugAddress
+                        }
+                        const elements = page.aboutData.productName.split('/');
+                        let url = `https://bugs.kde.org/enter_bug.cgi?format=guided&product=${elements[0]}&version=${page.aboutData.version}`;
+                        if (elements.length === 2) {
+                            url += "&component=" + elements[1];
+                        }
+                        return url;
+                    }
+                    text: qsTr("Report a Bug")
+                    url: theUrl
+                    visible: theUrl !== ""
+                }
             }
         }
 
@@ -187,13 +227,13 @@ Item
             Layout.fillWidth: true
         }
 
-        Heading {
-            FormData.isSection: true
+        Kirigami.Heading {
+            Kirigami.FormData.isSection: true
             text: qsTr("Copyright")
         }
 
         QQC2.Label {
-            Layout.leftMargin: Units.gridUnit
+            Layout.leftMargin: Kirigami.Units.gridUnit
             text: aboutData.otherText
             visible: text.length > 0
             wrapMode: Text.WordWrap
@@ -201,7 +241,7 @@ Item
         }
 
         QQC2.Label {
-            Layout.leftMargin: Units.gridUnit
+            Layout.leftMargin: Kirigami.Units.gridUnit
             text: aboutData.copyrightStatement
             visible: text.length > 0
             wrapMode: Text.WordWrap
@@ -209,7 +249,7 @@ Item
         }
 
         UrlButton {
-            Layout.leftMargin: Units.gridUnit
+            Layout.leftMargin: Kirigami.Units.gridUnit
             url: aboutData.homepage
             visible: url.length > 0
             wrapMode: Text.WordWrap
@@ -219,15 +259,11 @@ Item
         OverlaySheet {
             id: licenseSheet
             property alias text: bodyLabel.text
-            property alias name: heading.text
 
-            header: Heading {
-                id: heading
-            }
-
-            contentItem: QQC2.Label {
+            contentItem: SelectableLabel {
                 id: bodyLabel
                 text: licenseSheet.text
+                wrapMode: Text.Wrap
             }
         }
 
@@ -235,7 +271,7 @@ Item
             id: licenseLinkButton
 
             RowLayout {
-                Layout.leftMargin: Units.smallSpacing
+                Layout.leftMargin: Kirigami.Units.smallSpacing
 
                 QQC2.Label { text: qsTr("License:") }
 
@@ -243,9 +279,9 @@ Item
                     Layout.fillWidth: true
                     wrapMode: Text.WordWrap
                     text: modelData.name
-                    onClicked: {
+                    onClicked: mouse => {
                         licenseSheet.text = modelData.text
-                        licenseSheet.name = modelData.name
+                        licenseSheet.title = modelData.name
                         licenseSheet.open()
                     }
                 }
@@ -256,7 +292,7 @@ Item
             id: licenseTextItem
 
             QQC2.Label {
-                Layout.leftMargin: Units.smallSpacing
+                Layout.leftMargin: Kirigami.Units.smallSpacing
                 Layout.fillWidth: true
                 wrapMode: Text.WordWrap
                 text: qsTr("License: %1").arg(modelData.name)
@@ -268,18 +304,18 @@ Item
             delegate: _usePageStack ? licenseLinkButton : licenseTextItem
         }
 
-        Heading {
-            FormData.isSection: visible
+        Kirigami.Heading {
+            Kirigami.FormData.isSection: visible
             text: qsTr("Libraries in use")
             Layout.fillWidth: true
             wrapMode: Text.WordWrap
-            visible: Settings.information
+            visible: Kirigami.Settings.information
         }
 
         Repeater {
-            model: Settings.information
+            model: Kirigami.Settings.information
             delegate: QQC2.Label {
-                Layout.leftMargin: Units.gridUnit
+                Layout.leftMargin: Kirigami.Units.gridUnit
                 Layout.fillWidth: true
                 wrapMode: Text.WordWrap
                 id: libraries
@@ -292,14 +328,14 @@ Item
             delegate: QQC2.Label {
                 Layout.fillWidth: true
                 wrapMode: Text.WordWrap
-                Layout.leftMargin: Units.gridUnit
+                Layout.leftMargin: Kirigami.Units.gridUnit
                 text: modelData.name + (modelData.version === "" ? "" : " %1".arg(modelData.version))
             }
         }
 
-        Heading {
+        Kirigami.Heading {
             Layout.fillWidth: true
-            FormData.isSection: visible
+            Kirigami.FormData.isSection: visible
             text: qsTr("Authors")
             wrapMode: Text.WordWrap
             visible: aboutData.authors.length > 0
@@ -316,9 +352,9 @@ Item
                 repeat: false
                 interval: 1
                 onTriggered: {
-                    var hasAnyRemotes = false;
-                    for (var i = 0; i < authorsRepeater.count; ++i) {
-                        var itm = authorsRepeater.itemAt(i);
+                    let hasAnyRemotes = false;
+                    for (let i = 0; i < authorsRepeater.count; ++i) {
+                        const itm = authorsRepeater.itemAt(i);
                         if (itm.hasRemoteAvatar) {
                             hasAnyRemotes = true;
                             break;
@@ -337,9 +373,9 @@ Item
             onCountChanged: remotesThrottle.start()
         }
 
-        Heading {
+        Kirigami.Heading {
             height: visible ? implicitHeight : 0
-            FormData.isSection: visible
+            Kirigami.FormData.isSection: visible
             text: qsTr("Credits")
             visible: repCredits.count > 0
         }
@@ -350,9 +386,9 @@ Item
             delegate: personDelegate
         }
 
-        Heading {
+        Kirigami.Heading {
             height: visible ? implicitHeight : 0
-            FormData.isSection: visible
+            Kirigami.FormData.isSection: visible
             text: qsTr("Translators")
             visible: repTranslators.count > 0
         }

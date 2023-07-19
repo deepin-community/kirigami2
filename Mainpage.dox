@@ -28,7 +28,7 @@ A tutorial for Kirigami is available on <a href="https://develop.kde.org/docs/ki
 - \link org::kde::kirigami::templates::OverlaySheet  OverlaySheet \endlink
 - \link PageRouter  PageRouter \endlink
 - \link PageRoute  PageRoute \endlink
-- \link org::kde::kirigami::Theme Theme  \endlink
+- \link Kirigami::PlatformTheme Theme  \endlink
 - \link Kirigami::Units  Units \endlink
 - \link Icon Icon  \endlink
 - \link org::kde::kirigami::AbstractApplicationHeader AbstractApplicationHeader  \endlink
@@ -40,6 +40,8 @@ A tutorial for Kirigami is available on <a href="https://develop.kde.org/docs/ki
 - \link org::kde::kirigami::Heading Heading  \endlink
 - \link org::kde::kirigami::Label Label  \endlink
 - \link org::kde::kirigami::PlaceholderMessage PlaceholderMessage  \endlink
+- \link org::kde::kirigami::Dialog Dialog \endlink
+- \link org::kde::kirigami::NavigationTabBar NavigationTabBar \endlink
 
 
 \subsection example Minimal Example

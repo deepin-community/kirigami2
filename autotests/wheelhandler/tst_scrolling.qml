@@ -29,51 +29,51 @@ TestCase {
         let y = flickable.contentY
         const angleDeltaFactor = angleDelta / 120
         mouseWheel(flickable, flickable.leftMargin, 0, -angleDelta, -angleDelta, Qt.NoButton)
-        verify(flickable.contentX === x + hstep * angleDeltaFactor, "+xTick")
+        verify(flickable.contentX === Math.round(x + hstep * angleDeltaFactor), "+xTick")
         x = flickable.contentX
-        verify(flickable.contentY === y + vstep * angleDeltaFactor, "+yTick")
+        verify(flickable.contentY === Math.round(y + vstep * angleDeltaFactor), "+yTick")
         y = flickable.contentY
 
         mouseWheel(flickable, flickable.leftMargin, 0, angleDelta, angleDelta, Qt.NoButton)
-        verify(flickable.contentX === x - hstep * angleDeltaFactor, "-xTick")
+        verify(flickable.contentX === Math.round(x - hstep * angleDeltaFactor), "-xTick")
         x = flickable.contentX
-        verify(flickable.contentY === y - vstep * angleDeltaFactor, "-yTick")
+        verify(flickable.contentY === Math.round(y - vstep * angleDeltaFactor), "-yTick")
         y = flickable.contentY
 
         if (Qt.platform.pluginName !== "xcb") {
             mouseWheel(flickable, flickable.leftMargin, 0, 0, -angleDelta, Qt.NoButton, Qt.AltModifier)
-            verify(flickable.contentX === x + hstep * angleDeltaFactor, "+h_yTick")
+            verify(flickable.contentX === Math.round(x + hstep * angleDeltaFactor), "+h_yTick")
             x = flickable.contentX
             verify(flickable.contentY === y, "no +yTick")
 
             mouseWheel(flickable, flickable.leftMargin, 0, 0, angleDelta, Qt.NoButton, Qt.AltModifier)
-            verify(flickable.contentX === x - hstep * angleDeltaFactor, "-h_yTick")
+            verify(flickable.contentX === Math.round(x - hstep * angleDeltaFactor), "-h_yTick")
             x = flickable.contentX
             verify(flickable.contentY === y, "no -yTick")
         }
 
         mouseWheel(flickable, flickable.leftMargin, 0, -angleDelta, -angleDelta, Qt.NoButton, wheelHandler.pageScrollModifiers)
-        verify(flickable.contentX === x + pageWidth * angleDeltaFactor, "+xPage")
+        verify(flickable.contentX === Math.round(x + pageWidth * angleDeltaFactor), "+xPage")
         x = flickable.contentX
-        verify(flickable.contentY === y + pageHeight * angleDeltaFactor, "+yPage")
+        verify(flickable.contentY === Math.round(y + pageHeight * angleDeltaFactor), "+yPage")
         y = flickable.contentY
 
         mouseWheel(flickable, flickable.leftMargin, 0, angleDelta, angleDelta, Qt.NoButton, wheelHandler.pageScrollModifiers)
-        verify(flickable.contentX === x - pageWidth * angleDeltaFactor, "-xPage")
+        verify(flickable.contentX === Math.round(x - pageWidth * angleDeltaFactor), "-xPage")
         x = flickable.contentX
-        verify(flickable.contentY === y - pageHeight * angleDeltaFactor, "-yPage")
+        verify(flickable.contentY === Math.round(y - pageHeight * angleDeltaFactor), "-yPage")
         y = flickable.contentY
 
         if (Qt.platform.pluginName !== "xcb") {
             mouseWheel(flickable, flickable.leftMargin, 0, 0, -angleDelta, Qt.NoButton,
                     Qt.AltModifier | wheelHandler.pageScrollModifiers)
-            verify(flickable.contentX === x + pageWidth * angleDeltaFactor, "+h_yPage")
+            verify(flickable.contentX === Math.round(x + pageWidth * angleDeltaFactor), "+h_yPage")
             x = flickable.contentX
             verify(flickable.contentY === y, "no +yPage")
 
             mouseWheel(flickable, flickable.leftMargin, 0, 0, angleDelta, Qt.NoButton,
                     Qt.AltModifier | wheelHandler.pageScrollModifiers)
-            verify(flickable.contentX === x - pageWidth * angleDeltaFactor, "-h_yPage")
+            verify(flickable.contentX === Math.round(x - pageWidth * angleDeltaFactor), "-h_yPage")
             x = flickable.contentX
             verify(flickable.contentY === y, "no -yPage")
         }

@@ -4,10 +4,10 @@
  *  SPDX-License-Identifier: LGPL-2.0-or-later
  */
 
-import QtQuick 2.1
-import QtQuick.Controls 2.3 as Controls
-import QtQuick.Layouts 1.2
-import org.kde.kirigami 2.7 as Kirigami
+import QtQuick 2.15
+import QtQuick.Layouts 1.15
+import QtQuick.Controls 2.15 as QQC2
+import org.kde.kirigami 2.20 as Kirigami
 
 Kirigami.ApplicationWindow {
     id: root
@@ -25,14 +25,14 @@ Kirigami.ApplicationWindow {
         contentItem: ColumnLayout {
             Layout.preferredWidth: Kirigami.Units.gridUnit * 20
 
-            Controls.Label {
+            QQC2.Label {
                 Layout.alignment: Qt.AlignHCenter
                 text: "This is a sidebar"
                 Layout.fillWidth: true
                 width: parent.width - Kirigami.Units.smallSpacing * 2
                 wrapMode: Text.WordWrap
             }
-            Controls.Button {
+            QQC2.Button {
                 Layout.alignment: Qt.AlignHCenter
                 text: "Modal"
                 checkable: true
@@ -48,21 +48,21 @@ Kirigami.ApplicationWindow {
     contextDrawer: Kirigami.OverlayDrawer {
         id: contextDrawer
         drawerOpen: true
-        edge: Qt.application.layoutDirection == Qt.RightToLeft ? Qt.LeftEdge : Qt.RightEdge
+        edge: Qt.application.layoutDirection === Qt.RightToLeft ? Qt.LeftEdge : Qt.RightEdge
         modal: false
         leftPadding: Kirigami.Units.largeSpacing
         rightPadding: Kirigami.Units.largeSpacing
         contentItem: ColumnLayout {
             Layout.preferredWidth: Kirigami.Units.gridUnit * 10
 
-            Controls.Label {
+            QQC2.Label {
                 Layout.alignment: Qt.AlignHCenter
                 text: "This is a sidebar"
                 Layout.fillWidth: true
                 width: parent.width - Kirigami.Units.smallSpacing * 2
                 wrapMode: Text.WordWrap
             }
-            Controls.Button {
+            QQC2.Button {
                 Layout.alignment: Qt.AlignHCenter
                 text: "Modal"
                 checkable: true
@@ -76,30 +76,30 @@ Kirigami.ApplicationWindow {
         }
     }
 
-    menuBar: Controls.MenuBar {
-        Controls.Menu {
+    menuBar: QQC2.MenuBar {
+        QQC2.Menu {
             title: qsTr("&File")
-            Controls.Action { text: qsTr("&New...") }
-            Controls.Action { text: qsTr("&Open...") }
-            Controls.Action { text: qsTr("&Save") }
-            Controls.Action { text: qsTr("Save &As...") }
-            Controls.MenuSeparator { }
-            Controls.Action { text: qsTr("&Quit") }
+            QQC2.Action { text: qsTr("&New...") }
+            QQC2.Action { text: qsTr("&Open...") }
+            QQC2.Action { text: qsTr("&Save") }
+            QQC2.Action { text: qsTr("Save &As...") }
+            QQC2.MenuSeparator { }
+            QQC2.Action { text: qsTr("&Quit") }
         }
-        Controls.Menu {
+        QQC2.Menu {
             title: qsTr("&Edit")
-            Controls.Action { text: qsTr("Cu&t") }
-            Controls.Action { text: qsTr("&Copy") }
-            Controls.Action { text: qsTr("&Paste") }
+            QQC2.Action { text: qsTr("Cu&t") }
+            QQC2.Action { text: qsTr("&Copy") }
+            QQC2.Action { text: qsTr("&Paste") }
         }
-        Controls.Menu {
+        QQC2.Menu {
             title: qsTr("&Help")
-            Controls.Action { text: qsTr("&About") }
+            QQC2.Action { text: qsTr("&About") }
         }
     }
-    header: Controls.ToolBar {
+    header: QQC2.ToolBar {
         contentItem: RowLayout {
-            Controls.ToolButton {
+            QQC2.ToolButton {
                 text: "Global ToolBar"
             }
             Item {
@@ -108,13 +108,13 @@ Kirigami.ApplicationWindow {
             Kirigami.ActionTextField {
                 id: searchField
 
-                placeholderText: "Search..."
+                placeholderText: "Search…"
 
-                focusSequence: "Ctrl+F"
+                focusSequence: StandardKey.Find
                 leftActions: [
                     Kirigami.Action {
                         icon.name: "edit-clear"
-                        visible: searchField.text != ""
+                        visible: searchField.text !== ""
                         onTriggered: {
                             searchField.text = ""
                             searchField.accepted()
@@ -122,7 +122,7 @@ Kirigami.ApplicationWindow {
                     },
                     Kirigami.Action {
                         icon.name: "edit-clear"
-                        visible: searchField.text != ""
+                        visible: searchField.text !== ""
                         onTriggered: {
                             searchField.text = ""
                             searchField.accepted()
@@ -132,7 +132,7 @@ Kirigami.ApplicationWindow {
                 rightActions: [
                     Kirigami.Action {
                         icon.name: "edit-clear"
-                        visible: searchField.text != ""
+                        visible: searchField.text !== ""
                         onTriggered: {
                             searchField.text = ""
                             searchField.accepted()
@@ -140,7 +140,7 @@ Kirigami.ApplicationWindow {
                     },
                     Kirigami.Action {
                         icon.name: "anchor"
-                        visible: searchField.text != ""
+                        visible: searchField.text !== ""
                         onTriggered: {
                             searchField.text = ""
                             searchField.accepted()
@@ -157,9 +157,9 @@ Kirigami.ApplicationWindow {
         id: mainPageComponent
         MultipleColumnsGallery {}
     }
-    footer: Controls.ToolBar {
-        position: Controls.ToolBar.Footer
-        Controls.Label {
+    footer: QQC2.ToolBar {
+        position: QQC2.ToolBar.Footer
+        QQC2.Label {
             anchors.fill: parent
             verticalAlignment: Qt.AlignVCenter
             text: "Global Footer"

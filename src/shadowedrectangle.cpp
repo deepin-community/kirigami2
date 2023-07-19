@@ -11,7 +11,9 @@
 #include <QSGRendererInterface>
 
 #include "scenegraph/paintedrectangleitem.h"
+#if QT_CONFIG(opengl) || QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 #include "scenegraph/shadowedrectanglenode.h"
+#endif
 
 BorderGroup::BorderGroup(QObject *parent)
     : QObject(parent)
@@ -299,6 +301,7 @@ QSGNode *ShadowedRectangle::updatePaintNode(QSGNode *node, QQuickItem::UpdatePai
 {
     Q_UNUSED(data);
 
+#if QT_CONFIG(opengl) || QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     auto shadowNode = static_cast<ShadowedRectangleNode *>(node);
 
     if (!shadowNode) {
@@ -322,6 +325,10 @@ QSGNode *ShadowedRectangle::updatePaintNode(QSGNode *node, QQuickItem::UpdatePai
     shadowNode->setBorderColor(m_border->color());
     shadowNode->updateGeometry();
     return shadowNode;
+#else
+    Q_UNUSED(node)
+    return nullptr;
+#endif
 }
 
 void ShadowedRectangle::checkSoftwareItem()

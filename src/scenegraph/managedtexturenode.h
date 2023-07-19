@@ -11,7 +11,7 @@
 #include <QQuickWindow>
 #include <QSGSimpleTextureNode>
 #include <QSGTexture>
-#include <QSharedPointer>
+#include <memory>
 
 class ManagedTextureNode : public QSGSimpleTextureNode
 {
@@ -19,13 +19,13 @@ class ManagedTextureNode : public QSGSimpleTextureNode
 public:
     ManagedTextureNode();
 
-    void setTexture(QSharedPointer<QSGTexture> texture);
+    void setTexture(std::shared_ptr<QSGTexture> texture);
 
 private:
-    QSharedPointer<QSGTexture> m_texture;
+    std::shared_ptr<QSGTexture> m_texture;
 };
 
-typedef QHash<qint64, QHash<QWindow *, QWeakPointer<QSGTexture>>> TexturesCache;
+typedef QHash<qint64, QHash<QWindow *, std::weak_ptr<QSGTexture>>> TexturesCache;
 
 struct ImageTexturesCachePrivate {
     TexturesCache cache;
@@ -43,10 +43,10 @@ public:
      * If an @p image id is the same as one already provided before, we won't create
      * a new texture and return a shared pointer to the existing texture.
      */
-    QSharedPointer<QSGTexture> loadTexture(QQuickWindow *window, const QImage &image, QQuickWindow::CreateTextureOptions options);
+    std::shared_ptr<QSGTexture> loadTexture(QQuickWindow *window, const QImage &image, QQuickWindow::CreateTextureOptions options);
 
-    QSharedPointer<QSGTexture> loadTexture(QQuickWindow *window, const QImage &image);
+    std::shared_ptr<QSGTexture> loadTexture(QQuickWindow *window, const QImage &image);
 
 private:
-    QScopedPointer<ImageTexturesCachePrivate> d;
+    std::unique_ptr<ImageTexturesCachePrivate> d;
 };

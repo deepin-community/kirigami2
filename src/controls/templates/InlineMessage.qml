@@ -1,14 +1,15 @@
 /*
  *  SPDX-FileCopyrightText: 2018 Eike Hein <hein@kde.org>
+ *  SPDX-FileCopyrightText: 2022 ivan tkachenko <me@ratijas.tk>
  *
  *  SPDX-License-Identifier: LGPL-2.0-or-later
  */
 
 import QtQuick 2.7
-import QtQuick.Templates 2.0 as T2
-import QtQuick.Controls 2.0 as Controls
 import QtQuick.Layouts 1.0
-import org.kde.kirigami 2.5 as Kirigami
+import QtQuick.Controls 2.0 as QQC2
+import QtQuick.Templates 2.0 as T2
+import org.kde.kirigami 2.20 as Kirigami
 import "private"
 
 /**
@@ -58,7 +59,7 @@ import "private"
  * @endcode
  *
  * @since 5.45
- * @inherit QtQuick.Controls.Control
+ * @inherit QtQuick.QQC2.Control
  */
 T2.Control {
     id: root
@@ -76,6 +77,11 @@ T2.Control {
      * @param The clicked or tapped link.
      */
     signal linkActivated(string link)
+
+    /**
+     * This property holds the link embedded in the message text that the user is hovering over.
+     */
+    readonly property string hoveredLink: label.hoveredLink
 
     /**
      * This property holds the message type. One of Information, Positive, Warning or Error.
@@ -117,16 +123,18 @@ T2.Control {
     /**
      * This property holds whether the current message item is animating.
      */
-    readonly property bool animating: root.hasOwnProperty("_animating") && _animating
-
-    implicitHeight: visible ? contentLayout.implicitHeight + (2 * (background.border.width + Kirigami.Units.smallSpacing)) : 0
+    readonly property bool animating: _animating
 
     property bool _animating: false
 
-    leftPadding: background.border.width + Kirigami.Units.smallSpacing
-    topPadding: background.border.width + Kirigami.Units.smallSpacing
-    rightPadding: background.border.width + Kirigami.Units.smallSpacing
-    bottomPadding: background.border.width + Kirigami.Units.smallSpacing
+    implicitHeight: visible ? (contentLayout.implicitHeight + topPadding + bottomPadding) : 0
+
+    padding: Kirigami.Units.smallSpacing
+    // base style (such as qqc2-desktop-style) may define unique paddings for Control, reset it to uniform
+    topPadding: undefined
+    leftPadding: undefined
+    rightPadding: undefined
+    bottomPadding: undefined
 
     Behavior on implicitHeight {
         enabled: !root.visible
@@ -139,11 +147,11 @@ T2.Control {
 
     onVisibleChanged: {
         if (!visible) {
-            contentLayout.opacity = 0.0;
+            contentLayout.opacity = 0;
         }
     }
 
-    opacity: visible ? 1.0 : 0.0
+    opacity: visible ? 1 : 0
 
     Behavior on opacity {
         enabled: !root.visible
@@ -152,10 +160,10 @@ T2.Control {
     }
 
     onOpacityChanged: {
-        if (opacity == 0.0) {
-            contentLayout.opacity = 0.0;
-        } else if (opacity == 1.0) {
-            contentLayout.opacity = 1.0;
+        if (opacity === 0) {
+            contentLayout.opacity = 0;
+        } else if (opacity === 1) {
+            contentLayout.opacity = 1;
         }
     }
 
@@ -181,19 +189,24 @@ T2.Control {
 
         implicitHeight: {
             if (actionsLayout.atBottom) {
-                return text.implicitHeight + actionsLayout.height + Kirigami.Units.gridUnit
+                return label.implicitHeight + actionsLayout.height + Kirigami.Units.gridUnit
             } else {
-                return Math.max(icon.implicitHeight, text.implicitHeight, closeButton.implicitHeight, actionsLayout.height)
+                return Math.max(icon.implicitHeight, label.implicitHeight, closeButton.implicitHeight, actionsLayout.height)
             }
         }
 
-        property bool multiline: text.lineCount > 1 || actionsLayout.atBottom
+        readonly property real remainingWidth: width - (
+            icon.width
+            + labelArea.anchors.leftMargin + label.implicitWidth + labelArea.anchors.rightMargin
+            + (root.showCloseButton ? closeButton.width : 0)
+        )
+        readonly property bool multiline: remainingWidth <= 0 || actionsLayout.atBottom
 
         Kirigami.Icon {
             id: icon
 
             width: Kirigami.Units.iconSizes.smallMedium
-            height: actionsLayout.atBottom ? width : width
+            height: Kirigami.Units.iconSizes.smallMedium
 
             anchors {
                 left: parent.left
@@ -208,11 +221,11 @@ T2.Control {
                     return root.icon.source;
                 }
 
-                if (root.type == Kirigami.MessageType.Positive) {
+                if (root.type === Kirigami.MessageType.Positive) {
                     return "dialog-positive";
-                } else if (root.type == Kirigami.MessageType.Warning) {
+                } else if (root.type === Kirigami.MessageType.Warning) {
                     return "dialog-warning";
-                } else if (root.type == Kirigami.MessageType.Error) {
+                } else if (root.type === Kirigami.MessageType.Error) {
                     return "dialog-error";
                 }
 
@@ -223,38 +236,39 @@ T2.Control {
         }
 
         MouseArea {
-            id: textArea
+            id: labelArea
 
             anchors {
                 left: icon.right
                 leftMargin: Kirigami.Units.smallSpacing
-                right: closeButton.visible ? closeButton.left : parent.right
-                rightMargin: closeButton.visible ? Kirigami.Units.smallSpacing : 0
+                right: root.showCloseButton ? closeButton.left : parent.right
+                rightMargin: root.showCloseButton ? Kirigami.Units.smallSpacing : 0
                 top: parent.top
-                bottom: actionsLayout.atBottom ? undefined : parent.bottom
+                bottom: contentLayout.multiline ? undefined : parent.bottom
             }
 
-            cursorShape: text.hoveredLink ? Qt.PointingHandCursor : Qt.ArrowCursor
+            acceptedButtons: Qt.NoButton
+            cursorShape: label.hoveredLink.length > 0 ? Qt.PointingHandCursor : undefined
+            propagateComposedEvents: true
 
-            implicitWidth: text.implicitWidth
-            height: actionsLayout.atBottom ? text.implicitHeight : implicitHeight
+            implicitWidth: label.implicitWidth
+            height: contentLayout.multiline ? label.implicitHeight : implicitHeight
 
-            Controls.Label {
-                id: text
+            Kirigami.SelectableLabel {
+                id: label
 
                 width: parent.width
                 height: parent.height
 
                 color: Kirigami.Theme.textColor
                 wrapMode: Text.WordWrap
-                elide: Text.ElideRight
 
                 text: root.text
 
                 verticalAlignment: Text.AlignVCenter
 
-                onLinkHovered: root.linkHovered(link)
-                onLinkActivated: root.linkActivated(link)
+                onLinkHovered: link => root.linkHovered(link)
+                onLinkActivated: link => root.linkActivated(link)
             }
         }
 
@@ -263,28 +277,21 @@ T2.Control {
 
             flat: false
             actions: root.actions
-            visible: root.actions.length
+            visible: root.actions.length > 0
             alignment: Qt.AlignRight
 
-            property bool atBottom: {
-                var remainingWidth = parent.width - text.implicitWidth - Kirigami.Units.smallSpacing * 2 - icon.width
-                if (closeButton.visible) {
-                    remainingWidth -= closeButton.width - Kirigami.Units.smallSpacing
-                }
-
-                return text.lineCount > 1 || implicitWidth > remainingWidth
-            }
+            readonly property bool atBottom: (root.actions.length > 0) && (label.lineCount > 1 || implicitWidth > contentLayout.remainingWidth)
 
             anchors {
                 left: parent.left
-                top: atBottom ? textArea.bottom : parent.top
+                top: atBottom ? labelArea.bottom : parent.top
                 topMargin: atBottom ? Kirigami.Units.gridUnit : 0
-                right: (!atBottom && closeButton.visible) ? closeButton.left : parent.right
-                rightMargin: !atBottom && closeButton.visible ? Kirigami.Units.smallSpacing : 0
+                right: (!atBottom && root.showCloseButton) ? closeButton.left : parent.right
+                rightMargin: !atBottom && root.showCloseButton ? Kirigami.Units.smallSpacing : 0
             }
         }
 
-        Controls.ToolButton {
+        QQC2.ToolButton {
             id: closeButton
 
             visible: root.showCloseButton

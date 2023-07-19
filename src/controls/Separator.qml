@@ -6,8 +6,7 @@
  */
 
 import QtQuick 2.1
-import QtQuick.Layouts 1.2
-import org.kde.kirigami 2.12
+import org.kde.kirigami 2.12 as Kirigami
 
 /**
  * @brief A visual separator.
@@ -28,14 +27,14 @@ Rectangle {
     }
 
     /**
-     * This property holds the visual weight of the separator.
-     * 
-     * Weight values:
-     * * `Separator.Weight.Light`
-     * * `Separator.Weight.Normal`
-     * 
-     * The default is `Separator.Weight.Normal`
-     * 
+     * @brief This property holds the visual weight of the separator.
+     *
+     * Weight options:
+     * * ``Kirigami.Separator.Weight.Light``
+     * * ``Kirigami.Separator.Weight.Normal``
+     *
+     * default: ``Separator.Weight.Normal``
+     *
      * @since 5.72
      * @since org.kde.kirigami 2.12
      */
@@ -45,6 +44,5 @@ Rectangle {
      * mix weights lower than Normal with the background color
      * and mix weights higher than Normal with the text color.
      */
-    color: ColorUtils.linearInterpolation(Theme.backgroundColor, Theme.textColor, weight == Separator.Weight.Light ? 0.07 : 0.15);
+    color: Kirigami.ColorUtils.linearInterpolation(Kirigami.Theme.backgroundColor, Kirigami.Theme.textColor, weight === Separator.Weight.Light ? 0.07 : 0.15)
 }
-

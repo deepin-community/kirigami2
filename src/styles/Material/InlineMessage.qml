@@ -7,10 +7,8 @@
  */
 
 import QtQuick 2.7
-import QtGraphicalEffects 1.0
+import QtGraphicalEffects 1.0 as GE
 import org.kde.kirigami 2.5 as Kirigami
-
-import "../../private"
 import "../../templates" as T
 
 /**
@@ -104,7 +102,7 @@ T.InlineMessage {
         }
 
         layer.enabled: true
-        layer.effect: DropShadow {
+        layer.effect: GE.DropShadow {
             horizontalOffset: 0
             verticalOffset: 1
             radius: 12

@@ -4,12 +4,13 @@
  *  SPDX-License-Identifier: LGPL-2.0-or-later
  */
 
-import QtQuick 2.7
-import QtQuick.Controls 2.0
-import org.kde.kirigami 2.5 as Kirigami
+import QtQuick 2.15
+import QtQuick.Controls 2.15
 
-Kirigami.ApplicationWindow
-{
+import org.kde.kirigami 2.20 as Kirigami
+
+Kirigami.ApplicationWindow {
+
     Component {
         id: delegateComponent
         Kirigami.Card {

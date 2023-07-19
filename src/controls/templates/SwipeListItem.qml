@@ -6,16 +6,19 @@
 
 import QtQuick 2.6
 import QtQuick.Layouts 1.4
-import QtQuick.Controls 2.4 as Controls
-import QtQuick.Templates 2.4 as T2
+import QtQuick.Controls 2.4 as QQC2
+import QtQuick.Templates 2.4 as T
 import org.kde.kirigami 2.11 as Kirigami
 import "../private"
 
 /**
  * An item delegate intended to support extra actions obtainable
- * by uncovering them by dragging away the item with the handle
+ * by uncovering them by dragging away the item with the handle.
+ *
  * This acts as a container for normal list items.
  * Any subclass of AbstractListItem can be assigned as the contentItem property.
+ *
+ * Example usage:
  * @code
  * ListView {
  *     model: myModel
@@ -38,114 +41,158 @@ import "../private"
  * }
  * @endcode
  *
+ * @inherit QtQuick.Templates.SwipeDelegate
  */
-T2.SwipeDelegate {
+T.SwipeDelegate {
     id: listItem
 
+//BEGIN properties
     /**
-     * Holds if the item emits signals related to mouse interaction.
-     * The default value is false.
-     * @var bool supportsMouseEvents
-     * @deprcated Use hoverEnabled instead.
+     * @brief This property sets whether the item should emit signals related to mouse interaction.
+     *
+     * default: ``true``
+     *
+     * @deprecated Use hoverEnabled instead.
+     * @property bool supportsMouseEvents
      */
     property alias supportsMouseEvents: listItem.hoverEnabled
 
     /**
-     * True when the user hover the mouse over the list item
-     * NOTE: on mobile touch devices this will be true only when pressed is also true
-     * @var bool containsMouse
-     * @deprecated Use hovered instead.
+     * @brief This property tells whether the cursor is currently hovering over the item.
+     *
+     * On mobile touch devices, this will be true only when pressed.
+     *
+     * @see QtQuick.Templates.ItemDelegate::hovered
+     * @deprecated This will be removed in KF6; use the ``hovered`` property instead.
+     * @property bool containsMouse
      */
     property alias containsMouse: listItem.hovered
 
     /**
-     * If true the background of the list items will be alternating between two
-     * colors, helping readability with multiple column views.
-     * Use it only when implementing a view which shows data visually in multiple columns
-     * @ since 2.7
+     * @brief This property sets whether instances of this list item will alternate
+     * between two colors, helping readability.
+     *
+     * It is suggested to use this only when implementing a view with multiple columns.
+     *
+     * default: ``false``
+     *
+     * @since 2.7
      */
     property bool alternatingBackground: false
 
     /**
-     * If true the item will be a delegate for a section, so will look like a
-     * "title" for the items under it.
+     * @brief This property sets whether this item is a section delegate.
+     *
+     * Setting this to true will make the list item look like a "title" for items under it.
+     *
+     * default: ``false``
+     *
+     * @see ListSectionHeader
      */
     property bool sectionDelegate: false
 
     /**
-     * True if the separator between items is visible
-     * default: true
-     */
-    property bool separatorVisible: true
-
-    /**
-     * True if it's possible to see and access the item actions.
-     * Actions should go completely out of the way for instance during
-     * the editing of an item.
-     * @since 2.5
-     */
-    readonly property bool actionsVisible: actionsLayout.hasVisibleActions
-
-    /**
-     * @var list<QtQuick.Controls.Action> actions
-     * Defines the actions for the list item: at most 4 buttons will
-     * contain the actions for the item, that can be revealed by
-     * sliding away the list item.
-     */
-    property list<Controls.Action> actions
-
-    /**
-     * textColor: color
-     * Color for the text in the item
+     * @brief This property sets whether the separator is visible.
      *
-     * Note: if custom text elements are inserted in an AbstractListItem,
-     * their color property will have to be manually bound with this property.
+     * The separator is a line between this and the item under it.
+     *
+     * default: ``false``
      */
-    property color textColor: Kirigami.Theme.textColor
+    property bool separatorVisible: false
 
     /**
-     * backgroundColor: color
-     * Color for the background of the item
+     * @brief This property holds the background color of the list item.
+     *
+     * It is advised to use the default value.
+     * default: ``Kirigami.Theme.backgroundColor``
      */
     property color backgroundColor: Kirigami.Theme.backgroundColor
 
     /**
-     * alternateBackgroundColor: color
-     * The background color to use if alternatingBackground is true.
-     * It is advised to leave the default.
+     * @brief This property holds the background color to be used when
+     * background alternating is enabled.
+     *
+     * It is advised to use the default value.
+     * default: ``Kirigami.Theme.alternateBackgroundColor``
+     *
      * @since 2.7
      */
     property color alternateBackgroundColor: Kirigami.Theme.alternateBackgroundColor
 
     /**
-     * activeTextColor: color
-     * Color for the text in the item when pressed or selected
-     * It is advised to leave the default value (Theme.highlightedTextColor)
+     * @brief This property holds the color of the background
+     * when the item is pressed or selected.
      *
-     * Note: if custom text elements are inserted in an AbstractListItem,
+     * It is advised to use the default value.
+     * default: ``Kirigami.Theme.highlightColor``
+     */
+    property color activeBackgroundColor: Kirigami.Theme.highlightColor
+
+    /**
+     * @brief This property holds the color of the text in the item.
+     *
+     * It is advised to use the default value.
+     * default: ``Theme.textColor``
+     *
+     * If custom text elements are inserted in an AbstractListItem,
+     * their color will have to be manually set with this property.
+     */
+    property color textColor: Kirigami.Theme.textColor
+
+    /**
+     * @brief This property holds the color of the text when the item is pressed or selected.
+     *
+     * It is advised to use the default value.
+     * default: ``Kirigami.Theme.highlightedTextColor``
+     *
+     * If custom text elements are inserted in an AbstractListItem,
      * their color property will have to be manually bound with this property
      */
     property color activeTextColor: Kirigami.Theme.highlightedTextColor
 
     /**
-     * activeBackgroundColor: color
-     * Color for the background of the item when pressed or selected
-     * It is advised to leave the default value (Theme.highlightColor)
+     * @brief This property tells whether actions are visible and interactive.
+     *
+     * True if it's possible to see and interact with the item's actions.
+     *
+     * Actions become hidden while editing of an item, for example.
+     *
+     * @since 2.5
      */
-    property color activeBackgroundColor: Kirigami.Theme.highlightColor
+    readonly property bool actionsVisible: actionsLayout.hasVisibleActions
 
     /**
-     * alwaysVisibleActions: bool
-     * If true, the actions behind this SwipeListItem will be always visible.
-     * Valid both in tablet and desktop modes
+     * @brief This property sets whether actions behind this SwipeListItem will always be visible.
+     *
+     * default: `true in desktop and tablet mode`
+     *
      * @since 2.15
      */
     property bool alwaysVisibleActions: !Kirigami.Settings.isMobile
 
-    //TODO KF6 remove this super wrong thing
+    /**
+     * @brief This property holds actions of the list item.
+     *
+     * At most 4 actions can be revealed when sliding away the list item;
+     * others will be shown in the overflow menu.
+     */
+    property list<QQC2.Action> actions
+
+    /**
+     * @brief This property holds the width of the overlay.
+     *
+     * The value can represent the width of the handle component or the action layout.
+     *
+     * @since 2.19
+     * @property real overlayWidth
+     */
+    readonly property alias overlayWidth: overlayLoader.width
+
+    // TODO KF6 remove this super wrong thing
     /// @private
     /// @deprecated This property will be removed in KDE Framework 6. Use contentItem instead.
     default property alias _default: listItem.contentItem
+//END properties
 
     LayoutMirroring.childrenInherit: true
 
@@ -156,9 +203,8 @@ T2.SwipeDelegate {
 
     padding: !listItem.alwaysVisibleActions && Kirigami.Settings.tabletMode ? Kirigami.Units.largeSpacing : Kirigami.Units.smallSpacing
 
-    leftPadding: padding * 2
-
-    rightPadding: padding * 2 +  (overlayLoader.visible ? overlayLoader.width : 0) + Kirigami.Units.smallSpacing
+    leftPadding: padding * 2 + (mirrored ? overlayLoader.paddingOffset : 0)
+    rightPadding: padding * 2 + (mirrored ? 0 : overlayLoader.paddingOffset)
 
     topPadding: padding
     bottomPadding: padding
@@ -173,16 +219,15 @@ T2.SwipeDelegate {
 
         readonly property bool edgeEnabled: swipeFilterItem ? swipeFilterItem.currentItem === listItem || swipeFilterItem.currentItem === listItem.parent : false
 
-        property bool indicateActiveFocus: listItem.pressed || Kirigami.Settings.tabletMode || listItem.activeFocus || (view ? view.activeFocus : false)
-
-        //install the SwipeItemEventFilter
+        // install the SwipeItemEventFilter
         onViewChanged: {
             if (listItem.alwaysVisibleActions || !Kirigami.Settings.tabletMode) {
                 return;
             }
             if (internal.view && Kirigami.Settings.tabletMode && !internal.view.parent.parent._swipeFilter) {
-                var component = Qt.createComponent(Qt.resolvedUrl("../private/SwipeItemEventFilter.qml"));
+                const component = Qt.createComponent(Qt.resolvedUrl("../private/SwipeItemEventFilter.qml"));
                 internal.view.parent.parent._swipeFilter = component.createObject(internal.view.parent.parent);
+                component.destroy();
             }
         }
     }
@@ -192,8 +237,9 @@ T2.SwipeDelegate {
         function onTabletModeChanged() {
             if (Kirigami.Settings.tabletMode) {
                 if (!internal.swipeFilterItem) {
-                    var component = Qt.createComponent(Qt.resolvedUrl("../private/SwipeItemEventFilter.qml"));
+                    const component = Qt.createComponent(Qt.resolvedUrl("../private/SwipeItemEventFilter.qml"));
                     listItem.ListView.view.parent.parent._swipeFilter = component.createObject(listItem.ListView.view.parent.parent);
+                    component.destroy();
                 }
             } else {
                 if (listItem.ListView.view.parent.parent._swipeFilter) {
@@ -205,15 +251,40 @@ T2.SwipeDelegate {
         }
     }
 
-//BEGIN Items
+//BEGIN items
     Loader {
         id: overlayLoader
+        readonly property int paddingOffset: (visible ? width : 0) + Kirigami.Units.smallSpacing
+        readonly property var theAlias: anchors
+        function validate(want, defaultValue) {
+            const expectedLeftPadding = () => listItem.padding * 2 + (listItem.mirrored ? overlayLoader.paddingOffset : 0)
+            const expectedRightPadding = () => listItem.padding * 2 + (listItem.mirrored ? 0 : overlayLoader.paddingOffset)
+
+            const warningText =
+                `Don't override the leftPadding or rightPadding on a SwipeListItem!\n` +
+                `This makes it impossible for me to adjust my layout as I need to for various usecases.\n` +
+                `I'll try to fix the mistake for you, but you should remove your overrides from your app's code entirely.\n` +
+                `If I can't fix the paddings, I'll fall back to a default layout, but it'll be slightly incorrect and lacks\n` +
+                `adaptations needed for touch screens and right-to-left languages, among other things.`
+
+            if (listItem.leftPadding != expectedLeftPadding() || listItem.rightPadding != expectedRightPadding()) {
+                listItem.leftPadding = Qt.binding(expectedLeftPadding)
+                listItem.rightPadding = Qt.binding(expectedRightPadding)
+                console.warn(warningText)
+                return defaultValue
+            }
+
+            return want
+        }
         anchors {
-            right: contentItem ? contentItem.right : undefined
+            right: validate((Qt.application.layoutDirection === Qt.RightToLeft) ? undefined : (contentItem ? contentItem.right : undefined), contentItem ? contentItem.right : undefined)
+            rightMargin: validate(-paddingOffset, 0)
+            left: validate((Qt.application.layoutDirection === Qt.LeftToRight) ? undefined : (contentItem ? contentItem.left : undefined), undefined)
+            leftMargin: validate(-paddingOffset, 0)
             top: parent.top
             bottom: parent.bottom
-            rightMargin: -listItem.rightPadding + Kirigami.Units.smallSpacing
         }
+        LayoutMirroring.enabled: false
 
         parent: listItem
         z: contentItem ? contentItem.z + 1 : 0
@@ -222,7 +293,7 @@ T2.SwipeDelegate {
         visible: listItem.actionsVisible && opacity > 0
         asynchronous: true
         sourceComponent: handleComponent
-        opacity: listItem.alwaysVisibleActions || Kirigami.Settings.tabletMode || listItem.hovered || !listItem.supportsMouseEvents ? 1 : 0
+        opacity: listItem.alwaysVisibleActions || Kirigami.Settings.tabletMode || listItem.hovered ? 1 : 0
         Behavior on opacity {
             OpacityAnimator {
                 id: opacityAnim
@@ -248,8 +319,10 @@ T2.SwipeDelegate {
             property real lastPosition: 0
             property bool openIntention
 
-            onPressed: startX = mapToItem(listItem, 0, 0).x;
-            onClicked: {
+            onPressed: mouse => {
+                startX = mapToItem(listItem, 0, 0).x;
+            }
+            onClicked: mouse => {
                 if (Math.abs(mapToItem(listItem, 0, 0).x - startX) > Qt.styleHints.startDragDistance) {
                     return;
                 }
@@ -268,8 +341,8 @@ T2.SwipeDelegate {
                 }
                 slideAnim.restart();
             }
-            onPositionChanged: {
-                var pos = mapToItem(listItem, mouse.x, mouse.y);
+            onPositionChanged: mouse => {
+                const pos = mapToItem(listItem, mouse.x, mouse.y);
 
                 if (listItem.LayoutMirroring.enabled) {
                     listItem.swipe.position = Math.max(0, Math.min(openPosition, (pos.x / listItem.width)));
@@ -280,7 +353,7 @@ T2.SwipeDelegate {
                 }
                 lastPosition = listItem.swipe.position;
             }
-            onReleased: {
+            onReleased: mouse => {
                 if (listItem.LayoutMirroring.enabled) {
                     if (openIntention) {
                         slideAnim.to = openPosition
@@ -349,15 +422,15 @@ T2.SwipeDelegate {
         }
     }
 
-    //TODO: expose in API?
+    // TODO: expose in API?
     Component {
         id: actionsBackgroundDelegate
         MouseArea {
 
             anchors.fill: parent
 
-            // Controls.SwipeDelegate.onPressedChanged is broken with touch
-            onClicked: {
+            // QQC2.SwipeDelegate.onPressedChanged is broken with touch
+            onClicked: mouse => {
                     slideAnim.to = 0;
                     slideAnim.restart();
             }
@@ -394,12 +467,12 @@ T2.SwipeDelegate {
     RowLayout {
         id: actionsLayout
         anchors {
-                right: parent.right
-                top: parent.top
-                bottom: parent.bottom
-                rightMargin: Kirigami.Units.smallSpacing
-            }
-        visible: parent != listItem
+            right: parent.right
+            top: parent.top
+            bottom: parent.bottom
+            rightMargin: Kirigami.Units.smallSpacing
+        }
+        visible: parent !== listItem
         parent: !listItem.alwaysVisibleActions && Kirigami.Settings.tabletMode
                 ? listItem.swipe.leftItem || listItem.swipe.rightItem || listItem
                 : overlayLoader
@@ -413,8 +486,8 @@ T2.SwipeDelegate {
             if (definitelyVisible) {
                 hasVisibleActions = true;
             } else {
-                var actionCount = listItem.actions.length;
-                for (var i = 0; i < actionCount; i++) {
+                const actionCount = listItem.actions.length;
+                for (let i = 0; i < actionCount; i++) {
                     // Assuming that visible is only false if it is explicitly false, and not just falsy
                     if (listItem.actions[i].visible === false) {
                         continue;
@@ -436,7 +509,7 @@ T2.SwipeDelegate {
                             listItem.actions[0];
                 }
             }
-            delegate: Controls.ToolButton {
+            delegate: QQC2.ToolButton {
                 icon.name: modelData.iconName !== "" ? modelData.iconName : ""
                 icon.source: modelData.iconSource !== "" ? modelData.iconSource : ""
                 enabled: (modelData && modelData.enabled !== undefined) ? modelData.enabled : true;
@@ -444,10 +517,10 @@ T2.SwipeDelegate {
                 onVisibleChanged: actionsLayout.updateVisibleActions(visible);
                 Component.onCompleted: actionsLayout.updateVisibleActions(visible);
                 Component.onDestruction: actionsLayout.updateVisibleActions(visible);
-                Controls.ToolTip.delay: Kirigami.Units.toolTipDelay
-                Controls.ToolTip.timeout: 5000
-                Controls.ToolTip.visible: listItem.visible && (Kirigami.Settings.tabletMode ? pressed : hovered) && Controls.ToolTip.text.length > 0
-                Controls.ToolTip.text: modelData.tooltip || modelData.text
+                QQC2.ToolTip.delay: Kirigami.Units.toolTipDelay
+                QQC2.ToolTip.timeout: 5000
+                QQC2.ToolTip.visible: listItem.visible && (Kirigami.Settings.tabletMode ? pressed : hovered) && QQC2.ToolTip.text.length > 0
+                QQC2.ToolTip.text: modelData.tooltip || modelData.text
 
                 onClicked: {
                     if (modelData && modelData.trigger !== undefined) {
@@ -456,6 +529,9 @@ T2.SwipeDelegate {
                     slideAnim.to = 0;
                     slideAnim.restart();
                 }
+
+                Accessible.name: modelData.text
+                Accessible.description: modelData.tooltip
             }
         }
     }
@@ -465,8 +541,8 @@ T2.SwipeDelegate {
 
     swipe {
         enabled: false
-        right: listItem.alwaysVisibleActions ||listItem.LayoutMirroring.enabled || !Kirigami.Settings.tabletMode ? null : actionsBackgroundDelegate
-        left: listItem.alwaysVisibleActions ||listItem.LayoutMirroring.enabled && Kirigami.Settings.tabletMode ? actionsBackgroundDelegate : null
+        right: listItem.alwaysVisibleActions || listItem.LayoutMirroring.enabled || !Kirigami.Settings.tabletMode ? null : actionsBackgroundDelegate
+        left: listItem.alwaysVisibleActions || listItem.LayoutMirroring.enabled && Kirigami.Settings.tabletMode ? actionsBackgroundDelegate : null
     }
     NumberAnimation {
         id: slideAnim
@@ -476,6 +552,5 @@ T2.SwipeDelegate {
         property: "position"
         from: listItem.swipe.position
     }
-//END Items
+//END items
 }
-

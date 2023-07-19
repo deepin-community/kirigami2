@@ -25,8 +25,8 @@ public:
     QmlComponentsPool(QQmlEngine *engine);
     ~QmlComponentsPool() override;
 
-    QQmlComponent *m_separatorComponent = nullptr;
-    QQmlComponent *m_rightSeparatorComponent = nullptr;
+    QQmlComponent *m_leadingSeparatorComponent = nullptr;
+    QQmlComponent *m_trailingSeparatorComponent = nullptr;
     Kirigami::Units *m_units = nullptr;
 
 Q_SIGNALS:
@@ -50,8 +50,8 @@ public:
     qreal childWidth(QQuickItem *child);
     void updateVisibleItems();
     void forgetItem(QQuickItem *item);
-    QQuickItem *ensureSeparator(QQuickItem *item);
-    QQuickItem *ensureRightSeparator(QQuickItem *item);
+    QQuickItem *ensureLeadingSeparator(QQuickItem *item);
+    QQuickItem *ensureTrailingSeparator(QQuickItem *item);
 
     void setBoundedX(qreal x);
     void animateX(qreal x);
@@ -62,7 +62,11 @@ public:
 
 protected:
     void itemChange(QQuickItem::ItemChange change, const QQuickItem::ItemChangeData &value) override;
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     void geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry) override;
+#else
+    void geometryChange(const QRectF &newGeometry, const QRectF &oldGeometry) override;
+#endif
 
 private Q_SLOTS:
     void syncItemsOrder();
@@ -74,8 +78,8 @@ private:
     QList<QQuickItem *> m_items;
     QList<QObject *> m_visibleItems;
     QPointer<QQuickItem> m_viewAnchorItem;
-    QHash<QQuickItem *, QQuickItem *> m_separators;
-    QHash<QQuickItem *, QQuickItem *> m_rightSeparators;
+    QHash<QQuickItem *, QQuickItem *> m_leadingSeparators;
+    QHash<QQuickItem *, QQuickItem *> m_trailingSeparators;
     QHash<QObject *, QObject *> m_models;
 
     qreal m_leftPinnedSpace = 361;

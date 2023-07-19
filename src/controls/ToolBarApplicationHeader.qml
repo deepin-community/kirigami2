@@ -5,15 +5,17 @@
  */
 
 import QtQuick 2.5
-import QtQuick.Controls 2.0 as Controls
+import QtQuick.Controls 2.0 as QQC2
 import QtQuick.Layouts 1.2
-import "private"
-import org.kde.kirigami 2.4
+import org.kde.kirigami 2.4 as Kirigami
+import "private" as P
 
 
+// TODO KF6: Remove!
 /**
- * This Application header represents a toolbar that
+ * @brief ToolBarApplicationHeader represents a toolbar that
  * will display the actions of the current page.
+ *
  * Both Contextual actions and the main, left and right actions
  */
 ApplicationHeader {
@@ -23,7 +25,7 @@ ApplicationHeader {
     maximumHeight: preferredHeight
     headerStyle: ApplicationHeaderStyle.Titles
 
-    //FIXME: needs a property definition to have its own type in qml
+    // FIXME: needs a property definition to have its own type in qml
     property string _internal: ""
 
     Component.onCompleted: print("Warning: ToolbarApplicationHeader is deprecated, remove and use the automatic internal toolbar instead.")
@@ -39,21 +41,21 @@ ApplicationHeader {
                 left: parent.left
                 right: actionsLayout.left
             }
-            Separator {
+            Kirigami.Separator {
                 id: separator
                 Layout.preferredHeight: parent.height * 0.6
             }
 
-            Heading {
+            Kirigami.Heading {
                 id: title
                 Layout.fillWidth: true
 
                 Layout.preferredWidth: implicitWidth
                 Layout.minimumWidth: Math.min(titleTextMetrics.width, delegateItem.width - buttonTextMetrics.requiredWidth)
-                leftPadding: Units.largeSpacing
+                leftPadding: Kirigami.Units.largeSpacing
                 opacity: delegateItem.current ? 1 : 0.4
                 maximumLineCount: 1
-                color: Theme.textColor
+                color: Kirigami.Theme.textColor
                 elide: Text.ElideRight
                 text: page ? page.title : ""
             }
@@ -67,7 +69,7 @@ ApplicationHeader {
         TextMetrics {
             id: buttonTextMetrics
             text: (page.actions.left ? page.actions.left.text : "") + (page.actions.main ? page.actions.main.text : "") + (page.actions.right ? page.actions.right.text : "")
-            readonly property int collapsedButtonsWidth: ctxActionsButton.width + (page.actions.left ? ctxActionsButton.width + Units.gridUnit : 0) + (page.actions.main ? ctxActionsButton.width + Units.gridUnit : 0) + (page.actions.right ? ctxActionsButton.width + Units.gridUnit : 0)
+            readonly property int collapsedButtonsWidth: ctxActionsButton.width + (page.actions.left ? ctxActionsButton.width + Kirigami.Units.gridUnit : 0) + (page.actions.main ? ctxActionsButton.width + Kirigami.Units.gridUnit : 0) + (page.actions.right ? ctxActionsButton.width + Kirigami.Units.gridUnit : 0)
             readonly property int requiredWidth: width + collapsedButtonsWidth
         }
 
@@ -78,36 +80,36 @@ ApplicationHeader {
                 right: ctxActionsButton.visible ? ctxActionsButton.left : parent.right
             }
 
-            readonly property bool toobig: delegateItem.width - titleTextMetrics.width - Units.gridUnit < buttonTextMetrics.requiredWidth
+            readonly property bool toobig: delegateItem.width - titleTextMetrics.width - Kirigami.Units.gridUnit < buttonTextMetrics.requiredWidth
 
-            PrivateActionToolButton {
+            P.PrivateActionToolButton {
                 Layout.alignment: Qt.AlignVCenter
-                kirigamiAction: page && page.actions ? page.actions.left : null
-                showText: !parent.toobig
+                action: page && page.actions ? page.actions.left : null
+                display: parent.toobig ? QQC2.AbstractButton.IconOnly : QQC2.AbstractButton.TextBesideIcon
             }
-            PrivateActionToolButton {
+            P.PrivateActionToolButton {
                 Layout.alignment: Qt.AlignVCenter
-                Layout.rightMargin: Units.smallSpacing
-                kirigamiAction: page && page.actions ? page.actions.main : null
-                showText: !parent.toobig
+                Layout.rightMargin: Kirigami.Units.smallSpacing
+                action: page && page.actions ? page.actions.main : null
+                display: parent.toobig ? QQC2.AbstractButton.IconOnly : QQC2.AbstractButton.TextBesideIcon
                 flat: false
             }
-            PrivateActionToolButton {
+            P.PrivateActionToolButton {
                 Layout.alignment: Qt.AlignVCenter
-                kirigamiAction: page && page.actions ? page.actions.right : null
-                showText: !parent.toobig
+                action: page && page.actions ? page.actions.right : null
+                display: parent.toobig ? QQC2.AbstractButton.IconOnly : QQC2.AbstractButton.TextBesideIcon
             }
         }
 
-        PrivateActionToolButton {
+        P.PrivateActionToolButton {
             id: ctxActionsButton
             showMenuArrow: page.actions.contextualActions.length === 1
             anchors {
                 right: parent.right
                 verticalCenter: parent.verticalCenter
-                rightMargin: Units.smallSpacing
+                rightMargin: Kirigami.Units.smallSpacing
             }
-            Action {
+            Kirigami.Action {
                 id: overflowAction
                 icon.name: "overflow-menu"
                 tooltip: qsTr("More Actions")
@@ -115,7 +117,7 @@ ApplicationHeader {
                 children: page && page.actions.contextualActions ? page.actions.contextualActions : null
             }
 
-            kirigamiAction: page && page.actions.contextualActions.length === 1 ? page.actions.contextualActions[0] : overflowAction
+            action: page && page.actions.contextualActions.length === 1 ? page.actions.contextualActions[0] : overflowAction
         }
     }
 }

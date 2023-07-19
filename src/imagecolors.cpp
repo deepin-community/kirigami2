@@ -20,11 +20,18 @@
 #include "platformtheme.h"
 
 #include <QDebug>
+#include <QGuiApplication>
 #include <QTimer>
 #include <QtConcurrent>
 
 #include "loggingcategory.h"
 #include <cmath>
+#include <vector>
+
+#include "config-OpenMP.h"
+#if HAVE_OpenMP
+#include <omp.h>
+#endif
 
 #define return_fallback(value)                                                                                                                                 \
     if (m_imageData.m_samples.size() == 0) {                                                                                                                   \
@@ -53,6 +60,12 @@ ImageColors::~ImageColors()
 
 void ImageColors::setSource(const QVariant &source)
 {
+    if (m_futureSourceImageData) {
+        m_futureSourceImageData->cancel();
+        m_futureSourceImageData->deleteLater();
+        m_futureSourceImageData = nullptr;
+    }
+
     if (source.canConvert<QQuickItem *>()) {
         setSourceItem(source.value<QQuickItem *>());
     } else if (source.canConvert<QImage>()) {
@@ -60,7 +73,29 @@ void ImageColors::setSource(const QVariant &source)
     } else if (source.canConvert<QIcon>()) {
         setSourceImage(source.value<QIcon>().pixmap(128, 128).toImage());
     } else if (source.canConvert<QString>()) {
-        setSourceImage(QIcon::fromTheme(source.toString()).pixmap(128, 128).toImage());
+        const QString sourceString = source.toString();
+
+        if (QIcon::hasThemeIcon(sourceString)) {
+            setSourceImage(QIcon::fromTheme(sourceString).pixmap(128, 128).toImage());
+        } else {
+            QFuture<QImage> future = QtConcurrent::run([sourceString]() {
+                if (auto url = QUrl(sourceString); url.isLocalFile()) {
+                    return QImage(url.toLocalFile());
+                }
+                return QImage(sourceString);
+            });
+            m_futureSourceImageData = new QFutureWatcher<QImage>(this);
+            connect(m_futureSourceImageData, &QFutureWatcher<QImage>::finished, this, [this, source]() {
+                const QImage image = m_futureSourceImageData->future().result();
+                m_futureSourceImageData->deleteLater();
+                m_futureSourceImageData = nullptr;
+                setSourceImage(image);
+                m_source = source;
+                Q_EMIT sourceChanged();
+            });
+            m_futureSourceImageData->setFuture(future);
+            return;
+        }
     } else {
         return;
     }
@@ -139,6 +174,7 @@ void ImageColors::update()
     if (m_futureImageData) {
         m_futureImageData->cancel();
         m_futureImageData->deleteLater();
+        m_futureImageData = nullptr;
     }
     auto runUpdate = [this]() {
         QFuture<ImageData> future = QtConcurrent::run([this]() {
@@ -158,9 +194,12 @@ void ImageColors::update()
         m_futureImageData->setFuture(future);
     };
 
-    if (!m_sourceItem || !m_window) {
+    if (!m_sourceItem) {
         if (!m_sourceImage.isNull()) {
             runUpdate();
+        } else {
+            m_imageData = {};
+            Q_EMIT paletteChanged();
         }
         return;
     }
@@ -211,7 +250,7 @@ void ImageColors::positionColor(QRgb rgb, QList<ImageData::colorStat> &clusters)
     clusters << stat;
 }
 
-ImageData ImageColors::generatePalette(const QImage &sourceImage)
+ImageData ImageColors::generatePalette(const QImage &sourceImage) const
 {
     ImageData imageData;
 
@@ -222,35 +261,59 @@ ImageData ImageColors::generatePalette(const QImage &sourceImage)
     imageData.m_clusters.clear();
     imageData.m_samples.clear();
 
-    QColor sampleColor;
+#if HAVE_OpenMP
+    static const int numCore = std::min(8, omp_get_num_procs());
+    omp_set_num_threads(numCore);
+    std::vector<decltype(imageData.m_samples)> tempSamples(numCore, decltype(imageData.m_samples){});
+#endif
     int r = 0;
     int g = 0;
     int b = 0;
     int c = 0;
+
+#pragma omp parallel for collapse(2) reduction(+ : r) reduction(+ : g) reduction(+ : b) reduction(+ : c)
     for (int x = 0; x < sourceImage.width(); ++x) {
         for (int y = 0; y < sourceImage.height(); ++y) {
-            sampleColor = sourceImage.pixelColor(x, y);
+            const QColor sampleColor = sourceImage.pixelColor(x, y);
             if (sampleColor.alpha() == 0) {
                 continue;
             }
+            if (ColorUtils::chroma(sampleColor) < 20) {
+                continue;
+            }
             QRgb rgb = sampleColor.rgb();
-            c++;
+            ++c;
             r += qRed(rgb);
             g += qGreen(rgb);
             b += qBlue(rgb);
+#if HAVE_OpenMP
+            tempSamples[omp_get_thread_num()] << rgb;
+#else
             imageData.m_samples << rgb;
-            positionColor(rgb, imageData.m_clusters);
+#endif
         }
+    } // END omp parallel for
+
+#if HAVE_OpenMP
+    for (auto &s : tempSamples) {
+        imageData.m_samples << std::move(s);
     }
+#endif
 
     if (imageData.m_samples.isEmpty()) {
         return imageData;
     }
 
+    for (QRgb rgb : std::as_const(imageData.m_samples)) {
+        positionColor(rgb, imageData.m_clusters);
+    }
+
     imageData.m_average = QColor(r / c, g / c, b / c, 255);
 
     for (int iteration = 0; iteration < 5; ++iteration) {
-        for (auto &stat : imageData.m_clusters) {
+#pragma omp parallel for private(r, g, b, c)
+        for (int i = 0; i < imageData.m_clusters.size(); ++i) {
+            auto &stat = imageData.m_clusters[i];
             r = 0;
             g = 0;
             b = 0;
@@ -268,20 +331,21 @@ ImageData ImageColors::generatePalette(const QImage &sourceImage)
             stat.centroid = qRgb(r, g, b);
             stat.ratio = qreal(stat.colors.count()) / qreal(imageData.m_samples.count());
             stat.colors = QList<QRgb>({stat.centroid});
-        }
+        } // END omp parallel for
 
         for (auto color : std::as_const(imageData.m_samples)) {
             positionColor(color, imageData.m_clusters);
         }
     }
 
-    std::sort(imageData.m_clusters.begin(), imageData.m_clusters.end(), [](const ImageData::colorStat &a, const ImageData::colorStat &b) {
-        return a.colors.size() > b.colors.size();
+    std::sort(imageData.m_clusters.begin(), imageData.m_clusters.end(), [this](const ImageData::colorStat &a, const ImageData::colorStat &b) {
+        return getClusterScore(a) > getClusterScore(b);
     });
 
     // compress blocks that became too similar
     auto sourceIt = imageData.m_clusters.end();
-    QList<QList<ImageData::colorStat>::iterator> itemsToDelete;
+    // Use index instead of iterator, because QList::erase may invalidate iterator.
+    std::vector<int> itemsToDelete;
     while (sourceIt != imageData.m_clusters.begin()) {
         sourceIt--;
         for (auto destIt = imageData.m_clusters.begin(); destIt != imageData.m_clusters.end() && destIt != sourceIt; destIt++) {
@@ -292,13 +356,13 @@ ImageData ImageColors::generatePalette(const QImage &sourceImage)
                 const int b = ratio * qreal(qBlue((*sourceIt).centroid)) + (1 - ratio) * qreal(qBlue((*destIt).centroid));
                 (*destIt).ratio += (*sourceIt).ratio;
                 (*destIt).centroid = qRgb(r, g, b);
-                itemsToDelete << sourceIt;
+                itemsToDelete.push_back(std::distance(imageData.m_clusters.begin(), sourceIt));
                 break;
             }
         }
     }
-    for (const auto &i : std::as_const(itemsToDelete)) {
-        imageData.m_clusters.erase(i);
+    for (auto i : std::as_const(itemsToDelete)) {
+        imageData.m_clusters.removeAt(i);
     }
 
     imageData.m_highlight = QColor();
@@ -368,7 +432,64 @@ ImageData ImageColors::generatePalette(const QImage &sourceImage)
         imageData.m_palette << entry;
     }
 
+    postProcess(imageData);
+
     return imageData;
+}
+
+double ImageColors::getClusterScore(const ImageData::colorStat &stat) const
+{
+    return stat.ratio * ColorUtils::chroma(QColor(stat.centroid));
+}
+
+void ImageColors::postProcess(ImageData &imageData) const
+{
+    constexpr short unsigned WCAG_NON_TEXT_CONTRAST_RATIO = 3;
+    constexpr qreal WCAG_TEXT_CONTRAST_RATIO = 4.5;
+    const QColor backgroundColor = static_cast<Kirigami::PlatformTheme *>(qmlAttachedPropertiesObject<Kirigami::PlatformTheme>(this, true))->backgroundColor();
+    const qreal backgroundLum = ColorUtils::luminance(backgroundColor);
+    qreal lowerLum, upperLum;
+    // 192 is from kcm_colors
+    if (qGray(backgroundColor.rgb()) < 192) {
+        // (lowerLum + 0.05) / (backgroundLum + 0.05) >= 3
+        lowerLum = WCAG_NON_TEXT_CONTRAST_RATIO * (backgroundLum + 0.05) - 0.05;
+        upperLum = 0.95;
+    } else {
+        // For light themes, still prefer lighter colors
+        // (lowerLum + 0.05) / (textLum + 0.05) >= 4.5
+        const QColor textColor = static_cast<Kirigami::PlatformTheme *>(qmlAttachedPropertiesObject<Kirigami::PlatformTheme>(this, true))->textColor();
+        const qreal textLum = ColorUtils::luminance(textColor);
+        lowerLum = WCAG_TEXT_CONTRAST_RATIO * (textLum + 0.05) - 0.05;
+        upperLum = backgroundLum;
+    }
+
+    auto adjustSaturation = [](QColor &color) {
+        // Adjust saturation to make the color more vibrant
+        if (color.hsvSaturationF() < 0.5) {
+            const qreal h = color.hsvHueF();
+            const qreal v = color.valueF();
+            color.setHsvF(h, 0.5, v);
+        }
+    };
+    adjustSaturation(imageData.m_dominant);
+    adjustSaturation(imageData.m_highlight);
+    adjustSaturation(imageData.m_average);
+
+    auto adjustLightness = [lowerLum, upperLum](QColor &color) {
+        short unsigned colorOperationCount = 0;
+        const qreal h = color.hslHueF();
+        const qreal s = color.hslSaturationF();
+        const qreal l = color.lightnessF();
+        while (ColorUtils::luminance(color.rgb()) < lowerLum && colorOperationCount++ < 10) {
+            color.setHslF(h, s, std::min(1.0, l + colorOperationCount * 0.03));
+        }
+        while (ColorUtils::luminance(color.rgb()) > upperLum && colorOperationCount++ < 10) {
+            color.setHslF(h, s, std::max(0.0, l - colorOperationCount * 0.03));
+        }
+    };
+    adjustLightness(imageData.m_dominant);
+    adjustLightness(imageData.m_highlight);
+    adjustLightness(imageData.m_average);
 }
 
 QVariantList ImageColors::palette() const

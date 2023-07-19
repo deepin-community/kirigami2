@@ -9,7 +9,7 @@
 
 #include "platformtheme.h"
 
-#include <kirigami2_export.h>
+#include "kirigami2_export.h"
 
 namespace Kirigami
 {

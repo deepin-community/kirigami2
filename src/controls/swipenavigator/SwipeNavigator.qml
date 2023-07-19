@@ -6,84 +6,80 @@
 
 import QtQuick 2.12
 import QtQuick.Layouts 1.12
-import QtQuick.Controls 2.12
+import QtQuick.Controls 2.12 as QQC2
 import org.kde.kirigami 2.13 as Kirigami
+import "." as SN
 
+
+//TODO KF6: remove all of this?
 /**
- * SwipeNavigator is a control providing for lateral navigation.
- * 
+ * @brief SwipeNavigator is a control providing for lateral navigation.
  * @include swipenavigator/main.qml
  * @inherit QtQuick.Item
  */
 Item {
     id: swipeNavigatorRoot
 
-    implicitWidth: stackView.implicitWidth
-    implicitHeight: stackView.implicitHeight
-    
+//BEGIN properties
     /**
-     * pages: list<Kirigami.Page>
-     *
-     * A list of pages to swipe between.
+     * @brief This property holds the pages to swipe between.
      */
     default property list<Kirigami.Page> pages
 
     /**
-     * layers: StackView
+     * @brief This property holds the StackView that is holding the core item,
+     * which allows users of SwipeNavigator to push pages on top of it.
      *
-     * The StackView holding the core item, allowing users of a SwipeNavigator
-     * in order to push pages on top of the SwipeNavigator.
+     * @property QtQuick.Controls.StackView stackView
      */
     property alias layers: stackView
 
     /**
-     * big: bool
+     * @brief This property sets whether SwipeNavigator should be presented in large format,
+     * which is suitable for televisions.
      *
-     * Whether or not to present the SwipeNavigator in a larger format
-     * suitable for rendering on televisions.
+     * default: ``false``
      */
     property bool big: false
 
     /**
-     * header: Item
-     *
-     * The item that will be displayed before the tabs.
+     * @brief This property holds the item that will be displayed before the tabs.
+     * @property Item header
      */
     property Component header: Item {visible: false}
 
     /**
-     * footer: Item
-     *
-     * The item that will be displayed after the tabs.
+     * @brief This property holds the item that will be displayed after the tabs.
+     * @property Item footer
      */
     property Component footer: Item {visible: false}
 
     /**
-     * initialIndex: int
+     * @brief This property holds the initial tab index of the SwipeNavigator.
      *
-     * The initial tab index of the SwipeNavigator.
+     * default: ``0``
      */
     property int initialIndex: 0
 
     /**
-     * currentIndex: int
-     *
-     * The currently displayed index of the SwipeNavigator.
+     * @brief This property holds the currently displayed page in the SwipeNavigator.
+     * @property int currentIndex
      */
     property alias currentIndex: columnView.currentIndex
+//END properties
 
     /**
-     * Pushes a page as a new dialog on desktop and as a layer on mobile.
+     * @brief Pushes a page as a new dialog on desktop and as a layer on mobile.
      * @param page The page can be defined as a component, item or string. If an item is
      *             used then the page will get re-parented. If a string is used then it
      *             is interpreted as a url that is used to load a page component.
      * @param properties The properties given when initializing the page.
      * @param windowProperties The properties given to the initialized window on desktop.
-     * @return The new created page
+     * @return The newly created page
      */
     function pushDialogLayer(page, properties = {}, windowProperties = {}) {
         let item;
-        if (Settings.isMobile) {
+        if (Kirigami.Settings.isMobile) {
             item = layers.push(page, properties);
         } else {
             const windowComponent = Qt.createComponent(Qt.resolvedUrl("./ApplicationWindow.qml"));
@@ -91,26 +87,30 @@ Item {
                 windowProperties.modality = Qt.WindowModal;
             }
             if (!windowProperties.height) {
-                windowProperties.height = Units.gridUnit * 30;
+                windowProperties.height = Kirigami.Units.gridUnit * 30;
             }
             if (!windowProperties.width) {
-                windowProperties.width = Units.gridUnit * 50;
+                windowProperties.width = Kirigami.Units.gridUnit * 50;
             }
             if (!windowProperties.minimumWidth) {
-                windowProperties.minimumWidth = Units.gridUnit * 20;
+                windowProperties.minimumWidth = Kirigami.Units.gridUnit * 20;
             }
             if (!windowProperties.minimumHeight) {
-                windowProperties.minimumHeight = Units.gridUnit * 15;
+                windowProperties.minimumHeight = Kirigami.Units.gridUnit * 15;
             }
             if (!windowProperties.flags) {
                 windowProperties.flags = Qt.Dialog | Qt.WindowCloseButtonHint;
             }
             const window = windowComponent.createObject(swipeNavigatorRoot, windowProperties);
+            windowComponent.destroy();
             item = window.pageStack.push(page, properties);
         }
-        item.Keys.escapePressed.connect(function() { item.closeDialog() });
+        item.Keys.escapePressed.connect(event => item.closeDialog());
         return item;
     }
+
+    implicitWidth: stackView.implicitWidth
+    implicitHeight: stackView.implicitHeight
 
     QtObject {
         id: _gridManager
@@ -169,21 +169,21 @@ Item {
     }
 
 
-    StackView {
+    QQC2.StackView {
         id: stackView
 
         anchors.fill: parent
 
         function clear() {
-            //don't let it kill the main page row
-            var d = stackView.depth;
-            for (var i = 1; i < d; ++i) {
+            // don't let it kill the main page row
+            const d = stackView.depth;
+            for (let i = 1; i < d; ++i) {
                 pop();
             }
         }
 
-        initialItem: TabViewLayout {
-            bar: ToolBar {
+        initialItem: SN.TabViewLayout {
+            bar: QQC2.ToolBar {
                 id: topToolBar
 
                 padding: 0
@@ -199,13 +199,31 @@ Item {
                     columns: 3
 
                     // Row one
-                    Item { id: _spacer; Layout.row: 0; Layout.column: 1; Layout.fillWidth: true }
-                    Item { id: _dummyOne; Layout.row: 0; Layout.column: 0 }
-                    Item { id: _dummyTwo; Layout.row: 0; Layout.column: 2 }
+                    Item {
+                        id: _spacer
+                        Layout.row: 0
+                        Layout.column: 1
+                        Layout.fillWidth: true
+                    }
+                    Item {
+                        id: _dummyOne
+                        Layout.row: 0
+                        Layout.column: 0
+                    }
+                    Item {
+                        id: _dummyTwo
+                        Layout.row: 0
+                        Layout.column: 2
+                    }
 
                     // Row two
-                    Loader { id: _header; sourceComponent: swipeNavigatorRoot.header; Layout.row: 1; Layout.column: 0 }
-                    PrivateSwipeTabBar {
+                    Loader {
+                        id: _header
+                        sourceComponent: swipeNavigatorRoot.header
+                        Layout.row: 1
+                        Layout.column: 0
+                    }
+                    SN.PrivateSwipeTabBar {
                         id: __main
                         readonly property int offset: _header.width - _footer.width
                         readonly property int effectiveOffset: _gridManager.tall ? 0 : offset
@@ -218,7 +236,12 @@ Item {
                         Layout.column: 1
 
                     }
-                    Loader { id: _footer; sourceComponent: swipeNavigatorRoot.footer; Layout.row: 1; Layout.column: 2 }
+                    Loader {
+                        id: _footer
+                        sourceComponent: swipeNavigatorRoot.footer
+                        Layout.row: 1
+                        Layout.column: 2
+                    }
                 }
 
                 Accessible.role: Accessible.PageTabList
@@ -271,7 +294,7 @@ Item {
 
         pushEnter: Transition {
             ParallelAnimation {
-                //NOTE: It's a PropertyAnimation instead of an Animator because with an animator the item will be visible for an instant before starting to fade
+                // NOTE: It's a PropertyAnimation instead of an Animator because with an animator the item will be visible for an instant before starting to fade
                 PropertyAnimation {
                     property: "opacity"
                     from: 0

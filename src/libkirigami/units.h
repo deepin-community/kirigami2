@@ -10,7 +10,7 @@
 #include <QObject>
 #include <memory>
 
-#include <kirigami2_export.h>
+#include "kirigami2_export.h"
 
 class QQmlEngine;
 
@@ -19,6 +19,8 @@ class Units;
 class UnitsPrivate;
 
 /**
+ * @class IconSizes units.h <Kirigami/Units>
+ *
  * Provides access to platform-dependent icon sizing
  */
 class KIRIGAMI2_EXPORT IconSizes : public QObject
@@ -61,8 +63,9 @@ Q_SIGNALS:
     void enormousChanged();
 };
 
-
 /**
+ * @class Units units.h <Kirigami/Units>
+ *
  * A set of values to define semantically sizes and durations.
  */
 class KIRIGAMI2_EXPORT Units : public QObject
@@ -95,18 +98,26 @@ class KIRIGAMI2_EXPORT Units : public QObject
     Q_PROPERTY(IconSizes *iconSizes READ iconSizes CONSTANT)
 
     /**
-     * units.smallSpacing is the amount of spacing that should be used around smaller UI elements,
-     * for example as spacing in Columns. Internally, this size depends on the size of
-     * the default font as rendered on the screen, so it takes user-configured font size and DPI
-     * into account.
+     * This property holds the amount of spacing that should be used between smaller UI elements,
+     * such as a small icon and a label in a button.
+     * Internally, this size depends on the size of the default font as rendered on the screen,
+     * so it takes user-configured font size and DPI into account.
      */
     Q_PROPERTY(int smallSpacing READ smallSpacing WRITE setSmallSpacing NOTIFY smallSpacingChanged)
 
     /**
-     * units.largeSpacing is the amount of spacing that should be used inside bigger UI elements,
-     * for example between an icon and the corresponding text. Internally, this size depends on
-     * the size of the default font as rendered on the screen, so it takes user-configured font
-     * size and DPI into account.
+     * This property holds the amount of spacing that should be used between medium UI elements,
+     * such as buttons and text fields in a toolbar.
+     * Internally, this size depends on the size of the default font as rendered on the screen,
+     * so it takes user-configured font size and DPI into account.
+     */
+    Q_PROPERTY(int mediumSpacing READ mediumSpacing WRITE setMediumSpacing NOTIFY mediumSpacingChanged)
+
+    /**
+     * This property holds the amount of spacing that should be used between bigger UI elements,
+     * such as a large icon and a heading in a card.
+     * Internally, this size depends on the size of the default font as rendered on the screen,
+     * so it takes user-configured font size and DPI into account.
      */
     Q_PROPERTY(int largeSpacing READ largeSpacing WRITE setLargeSpacing NOTIFY largeSpacingChanged)
 
@@ -206,6 +217,8 @@ class KIRIGAMI2_EXPORT Units : public QObject
     Q_PROPERTY(QObject *fontMetrics READ fontMetrics CONSTANT)
 #endif
 
+    Q_PROPERTY(int maximumInteger READ maximumInteger CONSTANT)
+
 public:
     explicit Units(QObject *parent = nullptr);
     ~Units() override;
@@ -215,6 +228,9 @@ public:
 
     int smallSpacing() const;
     void setSmallSpacing(int size);
+
+    int mediumSpacing() const;
+    void setMediumSpacing(int size);
 
     int largeSpacing() const;
     void setLargeSpacing(int size);
@@ -252,9 +268,12 @@ public:
 
     IconSizes *iconSizes() const;
 
+    int maximumInteger() const;
+
 Q_SIGNALS:
     void gridUnitChanged();
     void smallSpacingChanged();
+    void mediumSpacingChanged();
     void largeSpacingChanged();
     void devicePixelRatioChanged();
     void veryLongDurationChanged();

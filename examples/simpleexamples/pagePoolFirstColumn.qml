@@ -4,8 +4,8 @@
  *  SPDX-License-Identifier: LGPL-2.0-or-later
  */
 
-import QtQuick 2.11
-import org.kde.kirigami 2.11 as Kirigami
+import QtQuick 2.15
+import org.kde.kirigami 2.20 as Kirigami
 
 Kirigami.ApplicationWindow {
     id: root

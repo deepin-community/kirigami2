@@ -5,15 +5,13 @@
  */
 
 import QtQuick 2.1
-import QtQuick.Layouts 1.2
-import QtGraphicalEffects 1.0
 import org.kde.kirigami 2.4 as Kirigami
 
 Item {
     width: height
     height: Kirigami.Units.iconSizes.smallMedium
     property Kirigami.OverlayDrawer drawer
-    property color color: Theme.textColor
+    property color color: Kirigami.Theme.textColor
     opacity: 0.8
     layer.enabled: true
 

@@ -4,32 +4,30 @@
  *  SPDX-License-Identifier: LGPL-2.0-or-later
  */
 
-import QtQuick 2.1
-import QtQuick.Layouts 1.2
-import QtQuick.Controls 2.0 as QQC2
-import org.kde.kirigami 2.4 as Kirigami
+import QtQuick 2.15
+import QtQuick.Layouts 1.15
+import QtQuick.Controls 2.15 as QQC2
+import org.kde.kirigami 2.20 as Kirigami
 
 Kirigami.ApplicationWindow {
     id: root
-    property string currentFile
 
+    property string currentFile
 
     pageStack.initialPage: iconView
 
     Kirigami.ScrollablePage {
         id: iconView
         title: "Notes"
-        actions {
-            contextualActions: [
-                Kirigami.Action {
-                    id: sortAction
-                    icon.name: "view-sort-ascending-symbolic"
-                    tooltip: "Sort Ascending"
-                }
-            ]
-        }
+        actions.contextualActions: [
+            Kirigami.Action {
+                id: sortAction
+                icon.name: "view-sort-ascending-symbolic"
+                tooltip: "Sort Ascending"
+            }
+        ]
         background: Rectangle {
-            color: Kirigami.Thmeme.backgroundColor
+            color: Kirigami.Theme.backgroundColor
         }
 
         GridView {
@@ -78,13 +76,13 @@ Kirigami.ApplicationWindow {
             title: root.currentFile
             actions {
                 main: Kirigami.Action {
-                        id: shareAction
-                        icon.name: "document-share"
-                        text: "Share..."
-                        tooltip: "Share this document with your device"
-                        checkable: true
-                        onCheckedChanged: sheet.sheetOpen = checked;
-                    }
+                    id: shareAction
+                    icon.name: "document-share"
+                    text: "Share..."
+                    tooltip: "Share this document with your device"
+                    checkable: true
+                    onCheckedChanged: sheet.sheetOpen = checked;
+                }
                 contextualActions: [
                     Kirigami.Action {
                         icon.name: "format-text-bold-symbolic"
@@ -123,12 +121,12 @@ Kirigami.ApplicationWindow {
                         ListElement {
                             title: "Share with phone \"My other Nexus5\""
                             description: "You selected this phone 0 times before. It's currently connected to your laptop via Wifi"
-                            buttonText: "push sync"
+                            buttonText: "Push Sync"
                         }
                         ListElement {
                             title: "Share with NextCloud"
                             description: "You currently do not have a server set up for sharing and storing notes from Katie. If you want to set one up click here"
-                            buttonText: "Setup..."
+                            buttonText: "Setup…"
                         }
                         ListElement {
                             title: "Send document via email"
@@ -185,7 +183,7 @@ Kirigami.ApplicationWindow {
                 background: Item {}
                 wrapMode: TextEdit.WordWrap
                 selectByMouse: true
-                text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec sollicitudin, lorem at semper pretium, tortor nisl pellentesque risus, eget eleifend odio ipsum ac mi. Donec justo ex, elementum vitae gravida vel, pretium ac lacus. Duis non metus ac enim viverra auctor in non nunc. Sed sit amet luctus nisi. Proin justo nulla, vehicula eget porta sit amet, aliquet vitae dolor. Mauris sed odio auctor, tempus ipsum ac, placerat enim. Ut in dolor vel ante dictum auctor.
+                text: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec sollicitudin, lorem at semper pretium, tortor nisl pellentesque risus, eget eleifend odio ipsum ac mi. Donec justo ex, elementum vitae gravida vel, pretium ac lacus. Duis non metus ac enim viverra auctor in non nunc. Sed sit amet luctus nisi. Proin justo nulla, vehicula eget porta sit amet, aliquet vitae dolor. Mauris sed odio auctor, tempus ipsum ac, placerat enim. Ut in dolor vel ante dictum auctor.
 
     Praesent blandit rhoncus augue. Phasellus consequat luctus pulvinar. Pellentesque rutrum laoreet dolor, sit amet pellentesque tellus mattis sed. Sed accumsan cursus tortor. Morbi et risus dolor. Nullam facilisis ipsum justo, nec sollicitudin mi pulvinar ac. Nulla facilisi. Donec maximus turpis eget mollis laoreet. Phasellus vel mauris et est mattis auctor eget sit amet turpis. Aliquam dignissim euismod purus, eu efficitur neque fermentum eu. Suspendisse potenti. Praesent mattis ex vitae neque rutrum tincidunt. Etiam placerat leo viverra pulvinar tincidunt.
 
@@ -193,7 +191,7 @@ Kirigami.ApplicationWindow {
 
     Proin quam libero, bibendum eget sodales id, gravida quis enim. Duis fermentum libero vitae sapien hendrerit, in tincidunt tortor semper. Nullam quam nisi, feugiat sed rutrum vitae, dignissim quis risus. Ut ultricies pellentesque est, ut gravida massa convallis sed. Ut placerat dui non felis interdum, id malesuada nulla ornare. Phasellus volutpat purus placerat velit porta tristique. Donec molestie leo in turpis bibendum pharetra. Fusce fermentum diam vitae neque laoreet, sed aliquam leo sollicitudin.
 
-    Ut facilisis massa arcu, eu suscipit ante varius sed. Morbi augue leo, mattis eu tempor vitae, condimentum sed urna. Curabitur ac blandit orci. Vestibulum quis consequat nunc. Proin imperdiet commodo imperdiet. Aenean mattis augue et imperdiet ultricies. Ut id feugiat nulla, et sollicitudin dui. Etiam scelerisque ligula ac euismod hendrerit. Integer in quam nibh. Pellentesque risus massa, porttitor quis fermentum eu, dictum varius magna. Morbi euismod bibendum lacus efficitur pretium. Phasellus elementum porttitor enim nec dictum. Morbi et augue laoreet, convallis quam quis, egestas quam."
+    Ut facilisis massa arcu, eu suscipit ante varius sed. Morbi augue leo, mattis eu tempor vitae, condimentum sed urna. Curabitur ac blandit orci. Vestibulum quis consequat nunc. Proin imperdiet commodo imperdiet. Aenean mattis augue et imperdiet ultricies. Ut id feugiat nulla, et sollicitudin dui. Etiam scelerisque ligula ac euismod hendrerit. Integer in quam nibh. Pellentesque risus massa, porttitor quis fermentum eu, dictum varius magna. Morbi euismod bibendum lacus efficitur pretium. Phasellus elementum porttitor enim nec dictum. Morbi et augue laoreet, convallis quam quis, egestas quam.`
             }
         }
     }

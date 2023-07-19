@@ -5,12 +5,11 @@
  *  SPDX-License-Identifier: LGPL-2.0-or-later
  */
 
-import QtQuick 2.7
-import QtQuick.Controls 2.3 as QQC2
-import org.kde.kirigami 2.4 as Kirigami
+import QtQuick 2.15
+import QtQuick.Controls 2.15 as QQC2
+import org.kde.kirigami 2.20 as Kirigami
 
-Kirigami.ApplicationWindow
-{
+Kirigami.ApplicationWindow {
     id: main
 
     header: Kirigami.ToolBarApplicationHeader {}
@@ -43,7 +42,7 @@ Kirigami.ApplicationWindow
             id: group
         }
 
-        contextualActions: [
+        actions.contextualActions: [
             Kirigami.Action {
                 text: "submenus"
                 icon.name: "kalgebra"

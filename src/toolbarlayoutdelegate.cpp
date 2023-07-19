@@ -268,6 +268,22 @@ qreal ToolBarLayoutDelegate::height() const
     return m_full->height();
 }
 
+qreal ToolBarLayoutDelegate::implicitWidth() const
+{
+    if (m_iconVisible) {
+        return m_icon->implicitWidth();
+    }
+    return m_full->implicitWidth();
+}
+
+qreal ToolBarLayoutDelegate::implicitHeight() const
+{
+    if (m_iconVisible) {
+        return m_icon->implicitHeight();
+    }
+    return m_full->implicitHeight();
+}
+
 qreal ToolBarLayoutDelegate::maxHeight() const
 {
     return std::max(m_full->height(), m_icon->height());

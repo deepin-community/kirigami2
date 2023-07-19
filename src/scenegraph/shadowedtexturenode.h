@@ -28,6 +28,7 @@ class ShadowedTextureNode : public ShadowedRectangleNode
 {
 public:
     ShadowedTextureNode();
+    ~ShadowedTextureNode();
 
     void setTextureSource(QSGTextureProvider *source);
     void preprocess() override;
@@ -39,4 +40,5 @@ private:
     QSGMaterialType *borderMaterialType() override;
 
     QPointer<QSGTextureProvider> m_textureSource;
+    QMetaObject::Connection m_textureChangeConnectionHandle;
 };

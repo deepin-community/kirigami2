@@ -5,70 +5,70 @@
  */
 
 import QtQuick 2.4
+import org.kde.kirigami 2.16 as Kirigami
 
 pragma Singleton
 
-
-QtObject {
+Kirigami.BasicThemeDefinition {
     id: theme
 
-    property color textColor: palette.windowText
-    property color disabledTextColor: disabledPalette.windowText
+    textColor: palette.windowText
+    disabledTextColor: disabledPalette.windowText
 
-    property color highlightColor: palette.highlight
-    property color highlightedTextColor: palette.highlightedText
-    property color backgroundColor: palette.window
-    property color alternateBackgroundColor: Qt.darker(palette.window, 1.05)
-    property color activeTextColor: palette.highlight
-    property color activeBackgroundColor: palette.highlight
-    property color linkColor: "#2980B9"
-    property color linkBackgroundColor: "#2980B9"
-    property color visitedLinkColor: "#7F8C8D"
-    property color visitedLinkBackgroundColor: "#7F8C8D"
-    property color hoverColor: palette.highlight
-    property color focusColor: palette.highlight
-    property color negativeTextColor: "#DA4453"
-    property color negativeBackgroundColor: "#DA4453"
-    property color neutralTextColor: "#F67400"
-    property color neutralBackgroundColor: "#F67400"
-    property color positiveTextColor: "#27AE60"
-    property color positiveBackgroundColor: "#27AE60"
+    highlightColor: palette.highlight
+    highlightedTextColor: palette.highlightedText
+    backgroundColor: palette.window
+    alternateBackgroundColor: Qt.darker(palette.window, 1.05)
+    activeTextColor: palette.highlight
+    activeBackgroundColor: palette.highlight
+    linkColor: "#2980B9"
+    linkBackgroundColor: "#2980B9"
+    visitedLinkColor: "#7F8C8D"
+    visitedLinkBackgroundColor: "#7F8C8D"
+    hoverColor: palette.highlight
+    focusColor: palette.highlight
+    negativeTextColor: "#DA4453"
+    negativeBackgroundColor: "#DA4453"
+    neutralTextColor: "#F67400"
+    neutralBackgroundColor: "#F67400"
+    positiveTextColor: "#27AE60"
+    positiveBackgroundColor: "#27AE60"
 
-    property color buttonTextColor: palette.buttonText
-    property color buttonBackgroundColor: palette.button
-    property color buttonAlternateBackgroundColor: Qt.darker(palette.button, 1.05)
-    property color buttonHoverColor: palette.highlight
-    property color buttonFocusColor: palette.highlight
+    buttonTextColor: palette.buttonText
+    buttonBackgroundColor: palette.button
+    buttonAlternateBackgroundColor: Qt.darker(palette.button, 1.05)
+    buttonHoverColor: palette.highlight
+    buttonFocusColor: palette.highlight
 
-    property color viewTextColor: palette.text
-    property color viewBackgroundColor: palette.base
-    property color viewAlternateBackgroundColor: palette.alternateBase
-    property color viewHoverColor: palette.highlight
-    property color viewFocusColor: palette.highlight
+    viewTextColor: palette.text
+    viewBackgroundColor: palette.base
+    viewAlternateBackgroundColor: palette.alternateBase
+    viewHoverColor: palette.highlight
+    viewFocusColor: palette.highlight
 
-    property color selectionTextColor: palette.highlightedText
-    property color selectionBackgroundColor: palette.highlight
-    property color selectionAlternateBackgroundColor: Qt.darker(palette.highlight, 1.05)
-    property color selectionHoverColor: palette.highlight
-    property color selectionFocusColor: palette.highlight
+    selectionTextColor: palette.highlightedText
+    selectionBackgroundColor: palette.highlight
+    selectionAlternateBackgroundColor: Qt.darker(palette.highlight, 1.05)
+    selectionHoverColor: palette.highlight
+    selectionFocusColor: palette.highlight
 
-    property color tooltipTextColor: palette.base
-    property color tooltipBackgroundColor: palette.text
-    property color tooltipAlternateBackgroundColor: Qt.darker(palette.text, 1.05)
-    property color tooltipHoverColor: palette.highlight
-    property color tooltipFocusColor: palette.highlight
+    tooltipTextColor: palette.base
+    tooltipBackgroundColor: palette.text
+    tooltipAlternateBackgroundColor: Qt.darker(palette.text, 1.05)
+    tooltipHoverColor: palette.highlight
+    tooltipFocusColor: palette.highlight
 
-    property color complementaryTextColor: palette.base
-    property color complementaryBackgroundColor: palette.text
-    property color complementaryAlternateBackgroundColor: Qt.darker(palette.text, 1.05)
-    property color complementaryHoverColor: palette.highlight
-    property color complementaryFocusColor: palette.highlight
+    complementaryTextColor: palette.base
+    complementaryBackgroundColor: palette.text
+    complementaryAlternateBackgroundColor: Qt.darker(palette.text, 1.05)
+    complementaryHoverColor: palette.highlight
+    complementaryFocusColor: palette.highlight
 
-    property color headerTextColor: palette.text
-    property color headerBackgroundColor: palette.base
-    property color headerAlternateBackgroundColor: palette.alternateBase
-    property color headerHoverColor: palette.highlight
-    property color headerFocusColor: palette.highlight
+    headerTextColor: palette.text
+    headerBackgroundColor: palette.base
+    headerAlternateBackgroundColor: palette.alternateBase
+    headerHoverColor: palette.highlight
+    headerFocusColor: palette.highlight
 
     property font defaultFont: fontMetrics.font
 

@@ -5,28 +5,22 @@
  *  SPDX-License-Identifier: LGPL-2.0-or-later
  */
 
-import QtQuick 2.7
-import QtQuick.Controls 2.0
-import org.kde.kirigami 2.4 as Kirigami
+import QtQuick 2.15
+import QtQuick.Controls 2.15
 
-Kirigami.ApplicationWindow
-{
+import org.kde.kirigami 2.20 as Kirigami
+
+Kirigami.ApplicationWindow {
     id: main
-    Component {
-        id: keyPage
-        Kirigami.ScrollablePage {
-            ListView {
-                model: 10
-                delegate: Rectangle {
-                    width: 100
-                    height: 30
-                    color: ListView.isCurrentItem ? "red" : "white"
-                }
+
+    pageStack.initialPage: Kirigami.ScrollablePage {
+        ListView {
+            model: 10
+            delegate: Rectangle {
+                width: 100
+                height: 30
+                color: ListView.isCurrentItem ? "red" : "white"
             }
         }
-    }
-
-    Component.onCompleted: {
-        main.pageStack.push(keyPage)
     }
 }

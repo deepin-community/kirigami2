@@ -198,12 +198,23 @@ public:
      */
     Q_INVOKABLE static qreal chroma(const QColor &color);
 
+    struct XYZColor {
+        qreal x = 0;
+        qreal y = 0;
+        qreal z = 0;
+    };
+
     struct LabColor {
         qreal l = 0;
         qreal a = 0;
         qreal b = 0;
     };
 
+    // Not for QML, returns the comvertion from srgb of a QColor and XYZ colorspace
+    static ColorUtils::XYZColor colorToXYZ(const QColor &color);
+
     // Not for QML, returns the comvertion from srgb of a QColor and Lab colorspace
     static ColorUtils::LabColor colorToLab(const QColor &color);
+
+    static qreal luminance(const QColor &color);
 };

@@ -4,14 +4,17 @@
 
 import QtQuick 2.15
 import QtQuick.Controls 2.15 as QQC2
-import org.kde.kirigami 2.19 as Kirigami
+import org.kde.kirigami 2.20 as Kirigami
 
 QQC2.ApplicationWindow {
     id: root
+
     width: flickable.implicitWidth
     height: flickable.implicitHeight
+
     Flickable {
         id: flickable
+
         anchors.fill: parent
         implicitWidth: wheelHandler.horizontalStepSize * 10 + leftMargin + rightMargin
         implicitHeight: wheelHandler.verticalStepSize * 10 + topMargin + bottomMargin

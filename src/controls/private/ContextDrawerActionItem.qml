@@ -7,9 +7,9 @@
 import QtQuick 2.6
 import QtQuick.Controls 2.0 as QQC2
 import QtQuick.Layouts 1.2
-import org.kde.kirigami 2.5
+import org.kde.kirigami 2.5 as Kirigami
 
-BasicListItem {
+Kirigami.BasicListItem {
     id: listItem
 
     readonly property bool isSeparator: modelData.hasOwnProperty("separator") && modelData.separator
@@ -23,15 +23,15 @@ BasicListItem {
     reserveSpaceForLabel: !isSeparator
 
     label: model ? (model.text ? model.text : model.tooltip) : (modelData.text ? modelData.text : modelData.tooltip)
-    hoverEnabled: (!isExpandible || root.collapsed) && !Settings.tabletMode
+    hoverEnabled: (!isExpandible || root.collapsed) && !Kirigami.Settings.tabletMode
     sectionDelegate: isExpandible
-    font.pointSize: isExpandible ? Theme.defaultFont.pointSize * 1.30 : Theme.defaultFont.pointSize
+    font.pointSize: isExpandible ? Kirigami.Theme.defaultFont.pointSize * 1.30 : Kirigami.Theme.defaultFont.pointSize
 
     enabled: !isExpandible && !isSeparator && (model ? model.enabled : modelData.enabled)
     visible: model ? model.visible : modelData.visible
     opacity: enabled || isExpandible ? 1.0 : 0.6
 
-    Separator {
+    Kirigami.Separator {
         id: separatorAction
 
         visible: listItem.isSeparator
@@ -40,7 +40,7 @@ BasicListItem {
 
     ActionsMenu {
         id: actionsMenu
-        y: Settings.isMobile ? -height : listItem.height
+        y: Kirigami.Settings.isMobile ? -height : listItem.height
         z: 99999999
         actions: modelData.children
         submenuComponent: Component {
@@ -53,9 +53,9 @@ BasicListItem {
         Layout.fillHeight: true
         sourceComponent: modelData.displayComponent
         onStatusChanged: {
-            for (var i in parent.children) {
-                var child = parent.children[i];
-                if (child == this) {
+            for (const i in parent.children) {
+                const child = parent.children[i];
+                if (child === this) {
                     child.visible = status === Loader.Ready;
                     break;
                 } else {
@@ -66,10 +66,10 @@ BasicListItem {
         Component.onCompleted: statusChanged()
     }
 
-    Icon {
+    Kirigami.Icon {
         isMask: true
         Layout.alignment: Qt.AlignVCenter
-        Layout.preferredHeight: Units.iconSizes.small/2
+        Layout.preferredHeight: Kirigami.Units.iconSizes.small/2
         selected: listItem.checked || listItem.pressed
         Layout.preferredWidth: Layout.preferredHeight
         source: "go-up-symbolic"

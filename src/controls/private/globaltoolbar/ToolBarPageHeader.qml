@@ -5,21 +5,19 @@
  */
 
 import QtQuick 2.15
-import QtQuick.Window 2.15
-import QtQuick.Controls 2.15 as Controls
+import QtQml 2.15
 import QtQuick.Layouts 1.15
-import org.kde.kirigami 2.19
-import "../" as Private
+import org.kde.kirigami 2.19 as Kirigami
 
 AbstractPageHeader {
     id: root
 
-    implicitWidth: layout.implicitWidth + Units.smallSpacing * 2
-    implicitHeight: Math.max(titleLoader.implicitHeight, toolBar.implicitHeight) + Units.smallSpacing * 2
+    implicitWidth: layout.implicitWidth + Kirigami.Units.smallSpacing * 2
+    implicitHeight: Math.max(titleLoader.implicitHeight, toolBar.implicitHeight) + Kirigami.Units.smallSpacing * 2
 
     MouseArea {
         anchors.fill: parent
-        onPressed: {
+        onPressed: mouse => {
             page.forceActiveFocus()
             mouse.accepted = false
         }
@@ -28,23 +26,25 @@ AbstractPageHeader {
     RowLayout {
         id: layout
         anchors.fill: parent
-        anchors.rightMargin: Units.smallSpacing
-        spacing: Units.smallSpacing
+        anchors.rightMargin: Kirigami.Units.smallSpacing
+        spacing: Kirigami.Units.smallSpacing
 
         Loader {
             id: titleLoader
 
             Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
-            Layout.fillWidth: item ? item.Layout.fillWidth : undefined
-            Layout.minimumWidth: item ? item.Layout.minimumWidth : undefined
-            Layout.preferredWidth: item ? item.Layout.preferredWidth : undefined
-            Layout.maximumWidth: item ? item.Layout.maximumWidth : undefined
+            Layout.fillWidth: item ? item.Layout.fillWidth : false
+            Layout.minimumWidth: item ? item.Layout.minimumWidth : -1
+            Layout.preferredWidth: item ? item.Layout.preferredWidth : -1
+            Layout.maximumWidth: item ? item.Layout.maximumWidth : -1
 
-            asynchronous: true
+            // Don't load async to prevent jumpy behaviour on slower devices as it loads in.
+            // If the title delegate really needs to load async, it should be its responsibility to do it itself.
+            asynchronous: false
             sourceComponent: page ? page.titleDelegate : null
         }
 
-        ActionToolBar {
+        Kirigami.ActionToolBar {
             id: toolBar
 
             Layout.alignment: Qt.AlignVCenter
@@ -53,14 +53,14 @@ AbstractPageHeader {
 
             visible: actions.length > 0
             alignment: pageRow ? pageRow.globalToolBar.toolbarActionAlignment : Qt.AlignRight
-            heightMode: ToolBarLayout.ConstrainIfLarger
+            heightMode: pageRow ? pageRow.globalToolBar.toolbarActionHeightMode : Kirigami.ToolBarLayout.ConstrainIfLarger
 
             actions: {
                 if (!page) {
                     return []
                 }
 
-                var result = []
+                const result = []
 
                 if (page.actions.main) {
                     result.push(page.actions.main)
@@ -72,26 +72,28 @@ AbstractPageHeader {
                     result.push(page.actions.right)
                 }
                 if (page.actions.contextualActions.length > 0) {
-                    result = result.concat(Array.prototype.map.call(page.actions.contextualActions, function(item) { return item }))
+                    return result.concat(Array.prototype.map.call(page.actions.contextualActions, function(item) { return item }))
                 }
-
                 return result
             }
 
             Binding {
                 target: page.actions.main
                 property: "displayHint"
-                value: page.actions.main ? (page.actions.main.displayHint | DisplayHint.KeepVisible) : null
+                value: page.actions.main ? (page.actions.main.displayHint | Kirigami.DisplayHint.KeepVisible) : null
+                restoreMode: Binding.RestoreBinding
             }
             Binding {
                 target: page.actions.left
                 property: "displayHint"
-                value: page.actions.left ? (page.actions.left.displayHint | DisplayHint.KeepVisible) : null
+                value: page.actions.left ? (page.actions.left.displayHint | Kirigami.DisplayHint.KeepVisible) : null
+                restoreMode: Binding.RestoreBinding
             }
             Binding {
                 target: page.actions.right
                 property: "displayHint"
-                value: page.actions.right ? (page.actions.right.displayHint | DisplayHint.KeepVisible) : null
+                value: page.actions.right ? (page.actions.right.displayHint | Kirigami.DisplayHint.KeepVisible) : null
+                restoreMode: Binding.RestoreBinding
             }
         }
     }
