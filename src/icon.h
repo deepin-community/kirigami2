@@ -207,7 +207,11 @@ Q_SIGNALS:
     void paintedAreaChanged();
 
 protected:
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     void geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry) override;
+#else
+    void geometryChange(const QRectF &newGeometry, const QRectF &oldGeometry) override;
+#endif
     QImage findIcon(const QSize &size);
     void handleFinished(QNetworkReply *reply);
     void handleRedirect(QNetworkReply *reply);
@@ -216,6 +220,7 @@ protected:
     void setStatus(Status status);
     void updatePolish() override;
     void updatePaintedGeometry();
+    void itemChange(QQuickItem::ItemChange change, const QQuickItem::ItemChangeData &value) override;
 
 private:
     Kirigami::PlatformTheme *m_theme = nullptr;

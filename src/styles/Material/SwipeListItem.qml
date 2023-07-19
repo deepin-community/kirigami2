@@ -5,10 +5,10 @@
  */
 
 import QtQuick 2.5
-import org.kde.kirigami 2.4
+import org.kde.kirigami 2.4 as Kirigami
 import QtQuick.Controls.Material 2.1 as Mat
 import QtQuick.Controls.Material.impl 2.1 as MatImp
-import "../../private"
+import "../../private" as P
 import "../../templates" as T
 
 /**
@@ -43,7 +43,7 @@ import "../../templates" as T
 T.SwipeListItem {
     id: listItem
 
-    background: DefaultListItemBackground {
+    background: P.DefaultListItemBackground {
         MatImp.Ripple {
             anchors.fill: parent
             clip: visible
@@ -53,5 +53,5 @@ T.SwipeListItem {
             color: Qt.rgba(0,0,0,0.2)
         }
     }
-    implicitHeight: contentItem.implicitHeight + Units.smallSpacing * 6
+    implicitHeight: contentItem.implicitHeight + Kirigami.Units.smallSpacing * 6
 }

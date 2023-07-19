@@ -5,11 +5,9 @@
  */
 
 import QtQuick 2.1
-import QtGraphicalEffects 1.0
 import QtQuick.Templates 2.0 as T2
-import org.kde.kirigami 2.15
-
-import "private"
+import org.kde.kirigami 2.15 as Kirigami
+import "private" as P
 import "templates" as T
 
 /**
@@ -18,6 +16,7 @@ import "templates" as T
  * For example in Okular Mobile, an Overlay Drawer is used to display
  * thumbnails of all pages within a document along with a search field.
  * This is used for the distinct task of navigating to another page.
+ *
  * @inherit org::kde::kirigami::templates::OverlayDrawer
  */
 T.OverlayDrawer {
@@ -30,6 +29,10 @@ T.OverlayDrawer {
     closePolicy: modal ? T2.Popup.CloseOnEscape | T2.Popup.CloseOnReleaseOutside : T2.Popup.NoAutoClose
     handleVisible: interactive && (modal || !drawerOpen) && (typeof(applicationWindow)===typeof(Function) && applicationWindow() ? applicationWindow().controlsVisible : true)
 
+    // FIXME: set to false when it does not lead to blocking closePolicy.
+    // See Kirigami bug: 454119
+    interactive: true
+
     onPositionChanged: {
         if (!modal && !root.peeking && !root.animating) {
             position = 1;
@@ -37,37 +40,37 @@ T.OverlayDrawer {
     }
 
     background: Rectangle {
-        color: Theme.backgroundColor
+        color: Kirigami.Theme.backgroundColor
 
         Item {
             parent: root.handle
             anchors.fill: parent
 
-            ShadowedRectangle {
+            Kirigami.ShadowedRectangle {
                 id: handleGraphics
                 anchors.centerIn: parent
 
-                Theme.colorSet: parent.parent.handleAnchor && parent.parent.handleAnchor.visible ? parent.parent.handleAnchor.Theme.colorSet : Theme.Button
+                Kirigami.Theme.colorSet: parent.parent.handleAnchor && parent.parent.handleAnchor.visible ? parent.parent.handleAnchor.Kirigami.Theme.colorSet : Kirigami.Theme.Button
 
-                Theme.backgroundColor: parent.parent.handleAnchor && parent.parent.handleAnchor.visible ? parent.parent.handleAnchor.Theme.backgroundColor : undefined
+                Kirigami.Theme.backgroundColor: parent.parent.handleAnchor && parent.parent.handleAnchor.visible ? parent.parent.handleAnchor.Kirigami.Theme.backgroundColor : undefined
 
-                Theme.textColor: parent.parent.handleAnchor && parent.parent.handleAnchor.visible ? parent.parent.handleAnchor.Theme.textColor : undefined
+                Kirigami.Theme.textColor: parent.parent.handleAnchor && parent.parent.handleAnchor.visible ? parent.parent.handleAnchor.Kirigami.Theme.textColor : undefined
 
-                Theme.inherit: false
-                color: root.handle.pressed ? Theme.highlightColor : Theme.backgroundColor
+                Kirigami.Theme.inherit: false
+                color: root.handle.pressed ? Kirigami.Theme.highlightColor : Kirigami.Theme.backgroundColor
 
                 visible: !parent.parent.handleAnchor || !parent.parent.handleAnchor.visible || root.handle.pressed || (root.modal && root.position > 0)
 
                 shadow.color: Qt.rgba(0, 0, 0, root.handle.pressed ? 0.6 : 0.4)
                 shadow.yOffset: 1
-                shadow.size: Units.gridUnit / 2
+                shadow.size: Kirigami.Units.gridUnit / 2
 
-                width: Units.iconSizes.smallMedium + Units.smallSpacing * 2
+                width: Kirigami.Units.iconSizes.smallMedium + Kirigami.Units.smallSpacing * 2
                 height: width
                 radius: 2
                 Behavior on color {
                     ColorAnimation {
-                        duration: Units.longDuration
+                        duration: Kirigami.Units.longDuration
                         easing.type: Easing.InOutQuad
                     }
                 }
@@ -75,17 +78,17 @@ T.OverlayDrawer {
             Loader {
                 anchors.centerIn: handleGraphics
                 width: height
-                height: Units.iconSizes.smallMedium
+                height: Kirigami.Units.iconSizes.smallMedium
 
-                Theme.colorSet: handleGraphics.Theme.colorSet
-                Theme.backgroundColor: handleGraphics.Theme.backgroundColor
-                Theme.textColor: handleGraphics.Theme.textColor
+                Kirigami.Theme.colorSet: handleGraphics.Kirigami.Theme.colorSet
+                Kirigami.Theme.backgroundColor: handleGraphics.Kirigami.Theme.backgroundColor
+                Kirigami.Theme.textColor: handleGraphics.Kirigami.Theme.textColor
 
                 asynchronous: true
 
                 source: {
-                    var edge = root.edge;
-                    if (Qt.application.layoutDirection == Qt.RightToLeft) {
+                    let edge = root.edge;
+                    if (Qt.application.layoutDirection === Qt.RightToLeft) {
                         if (edge === Qt.LeftEdge) {
                             edge = Qt.RightEdge;
                         } else {
@@ -96,51 +99,50 @@ T.OverlayDrawer {
                     if ((root.handleClosedIcon.source || root.handleClosedIcon.name)
                         && (root.handleOpenIcon.source || root.handleOpenIcon.name)) {
                         return Qt.resolvedUrl("templates/private/GenericDrawerIcon.qml");
-                    } else if (edge == Qt.LeftEdge ) {
+                    } else if (edge === Qt.LeftEdge ) {
                         return Qt.resolvedUrl("templates/private/MenuIcon.qml");
-                    } else if(edge == Qt.RightEdge && root.hasOwnProperty("actions")) {
+                    } else if(edge === Qt.RightEdge && root.hasOwnProperty("actions")) {
                         return Qt.resolvedUrl("templates/private/ContextIcon.qml");
-                    }else {
+                    } else {
                         return "";
                     }
                 }
                 onItemChanged: {
-                    if(item) {
+                    if (item) {
                         item.drawer = Qt.binding(function(){return root});
-                        item.color = Qt.binding(function(){return root.handle.pressed ? Theme.highlightedTextColor : Theme.textColor});
+                        item.color = Qt.binding(function(){return root.handle.pressed ? Kirigami.Theme.highlightedTextColor : Kirigami.Theme.textColor});
                     }
                 }
             }
         }
 
-
-        Separator {
+        Kirigami.Separator {
             LayoutMirroring.enabled: false
-           // LayoutMirroring.childrenInherit: true
+            // LayoutMirroring.childrenInherit: true
             anchors {
-                right: root.edge == Qt.RightEdge ? parent.left : (root.edge == Qt.LeftEdge ? undefined : parent.right)
-                left: root.edge == Qt.LeftEdge ? parent.right : (root.edge == Qt.RightEdge ? undefined : parent.left)
-                top: root.edge == Qt.TopEdge ? parent.bottom : (root.edge == Qt.BottomEdge ? undefined : parent.top)
-                bottom: root.edge == Qt.BottomEdge ? parent.top : (root.edge == Qt.TopEdge ? undefined : parent.bottom)
+                right: root.edge === Qt.RightEdge ? parent.left : (root.edge === Qt.LeftEdge ? undefined : parent.right)
+                left: root.edge === Qt.LeftEdge ? parent.right : (root.edge === Qt.RightEdge ? undefined : parent.left)
+                top: root.edge === Qt.TopEdge ? parent.bottom : (root.edge === Qt.BottomEdge ? undefined : parent.top)
+                bottom: root.edge === Qt.BottomEdge ? parent.top : (root.edge === Qt.TopEdge ? undefined : parent.bottom)
             }
             visible: !root.modal
         }
-        EdgeShadow {
+        P.EdgeShadow {
             z: -2
             visible: root.modal
             edge: root.edge
             anchors {
-                right: root.edge == Qt.RightEdge ? parent.left : (root.edge == Qt.LeftEdge ? undefined : parent.right)
-                left: root.edge == Qt.LeftEdge ? parent.right : (root.edge == Qt.RightEdge ? undefined : parent.left)
-                top: root.edge == Qt.TopEdge ? parent.bottom : (root.edge == Qt.BottomEdge ? undefined : parent.top)
-                bottom: root.edge == Qt.BottomEdge ? parent.top : (root.edge == Qt.TopEdge ? undefined : parent.bottom)
+                right: root.edge === Qt.RightEdge ? parent.left : (root.edge === Qt.LeftEdge ? undefined : parent.right)
+                left: root.edge === Qt.LeftEdge ? parent.right : (root.edge === Qt.RightEdge ? undefined : parent.left)
+                top: root.edge === Qt.TopEdge ? parent.bottom : (root.edge === Qt.BottomEdge ? undefined : parent.top)
+                bottom: root.edge === Qt.BottomEdge ? parent.top : (root.edge === Qt.TopEdge ? undefined : parent.bottom)
             }
 
-            opacity: root.position == 0 ? 0 : 1
+            opacity: root.position === 0 ? 0 : 1
 
             Behavior on opacity {
                 NumberAnimation {
-                    duration: Units.longDuration
+                    duration: Kirigami.Units.longDuration
                     easing.type: Easing.InOutQuad
                 }
             }

@@ -5,12 +5,10 @@
  */
 
 import QtQuick 2.1
-import QtQuick.Layouts 1.2
-import QtQuick.Controls 2.0 as Controls
+import QtQuick.Controls 2.0 as QQC2
+import org.kde.kirigami 2.4 as Kirigami
 
-import org.kde.kirigami 2.4
-
-Controls.ToolButton {
+QQC2.ToolButton {
     id: button
 
     icon.name: (LayoutMirroring.enabled ? "go-previous-symbolic-rtl" : "go-previous-symbolic")
@@ -25,16 +23,16 @@ Controls.ToolButton {
         }
     }
     // The gridUnit wiggle room is used to not flicker the button visibility during an animated resize for instance due to a sidebar collapse
-    visible: applicationWindow().pageStack.layers.depth > 1 || (applicationWindow().pageStack.contentItem.contentWidth > applicationWindow().pageStack.width + Units.gridUnit && (button.showNavButtons === true || (button.showNavButtons & ApplicationHeaderStyle.ShowBackButton)))
+    visible: applicationWindow().pageStack.layers.depth > 1 || (applicationWindow().pageStack.contentItem.contentWidth > applicationWindow().pageStack.width + Kirigami.Units.gridUnit && (button.showNavButtons === true || (button.showNavButtons & Kirigami.ApplicationHeaderStyle.ShowBackButton)))
 
     onClicked: {
         applicationWindow().pageStack.goBack();
     }
 
-    Controls.ToolTip {
+    QQC2.ToolTip {
         visible: button.hovered
         text: qsTr("Navigate Back")
-        delay: Units.toolTipDelay
+        delay: Kirigami.Units.toolTipDelay
         timeout: 5000
         y: button.height
     }

@@ -6,12 +6,14 @@ import QtQuick 2.15
 import QtQml 2.15
 import QtQuick.Templates 2.15 as T
 import QtQuick.Controls 2.15 as QQC2
-import org.kde.kirigami 2.19 as Kirigami
+
+import org.kde.kirigami 2.20 as Kirigami
 
 QQC2.ApplicationWindow {
     id: root
     width: 200 * Qt.styleHints.wheelScrollLines + scrollView.leftPadding + scrollView.rightPadding
     height: 200 * Qt.styleHints.wheelScrollLines + scrollView.topPadding + scrollView.bottomPadding
+    visible: true
     ScrollView {
         id: scrollView
         anchors.fill: parent

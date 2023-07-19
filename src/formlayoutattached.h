@@ -13,8 +13,11 @@
 class QQuickItem;
 
 /**
- * This attached property contains the information for decorating a FormLayout:
+ * This attached property contains the information for decorating a org::kde::kirigami::FormLayout:
+ *
  * It contains the text labels of fields and information about sections.
+ *
+ * Some of its properties can be used with other <a href="https://doc.qt.io/qt-6/qml-qtquick-layouts-layout.html">Layout</a> types.
  * @code
  * import org.kde.kirigami 2.3 as Kirigami
  * Kirigami.FormLayout {
@@ -26,23 +29,24 @@ class QQuickItem;
  *    }
  * }
  * @endcode
+ * @see org::kde::kirigami::FormLayout
  * @since 2.3
  */
 class FormLayoutAttached : public QObject
 {
     Q_OBJECT
     /**
-     * The label for a form layout field
+     * The label for a org::kde::kirigami::FormLayout field
      */
     Q_PROPERTY(QString label READ label WRITE setLabel NOTIFY labelChanged)
     /**
-     * The alignment for the label of a form layout field
+     * The alignment for the label of a org::kde::kirigami::FormLayout field
      */
     Q_PROPERTY(int labelAlignment READ labelAlignment WRITE setLabelAlignment NOTIFY labelAlignmentChanged)
     /**
-     * If true the FormLayout item is a section separator, a section separator
+     * If true, the child item of a org::kde::kirigami::FormLayout becomes a section separator, and
      * may have different looks:
-     * * To make it just a space between two fields, just put an empty item with isSection:
+     * * To make it just a space between two fields, just put an empty item with FormData.isSection:
      * @code
      * TextField {
      *     Kirigami.FormData.label: "Label:"
@@ -82,29 +86,55 @@ class FormLayoutAttached : public QObject
      *     Kirigami.FormData.label: "Label:"
      * }
      * @endcode
+     * @see org::kde::kirigami::FormLayout
      */
     Q_PROPERTY(bool isSection READ isSection WRITE setIsSection NOTIFY isSectionChanged)
 
     /**
-     * If true a checkbox is prepended to the FormLayout item.
+     * If true, a checkbox is prepended to the org::kde::kirigami::FormLayout item.
      */
     Q_PROPERTY(bool checkable READ checkable WRITE setCheckable NOTIFY checkableChanged)
 
     /**
-     * This property is true when the checkbox of the FormLayout item is checked, @see checkable.
+     * This property is true when the checkbox of the org::kde::kirigami::FormLayout item is checked.
+     * @see checkable.
      */
     Q_PROPERTY(bool checked READ checked WRITE setChecked NOTIFY checkedChanged)
 
     /**
-     * This property holds whether the label and the checkbox of the FormLayout item receive mouse and keyboard events.
+     * This property holds whether the label and the checkbox of the org::kde::kirigami::FormLayout item receive mouse and keyboard events.
      */
     Q_PROPERTY(bool enabled READ enabled WRITE setEnabled NOTIFY enabledChanged)
 
     /**
-     * The Item the label will be considered a "Buddy" for,
-     * which will be the parent item the attached property is in.
+     * This property can only be used
+     * in conjunction with a Kirigami.FormData.label,
+     * often in a layout that is a child of a org::kde::kirigami::FormLayout.
+     *
+     * It then turns the item specified into a "buddy"
+     * of the label, making it work as if it were
+     * a child of the org::kde::kirigami::FormLayout.
+     *
      * A buddy item is useful for instance when the label has a keyboard accelerator,
-     * which on triggered will be given active keyboard focus to.
+     * which when triggered provides active keyboard focus to the buddy item.
+     *
+     * @code
+     * Kirigami.FormLayout {
+     *     Layouts.ColumnLayout {
+     *         // If the accelerator is in the letter S,
+     *         // pressing Alt+S gives focus to the slider.
+     *         Kirigami.FormData.label: "Slider label:"
+     *         Kirigami.FormData.buddyFor: slider
+     *
+     *         QQC2.Slider {
+     *             id: slider
+     *             from: 0
+     *             to: 100
+     *             value: 50
+     *         }
+     *     }
+     * }
+     * @endcode
      */
     Q_PROPERTY(QQuickItem *buddyFor READ buddyFor WRITE setBuddyFor NOTIFY buddyForChanged)
 

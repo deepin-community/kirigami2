@@ -5,16 +5,14 @@
  */
 
 import QtQuick 2.1
-import QtQuick.Layouts 1.2
-import QtGraphicalEffects 1.0
-import org.kde.kirigami 2.4
+import org.kde.kirigami 2.4 as Kirigami
 
 Item {
     id: canvas
     width: height
-    height: Units.iconSizes.smallMedium
-    property OverlayDrawer drawer
-    property color color: Theme.textColor
+    height: Kirigami.Units.iconSizes.smallMedium
+    property Kirigami.OverlayDrawer drawer
+    property color color: Kirigami.Theme.textColor
     opacity: 0.8
     layer.enabled: true
 
@@ -24,7 +22,7 @@ Item {
         id: iconRoot
         anchors {
             fill: parent
-            margins: Units.smallSpacing
+            margins: Kirigami.Units.smallSpacing
         }
         readonly property int thickness: 2
         readonly property real drawerPosition: drawer ? drawer.position : 0
@@ -35,7 +33,7 @@ Item {
                 top: parent.top
                 topMargin: -iconRoot.thickness/2 * iconRoot.drawerPosition
             }
-            antialiasing: iconRoot.drawerPosition != 0
+            antialiasing: iconRoot.drawerPosition !== 0
             transformOrigin: Item.Right
             width: (1 - iconRoot.drawerPosition) * parent.width + iconRoot.drawerPosition * (Math.sqrt(2*(parent.width*parent.width)))
             height: iconRoot.thickness
@@ -56,7 +54,7 @@ Item {
                 bottom: parent.bottom
                 bottomMargin: -iconRoot.thickness/2 * iconRoot.drawerPosition
             }
-            antialiasing: iconRoot.drawerPosition != 0
+            antialiasing: iconRoot.drawerPosition !== 0
             transformOrigin: Item.Right
             width: (1 - iconRoot.drawerPosition) * parent.width + iconRoot.drawerPosition * (Math.sqrt(2*(parent.width*parent.width)))
             height: iconRoot.thickness
@@ -65,4 +63,3 @@ Item {
         }
     }
 }
-

@@ -8,16 +8,13 @@ import QtQuick 2.12
 import QtQuick.Templates 2.3 as T2
 import QtQuick.Controls 2.2 as QQC2
 import QtQuick.Layouts 1.2
-import QtGraphicalEffects 1.0
-import org.kde.kirigami 2.13
-
-import "private"
-import "templates/private"
+import org.kde.kirigami 2.13 as Kirigami
+import "private" as P
 
 /**
- * A drawer specialization intended for the global actions of the application
- * valid regardless of the application state (think about the menubar
- * of a desktop application).
+ * A specialized form of the Drawer intended for showing an application's
+ * always-available global actions. Think of it like a mobile version of
+ * a desktop application's menubar.
  *
  * Example usage:
  * @code
@@ -53,36 +50,39 @@ import "templates/private"
  */
 OverlayDrawer {
     id: root
-    edge: Qt.application.layoutDirection == Qt.RightToLeft ? Qt.RightEdge : Qt.LeftEdge
+    edge: Qt.application.layoutDirection === Qt.RightToLeft ? Qt.RightEdge : Qt.LeftEdge
     handleClosedIcon.source: null
     handleOpenIcon.source: null
-    handleVisible: (modal || !drawerOpen) && (typeof(applicationWindow)===typeof(Function) && applicationWindow() ? applicationWindow().controlsVisible : true) && (!isMenu || Settings.isMobile)
+    handleVisible: (modal || !drawerOpen) && (typeof(applicationWindow)===typeof(Function) && applicationWindow() ? applicationWindow().controlsVisible : true) && (!isMenu || Kirigami.Settings.isMobile)
 
-    enabled: !isMenu || Settings.isMobile
+    enabled: !isMenu || Kirigami.Settings.isMobile
 
+//BEGIN properties
     /**
-     * @var string title
-     * A title to be displayed on top of the drawer
+     * @brief This property holds the title displayed at the top of the drawer.
+     * @see org::kde::kirigami::private::BannerImage::title
+     * @property string title
      */
     property alias title: bannerImage.title
 
     /**
-     * @var var icon
-     * An icon to be displayed alongside the title.
-     * It can be a QIcon, a fdo-compatible icon name, or any url understood by Image
+     * @brief This property holds an icon to be displayed alongside the title.
+     * @see org::kde::kirigami::private::BannerImage::titleIcon
+     * @see org::kde::kirigami::Icon::source
+     * @property var titleIcon
      */
     property alias titleIcon: bannerImage.titleIcon
 
     /**
-     * @var string bannerImageSource
-     * An image to be used as background for the title and icon for
-     * a decorative purpose.
-     * It accepts any url format supported by Image
+     * @brief This property holds the banner image source.
+     * @see org::kde::kirigami::ShadowedImage::source
+     * @property url bannerImageSource
      */
     property alias bannerImageSource: bannerImage.source
 
     /**
-     * @var list<Action> actions
+     * @brief This property holds the actions displayed in the drawer.
+     *
      * The list of actions can be nested having a tree structure.
      * A tree depth bigger than 2 is discouraged.
      *
@@ -116,55 +116,34 @@ OverlayDrawer {
      *  [...]
      * }
      * @endcode
+     * @property list<Action> actions
      */
     property list<QtObject> actions
 
     /**
-     * an item that will stay on top of the drawer,
-     * and if the drawer contents can be scrolled,
-     * this item will stay still and won't scroll.
-     * Intended mainly for toolbars
+     * @brief This property holds an item that will always be displayed at the top of the drawer.
+     *
+     * If the drawer contents can be scrolled, this item will stay still and won't scroll.
+     *
+     * @note This property is mainly intended for toolbars.
      * @since 2.12
      */
     property Item header
 
     /**
-     * if true the banner area, which can contain an image,
-     * an icon and a title will be visible.
-     * By default the banner will be visible only on mobile platforms
+     * @brief This property sets drawers banner visibility.
+     *
+     * If true, the banner area (which can contain an image,
+     * an icon, and a title) will be visible.
+     *
+     * default: `the banner will be visible only on mobile platforms`
+     *
      * @since 2.12
      */
-    property bool bannerVisible: Settings.isMobile
-    /**
-     * @var list<Item> content
-     * Any random Item can be instantiated inside the drawer and
-     * will be displayed underneath the actions list.
-     *
-     * This is the default property.
-     *
-     * Example usage:
-     * @code
-     * import org.kde.kirigami 2.4 as Kirigami
-     *
-     * Kirigami.ApplicationWindow {
-     *  [...]
-     *     globalDrawer: Kirigami.GlobalDrawer {
-     *         actions: [...]
-     *         Button {
-     *             text: "Button"
-     *             onClicked: //do stuff
-     *         }
-     *     }
-     *  [...]
-     * }
-     * @endcode
-     */
-    default property alias content: mainContent.data
+    property bool bannerVisible: Kirigami.Settings.isMobile
 
     /**
-     * @var list<Item> topContent
-     * Items that will be instantiated inside the drawer and
-     * will be displayed on top of the actions list.
+     * @brief This property holds items that are displayed above the actions.
      *
      * Example usage:
      * @code
@@ -182,63 +161,108 @@ OverlayDrawer {
      *  [...]
      * }
      * @endcode
+     * @property list<QtObject> topContent
      */
     property alias topContent: topContent.data
 
     /**
-     * If true, when the drawer is collapsed as a sidebar, the content items
-     * at the bottom will be hidden (default false).
-     * If you want to keep some items visible and some invisible, set this to
-     * false and control the visibility/opacity of individual items,
-     * binded to the collapsed property
-     * @since 2.5
+     * @brief This property holds items that are displayed under the actions.
+     *
+     * Example usage:
+     * @code
+     * import org.kde.kirigami 2.4 as Kirigami
+     *
+     * Kirigami.ApplicationWindow {
+     *  [...]
+     *     globalDrawer: Kirigami.GlobalDrawer {
+     *         actions: [...]
+     *         Button {
+     *             text: "Button"
+     *             onClicked: //do stuff
+     *         }
+     *     }
+     *  [...]
+     * }
+     * @endcode
+     * @note This is a `default` property.
+     * @property list<QtObject> content
      */
-    property bool showContentWhenCollapsed: false
+    default property alias content: mainContent.data
 
     /**
-     * If true, when the drawer is collapsed as a sidebar, the top content items
-     * at the top will be hidden (default false).
+     * @brief This property sets whether content items at the top should be shown.
+     * when the drawer is collapsed as a sidebar.
+     *
      * If you want to keep some items visible and some invisible, set this to
      * false and control the visibility/opacity of individual items,
      * binded to the collapsed property
+     *
+     * default: ``false``
+     *
      * @since 2.5
      */
     property bool showTopContentWhenCollapsed: false
 
-    //TODO
+    /**
+     * @brief This property sets whether content items at the bottom should be shown.
+     * when the drawer is collapsed as a sidebar.
+     *
+     * If you want to keep some items visible and some invisible, set this to
+     * false and control the visibility/opacity of individual items,
+     * binded to the collapsed property
+     *
+     * default: ``false``
+     *
+     * @see content
+     * @since 2.5
+     */
+    property bool showContentWhenCollapsed: false
+
+    // TODO
     property bool showHeaderWhenCollapsed: false
 
     /**
-     * On the actions menu, whenever a leaf action is triggered, the menu
-     * will reset to its parent.
+     * @brief This property sets whether activating a leaf action resets the
+     * menu to show leaf's parent actions.
+     * 
+     * A leaf action is an action without any child actions.
+     *
+     * default: ``true``
      */
     property bool resetMenuOnTriggered: true
 
     /**
-     * Points to the action acting as a submenu
+     * @brief This property points to the action acting as a submenu
      */
     readonly property Action currentSubMenu: stackView.currentItem ? stackView.currentItem.current: null
 
     /**
-     * When true the global drawer becomes a menu on the desktop. Defauls to false.
+     * @brief This property sets whether the drawer becomes a menu on the desktop.
+     *
+     * default: ``false``
+     *
      * @since 2.11
      */
     property bool isMenu: false
 
     /**
-     * Notifies that the banner has been clicked
+     * @brief This property sets the visibility of the collapse button
+     * when the drawer collapsible.
+     *
+     * default: ``true``
+     *
+     * @since 2.12
+     */
+    property bool collapseButtonVisible: true
+//END properties
+
+    /**
+     * @brief This signal notifies that the banner has been clicked.
      */
     signal bannerClicked()
 
     /**
-     * When the sidebar is collapsible, this controls the visibility of
-     * the collapse button
-     * @since 2.12
-     */
-    property bool collapseButtonVisible: true
-
-    /**
-     * Reverts the menu back to its initial state
+     * @brief This function reverts the menu back to its initial state
      */
     function resetMenu() {
         stackView.pop(stackView.get(0, T2.StackView.DontLoad));
@@ -247,9 +271,9 @@ OverlayDrawer {
         }
     }
 
-    //rightPadding: !Settings.isMobile && mainFlickable.contentHeight > mainFlickable.height ? Units.gridUnit : Units.smallSpacing
+    // rightPadding: !Kirigami.Settings.isMobile && mainFlickable.contentHeight > mainFlickable.height ? Kirigami.Units.gridUnit : Kirigami.Units.smallSpacing
 
-    Theme.colorSet: modal ? Theme.Window : Theme.View
+    Kirigami.Theme.colorSet: modal ? Kirigami.Theme.Window : Kirigami.Theme.View
 
     onHeaderChanged: {
         if (header) {
@@ -271,9 +295,9 @@ OverlayDrawer {
     contentItem: QQC2.ScrollView {
         id: scrollView
         //ensure the attached property exists
-        Theme.inherit: true
+        Kirigami.Theme.inherit: true
         anchors.fill: parent
-        implicitWidth: Math.min (Units.gridUnit * 20, root.parent.width * 0.8)
+        implicitWidth: Math.min (Kirigami.Units.gridUnit * 20, root.parent.width * 0.8)
         QQC2.ScrollBar.horizontal.policy: QQC2.ScrollBar.AlwaysOff
         QQC2.ScrollBar.vertical.anchors {
             top: scrollView.top
@@ -299,9 +323,9 @@ OverlayDrawer {
                 y: bannerImage.visible ? Math.max(headerContainer.height, -mainFlickable.contentY) - height : 0
 
                 Layout.fillWidth: true
-                //visible: !bannerImage.empty || root.collapsible
+                // visible: !bannerImage.empty || root.collapsible
 
-                BannerImage {
+                P.BannerImage {
                     id: bannerImage
 
 
@@ -311,16 +335,16 @@ OverlayDrawer {
 
                     Behavior on opacity {
                         OpacityAnimator {
-                            duration: Units.longDuration
+                            duration: Kirigami.Units.longDuration
                             easing.type: Easing.InOutQuad
                         }
                     }
-                    //leftPadding: root.collapsible ? collapseButton.width + Units.smallSpacing*2 : topPadding
+                    // leftPadding: root.collapsible ? collapseButton.width + Kirigami.Units.smallSpacing*2 : topPadding
                     MouseArea {
                         anchors.fill: parent
-                        onClicked: root.bannerClicked()
+                        onClicked: mouse => root.bannerClicked()
                     }
-                    EdgeShadow {
+                    P.EdgeShadow {
                         edge: Qt.BottomEdge
                         visible: bannerImageSource != ""
                         anchors {
@@ -332,18 +356,18 @@ OverlayDrawer {
                 }
                 RowLayout {
                     id: headerContainer
-                    Theme.inherit: false
-                    Theme.colorSet: Theme.Window
+                    Kirigami.Theme.inherit: false
+                    Kirigami.Theme.colorSet: Kirigami.Theme.Window
 
                     Layout.fillWidth: true
                     visible: contentItem && opacity > 0
                     // Workaround for https://bugreports.qt.io/browse/QTBUG-90034
-                    Layout.preferredHeight: implicitHeight <= 0 || opacity == 1 ? -1 : implicitHeight * opacity
+                    Layout.preferredHeight: implicitHeight <= 0 || opacity === 1 ? -1 : implicitHeight * opacity
                     opacity: !root.collapsed || showHeaderWhenCollapsed
                     Behavior on opacity {
-                        //not an animator as is binded
+                        // not an animator as is binded
                         NumberAnimation {
-                            duration: Units.longDuration
+                            duration: Kirigami.Units.longDuration
                             easing.type: Easing.InOutQuad
                         }
                     }
@@ -363,20 +387,20 @@ OverlayDrawer {
                     Layout.alignment: Qt.AlignHCenter
                     Layout.leftMargin: root.leftPadding
                     Layout.rightMargin: root.rightPadding
-                    Layout.bottomMargin: Units.smallSpacing
+                    Layout.bottomMargin: Kirigami.Units.smallSpacing
                     Layout.topMargin: root.topPadding
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     Layout.preferredHeight: implicitHeight * opacity
-                    //NOTE: why this? just Layout.fillWidth: true doesn't seem sufficient
-                    //as items are added only after this column creation
+                    // NOTE: why this? just Layout.fillWidth: true doesn't seem sufficient
+                    // as items are added only after this column creation
                     Layout.minimumWidth: parent.width - root.leftPadding - root.rightPadding
                     visible: children.length > 0 && childrenRect.height > 0 && opacity > 0
                     opacity: !root.collapsed || showTopContentWhenCollapsed
                     Behavior on opacity {
-                        //not an animator as is binded
+                        // not an animator as is binded
                         NumberAnimation {
-                            duration: Units.longDuration
+                            duration: Kirigami.Units.longDuration
                             easing.type: Easing.InOutQuad
                         }
                     }
@@ -388,39 +412,39 @@ OverlayDrawer {
                     Layout.fillWidth: true
                     Layout.minimumHeight: currentItem ? currentItem.implicitHeight : 0
                     Layout.maximumHeight: Layout.minimumHeight
-                    property ActionsMenu openSubMenu
+                    property P.ActionsMenu openSubMenu
                     initialItem: menuComponent
-                    //NOTE: it's important those are NumberAnimation and not XAnimators
+                    // NOTE: it's important those are NumberAnimation and not XAnimators
                     // as while the animation is running the drawer may close, and
-                    //the animator would stop when not drawing see BUG 381576
+                    // the animator would stop when not drawing see BUG 381576
                     popEnter: Transition {
-                        NumberAnimation { property: "x"; from: (stackView.mirrored ? -1 : 1) * -stackView.width; to: 0; duration: Units.veryLongDuration; easing.type: Easing.OutCubic }
+                        NumberAnimation { property: "x"; from: (stackView.mirrored ? -1 : 1) * -stackView.width; to: 0; duration: Kirigami.Units.veryLongDuration; easing.type: Easing.OutCubic }
                     }
 
                     popExit: Transition {
-                        NumberAnimation { property: "x"; from: 0; to: (stackView.mirrored ? -1 : 1) * stackView.width; duration: Units.veryLongDuration; easing.type: Easing.OutCubic }
+                        NumberAnimation { property: "x"; from: 0; to: (stackView.mirrored ? -1 : 1) * stackView.width; duration: Kirigami.Units.veryLongDuration; easing.type: Easing.OutCubic }
                     }
 
                     pushEnter: Transition {
-                        NumberAnimation { property: "x"; from: (stackView.mirrored ? -1 : 1) * stackView.width; to: 0; duration: Units.veryLongDuration; easing.type: Easing.OutCubic }
+                        NumberAnimation { property: "x"; from: (stackView.mirrored ? -1 : 1) * stackView.width; to: 0; duration: Kirigami.Units.veryLongDuration; easing.type: Easing.OutCubic }
                     }
 
                     pushExit: Transition {
-                        NumberAnimation { property: "x"; from: 0; to: (stackView.mirrored ? -1 : 1) * -stackView.width; duration: Units.veryLongDuration; easing.type: Easing.OutCubic }
+                        NumberAnimation { property: "x"; from: 0; to: (stackView.mirrored ? -1 : 1) * -stackView.width; duration: Kirigami.Units.veryLongDuration; easing.type: Easing.OutCubic }
                     }
 
                     replaceEnter: Transition {
-                        NumberAnimation { property: "x"; from: (stackView.mirrored ? -1 : 1) * stackView.width; to: 0; duration: Units.veryLongDuration; easing.type: Easing.OutCubic }
+                        NumberAnimation { property: "x"; from: (stackView.mirrored ? -1 : 1) * stackView.width; to: 0; duration: Kirigami.Units.veryLongDuration; easing.type: Easing.OutCubic }
                     }
 
                     replaceExit: Transition {
-                        NumberAnimation { property: "x"; from: 0; to: (stackView.mirrored ? -1 : 1) * -stackView.width; duration: Units.veryLongDuration; easing.type: Easing.OutCubic }
+                        NumberAnimation { property: "x"; from: 0; to: (stackView.mirrored ? -1 : 1) * -stackView.width; duration: Kirigami.Units.veryLongDuration; easing.type: Easing.OutCubic }
                     }
                 }
                 Item {
                     Layout.fillWidth: true
                     Layout.fillHeight: root.actions.length>0
-                    Layout.minimumHeight: Units.smallSpacing
+                    Layout.minimumHeight: Kirigami.Units.smallSpacing
                 }
 
                 ColumnLayout {
@@ -430,21 +454,21 @@ OverlayDrawer {
                     Layout.rightMargin: root.rightPadding
                     Layout.fillWidth: true
                     Layout.fillHeight: true
-                    //NOTE: why this? just Layout.fillWidth: true doesn't seem sufficient
-                    //as items are added only after this column creation
+                    // NOTE: why this? just Layout.fillWidth: true doesn't seem sufficient
+                    // as items are added only after this column creation
                     Layout.minimumWidth: parent.width - root.leftPadding - root.rightPadding
                     visible: children.length > 0 && (opacity > 0 || mainContentAnimator.running)
                     opacity: !root.collapsed || showContentWhenCollapsed
                     Behavior on opacity {
                         OpacityAnimator {
                             id: mainContentAnimator
-                            duration: Units.longDuration
+                            duration: Kirigami.Units.longDuration
                             easing.type: Easing.InOutQuad
                         }
                     }
                 }
                 Item {
-                    Layout.minimumWidth: Units.smallSpacing
+                    Layout.minimumWidth: Kirigami.Units.smallSpacing
                     Layout.minimumHeight: root.bottomPadding
                 }
 
@@ -462,13 +486,12 @@ OverlayDrawer {
                         BasicListItem {
                             id: backItem
                             visible: level > 0
-                            supportsMouseEvents: true
                             icon: (LayoutMirroring.enabled ? "go-previous-symbolic-rtl" : "go-previous-symbolic")
 
-                            label: MnemonicData.richTextLabel
-                            MnemonicData.enabled: backItem.enabled && backItem.visible
-                            MnemonicData.controlType: MnemonicData.MenuItem
-                            MnemonicData.label: qsTr("Back")
+                            label: Kirigami.MnemonicData.richTextLabel
+                            Kirigami.MnemonicData.enabled: backItem.enabled && backItem.visible
+                            Kirigami.MnemonicData.controlType: Kirigami.MnemonicData.MenuItem
+                            Kirigami.MnemonicData.label: qsTr("Back")
 
                             separatorVisible: false
                             onClicked: stackView.pop()
@@ -480,7 +503,7 @@ OverlayDrawer {
                             Keys.onUpPressed: nextItemInFocusChain(false).focus = true
                         }
                         Shortcut {
-                            sequence: backItem.MnemonicData.sequence
+                            sequence: backItem.Kirigami.MnemonicData.sequence
                             onActivated: backItem.clicked()
                         }
 
@@ -488,8 +511,8 @@ OverlayDrawer {
                             id: actionsRepeater
 
                             readonly property bool withSections: {
-                                for (var i = 0; i < root.actions.length; i++) {
-                                    let action = root.actions[i];
+                                for (let i = 0; i < root.actions.length; i++) {
+                                    const action = root.actions[i];
                                     if (!(action.hasOwnProperty("expandible") && action.expandible)) {
                                         return false;
                                     }
@@ -500,7 +523,7 @@ OverlayDrawer {
                             model: root.actions
                             delegate: Column {
                                 width: parent.width
-                                GlobalDrawerActionItem {
+                                P.GlobalDrawerActionItem {
                                     id: drawerItem
                                     visible: (modelData.hasOwnProperty("visible") && modelData.visible) && (root.collapsed || !(modelData.hasOwnProperty("expandible") && modelData.expandible))
                                     width: parent.width
@@ -510,21 +533,21 @@ OverlayDrawer {
                                             mainFlickable.contentY += height
                                         }
                                     }
-                                    Theme.colorSet: drawerItem.visible && !root.modal && !root.collapsed && actionsRepeater.withSections ? Theme.Window : parent.Theme.colorSet
-                                    backgroundColor: Theme.backgroundColor
+                                    Kirigami.Theme.colorSet: drawerItem.visible && !root.modal && !root.collapsed && actionsRepeater.withSections ? Kirigami.Theme.Window : parent.Kirigami.Theme.colorSet
+                                    backgroundColor: Kirigami.Theme.backgroundColor
                                 }
                                 Item {
                                     id: headerItem
                                     visible: !root.collapsed && (modelData.hasOwnProperty("expandible") && modelData.expandible && !!modelData.children && modelData.children.length > 0)
                                     height: sectionHeader.implicitHeight
                                     width: parent.width
-                                    ListSectionHeader {
+                                    Kirigami.ListSectionHeader {
                                         id: sectionHeader
                                         anchors.fill: parent
-                                        Theme.colorSet: root.modal ? Theme.View : Theme.Window
+                                        Kirigami.Theme.colorSet: root.modal ? Kirigami.Theme.View : Kirigami.Theme.Window
                                         contentItem: RowLayout {
-                                            Icon {
-                                                property int size: Units.iconSizes.smallMedium
+                                            Kirigami.Icon {
+                                                property int size: Kirigami.Units.iconSizes.smallMedium
                                                 Layout.minimumHeight: size
                                                 Layout.maximumHeight: size
                                                 Layout.minimumWidth: size
@@ -545,7 +568,7 @@ OverlayDrawer {
                                 Repeater {
                                     id: __repeater
                                     model: headerItem.visible ? modelData.children : null
-                                    delegate: GlobalDrawerActionItem {
+                                    delegate: P.GlobalDrawerActionItem {
                                         width: parent.width
                                         opacity: !root.collapsed
                                         leftPadding: actionsRepeater.withSections && !root.collapsed && !root.modal ? padding * 2 : padding * 4
@@ -562,6 +585,10 @@ OverlayDrawer {
                     onClicked: root.collapsed = !root.collapsed
                     visible: root.collapsible && root.collapseButtonVisible
                     text: root.collapsed ? "" : qsTr("Close Sidebar")
+
+                    QQC2.ToolTip.visible: root.collapsed && hovered
+                    QQC2.ToolTip.text: qsTr("Open Sidebar")
+                    QQC2.ToolTip.delay: Kirigami.Units.toolTipDelay
                 }
             }
         }

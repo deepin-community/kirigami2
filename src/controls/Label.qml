@@ -5,10 +5,10 @@
  */
 
 import QtQuick 2.1
-import QtQuick.Window 2.2
-import org.kde.kirigami 2.4
-import QtQuick.Controls 2.0 as Controls
+import org.kde.kirigami 2.4 as Kirigami
+import QtQuick.Controls 2.0 as QQC2
 
+// TODO KF6: Remove!
 /**
  * This is a label which uses the current Theme.
  *
@@ -22,8 +22,8 @@ import QtQuick.Controls 2.0 as Controls
  * @inherit QtQuick.Templates.Label
  * @deprecated use QtQuick.Templates.Label directly, it will be styled appropriately
  */
-Controls.Label {
-    height: Math.round(Math.max(paintedHeight, Units.gridUnit * 1.6))
+QQC2.Label {
+    height: Math.round(Math.max(paintedHeight, Kirigami.Units.gridUnit * 1.6))
     verticalAlignment: lineCount > 1 ? Text.AlignTop : Text.AlignVCenter
 
     activeFocusOnTab: false

@@ -4,8 +4,8 @@
  *  SPDX-License-Identifier: LGPL-2.0-or-later
  */
 
-import QtQuick 2.1
-import org.kde.kirigami 2.4 as Kirigami
+import QtQuick 2.15
+import org.kde.kirigami 2.20 as Kirigami
 
 Kirigami.ApplicationItem {
     id: root
@@ -47,22 +47,18 @@ Kirigami.ApplicationItem {
         id: mainPageComponent
         Kirigami.Page {
             title: "Hello"
-            actions {
-                contextualActions: [
-                    Kirigami.Action {
-                        text: "action 1"
-                    },
-                    Kirigami.Action {
-                        text: "action 2"
-                    }
-                ]
-            }
+            actions.contextualActions: [
+                Kirigami.Action {
+                    text: "action 1"
+                },
+                Kirigami.Action {
+                    text: "action 2"
+                }
+            ]
             Rectangle {
                 color: "red"
                 anchors.fill: parent
             }
         }
     }
-
-
 }

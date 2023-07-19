@@ -6,28 +6,28 @@
 
 import QtQuick 2.15
 import QtQml 2.15
-import QtQuick.Templates 2.15 as T
 import QtQuick.Layouts 1.15
+import QtGraphicalEffects 1.12 as GE
+import QtQuick.Templates 2.15 as T
 import org.kde.kirigami 2.19 as Kirigami
-import QtGraphicalEffects 1.12
 
 /**
- * Page navigation tab-bar, used as an alternative to sidebars for 3-5 elements.
- * 
+ * @brief Page navigation tab-bar, used as an alternative to sidebars for 3-5 elements.
+ *
  * Can be combined with secondary toolbars above (if in the footer) to provide page actions.
- * 
- * Example:
+ *
+ * Example usage:
  * @code{.qml}
  * import org.kde.kirigami 2.19 as Kirigami
- * 
+ *
  * import QtQuick 2.15
  * import QtQuick.Controls 2.15
  * import QtQuick.Layouts 1.15
  * import org.kde.kirigami 2.19 as Kirigami
- * 
+ *
  * Kirigami.ApplicationWindow {
  *     title: "Clock"
- * 
+ *
  *     pageStack.initialPage: worldPage
  *     Kirigami.Page {
  *         id: worldPage
@@ -49,8 +49,8 @@ import QtGraphicalEffects 1.12
  *         title: "Alarms"
  *         visible: false
  *     }
- *     
- *     
+ *
+ *
  *     footer: Kirigami.NavigationTabBar {
  *         actions: [
  *             Kirigami.Action {
@@ -110,72 +110,110 @@ import QtGraphicalEffects 1.12
  * }
  *
  * @endcode
- * 
- * @inherit QtQuick.Templates.Toolbar
+ *
+ * @see NavigationTabButton
  * @since 5.87
  * @since org.kde.kirigami 2.19
+ * @inherit QtQuick.Templates.Toolbar
  */
 
 T.ToolBar {
     id: root
 
+//BEGIN properties
     /**
-     * This property holds the list of actions in the toolbar.
+     * @brief This property holds the list of actions displayed in the toolbar.
      */
     property list<Kirigami.Action> actions
 
     /**
-     * The property holds the maximum width of the toolbar actions, before margins are added.
+     * @brief The property holds the maximum width of the toolbar actions, before margins are added.
      */
     property real maximumContentWidth: {
-        let minDelegateWidth = Kirigami.Units.gridUnit * 5;
+        const minDelegateWidth = Kirigami.Units.gridUnit * 5;
         // always have at least the width of 5 items (so small amounts of actions look natural)
         return Math.max(minDelegateWidth * actions.length, minDelegateWidth * 5);
     }
 
     /**
-     * This property holds the background color of the toolbar.
+     * @brief This property holds the background color of the toolbar.
+     *
+     * default: ``Kirigami.Theme.highlightColor``
      */
     property color backgroundColor: Kirigami.Theme.backgroundColor
 
     /**
-     * This property holds the foreground color of the toolbar (text, icon).
+     * @brief This property holds the foreground color of the toolbar (text, icon).
      */
-    property color foregroundColor: Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.7)
+    property color foregroundColor: Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.85)
 
     /**
-     * This property holds the highlight foreground color (text, icon when action is checked).
+     * @brief This property holds the highlight foreground color (text, icon when action is checked).
      */
-    property color highlightForegroundColor: Kirigami.ColorUtils.tintWithAlpha(Kirigami.Theme.highlightColor, Kirigami.Theme.textColor, 0.5)
+    property color highlightForegroundColor: Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.85)
 
     /**
-     * This property holds the color of the highlight bar, when an action is checked.
+     * @brief This property holds the color of the highlight bar when an action is checked.
+     *
+     * default: ``Kirigami.Theme.highlightColor``
      */
     property color highlightBarColor: Kirigami.Theme.highlightColor
 
     /**
-     * This property holds whether the toolbar should provide its own shadow.
+     * @brief This property sets whether the toolbar should provide its own shadow.
+     *
+     * default: ``true``
      */
     property bool shadow: true
 
     /**
-     * This property holds the index of the checked tab.
-     * 
-     * 
+     * @brief This property holds the index of currently checked tab.
+     *
      * If the index set is out of bounds, or the triggered signal did not change any checked property of an action, the index
      * will remain the same.
      */
     property int currentIndex: tabGroup.checkedButton && tabGroup.buttons.length > 0 ? tabGroup.checkedButton.tabIndex : -1
 
     /**
-     * This property holds the number of tab buttons.
+     * @brief This property holds the number of tab buttons.
      */
     readonly property int count: tabGroup.buttons.length
 
     /**
-     * This property holds the ButtonGroup used to manage the tabs.
+     * @brief This property holds the ButtonGroup used to manage the tabs.
      */
     readonly property T.ButtonGroup tabGroup: tabGroup
+
+    /**
+     * @brief This property sets whether the icon colors should be masked with a single color.
+     *
+     * This only applies to buttons generated by the actions property.
+     *
+     * default: ``true``
+     *
+     * @since 5.96
+     */
+    property bool recolorIcons: true
+
+    /**
+     * @brief This property holds the calculated width that buttons on the tab bar use.
+     *
+     * @since 5.102
+     */
+    property real buttonWidth: {
+        // Counting buttons because Repeaters can be counted among visibleChildren
+        let visibleButtonCount = 0;
+        const minWidth = contentItem.height * 0.75;
+        for (let i = 0; i < contentItem.visibleChildren.length; ++i) {
+            if (contentItem.width / visibleButtonCount >= minWidth && // make buttons go off the screen if there is physically no room for them
+                contentItem.visibleChildren[i] instanceof T.AbstractButton) { // Checking for AbstractButtons because any AbstractButton can act as a tab
+                ++visibleButtonCount;
+            }
+        }
+
+        return Math.round(contentItem.width / visibleButtonCount);
+    }
+//END properties
 
     onCurrentIndexChanged: {
         if (currentIndex === -1) {
@@ -209,7 +247,7 @@ T.ToolBar {
     background: Rectangle { // color & shadow
         implicitHeight: Kirigami.Units.gridUnit * 3 + Kirigami.Units.smallSpacing * 2
         color: root.backgroundColor
-        RectangularGlow {
+        GE.RectangularGlow {
             anchors.fill: parent
             z: -1
             visible: root.shadow
@@ -230,8 +268,11 @@ T.ToolBar {
         id: tabGroup
         exclusive: true
         buttons: root.contentItem.children
-        
+
         onCheckedButtonChanged: {
+            if (!checkedButton) {
+                return
+            }
             if (root.currentIndex !== checkedButton.tabIndex) {
                 root.currentIndex = checkedButton.tabIndex;
             }
@@ -247,15 +288,15 @@ T.ToolBar {
             parent: root.contentItem
             action: modelData
             visible: modelData.visible
+            width: root.buttonWidth
+            recolorIcon: root.recolorIcons
             T.ButtonGroup.group: tabGroup
             // Workaround setting the action when checkable is not explicitly set making tabs uncheckable
             onActionChanged: action.checkable = true
-            
+
             foregroundColor: root.foregroundColor
             highlightForegroundColor: root.highlightForegroundColor
             highlightBarColor: root.highlightBarColor
         }
     }
 }
-
-

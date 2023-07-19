@@ -5,8 +5,6 @@
  */
 
 import QtQuick 2.12
-import QtQuick.Layouts 1.12
-import QtQuick.Controls 2.12
 import org.kde.kirigami 2.12 as Kirigami
 
 Rectangle {
@@ -20,9 +18,9 @@ Rectangle {
     }
 
     color: {
-        if (state == "highlighted") {
+        if (state === "highlighted") {
             return Kirigami.Theme.activeTextColor
-        } else if (state == "requestingAttention") {
+        } else if (state === "requestingAttention") {
             return Kirigami.Theme.negativeTextColor
         }
         return "transparent"

@@ -76,8 +76,13 @@ public:
     QElapsedTimer performanceTimer;
 
     static void appendAction(ToolBarLayout::ActionsProperty *list, QObject *action);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     static int actionCount(ToolBarLayout::ActionsProperty *list);
     static QObject *action(ToolBarLayout::ActionsProperty *list, int index);
+#else
+    static qsizetype actionCount(ToolBarLayout::ActionsProperty *list);
+    static QObject *action(ToolBarLayout::ActionsProperty *list, qsizetype index);
+#endif
     static void clearActions(ToolBarLayout::ActionsProperty *list);
 };
 
@@ -310,12 +315,20 @@ void ToolBarLayout::componentComplete()
     relayout();
 }
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 void ToolBarLayout::geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry)
+#else
+void ToolBarLayout::geometryChange(const QRectF &newGeometry, const QRectF &oldGeometry)
+#endif
 {
     if (newGeometry != oldGeometry) {
         relayout();
     }
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     QQuickItem::geometryChanged(newGeometry, oldGeometry);
+#else
+    QQuickItem::geometryChange(newGeometry, oldGeometry);
+#endif
 }
 
 void ToolBarLayout::itemChange(QQuickItem::ItemChange change, const QQuickItem::ItemChangeData &data)
@@ -356,7 +369,7 @@ void ToolBarLayout::Private::performLayout()
         return;
     }
 
-    qreal maxHeight = moreButtonInstance->isVisible() ? moreButtonInstance->height() : 0.0;
+    qreal maxHeight = 0.0;
     qreal maxWidth = 0.0;
 
     // First, calculate the total width and maximum height of all delegates.
@@ -428,8 +441,14 @@ void ToolBarLayout::Private::performLayout()
             moreButtonInstance->setX(0.0);
         }
 
-        if (heightMode == AlwaysFill || (heightMode == ConstrainIfLarger && moreButtonInstance->height() > maxHeight)) {
+        if (heightMode == AlwaysFill) {
             moreButtonInstance->setHeight(q->height());
+        } else if (heightMode == ConstrainIfLarger) {
+            if (moreButtonInstance->implicitHeight() > maxHeight) {
+                moreButtonInstance->setHeight(maxHeight);
+            } else {
+                moreButtonInstance->setHeight(moreButtonInstance->implicitHeight());
+            }
         }
 
         moreButtonInstance->setY(qRound((maxHeight - moreButtonInstance->height()) / 2.0));
@@ -440,14 +459,24 @@ void ToolBarLayout::Private::performLayout()
         moreButtonInstance->setVisible(false);
     }
 
+    if (moreButtonInstance->isVisible() && !q->heightValid()) {
+        maxHeight = std::max(maxHeight, moreButtonInstance->implicitHeight());
+    };
+
     qreal currentX = layoutStart(visibleActionsWidth);
     for (auto entry : std::as_const(sortedDelegates)) {
         if (!entry->isVisible()) {
             continue;
         }
 
-        if (heightMode == AlwaysFill || (heightMode == ConstrainIfLarger && entry->height() > maxHeight)) {
+        if (heightMode == AlwaysFill) {
             entry->setHeight(q->height());
+        } else if (heightMode == ConstrainIfLarger) {
+            if (entry->implicitHeight() > maxHeight) {
+                entry->setHeight(maxHeight);
+            } else {
+                entry->setHeight(entry->implicitHeight());
+            }
         }
 
         qreal y = qRound((maxHeight - entry->height()) / 2.0);
@@ -492,7 +521,7 @@ QVector<ToolBarLayoutDelegate *> ToolBarLayout::Private::createDelegates()
     for (auto action : std::as_const(actions)) {
         if (delegates.find(action) != delegates.end()) {
             result.append(delegates.at(action).get());
-        } else {
+        } else if (action) {
             auto delegate = std::unique_ptr<ToolBarLayoutDelegate>(createDelegate(action));
             if (delegate) {
                 result.append(delegate.get());
@@ -664,12 +693,20 @@ void ToolBarLayout::Private::appendAction(ToolBarLayout::ActionsProperty *list, 
     layout->addAction(action);
 }
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 int ToolBarLayout::Private::actionCount(ToolBarLayout::ActionsProperty *list)
+#else
+qsizetype ToolBarLayout::Private::actionCount(ToolBarLayout::ActionsProperty *list)
+#endif
 {
     return reinterpret_cast<ToolBarLayout *>(list->data)->d->actions.count();
 }
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 QObject *ToolBarLayout::Private::action(ToolBarLayout::ActionsProperty *list, int index)
+#else
+QObject *ToolBarLayout::Private::action(ToolBarLayout::ActionsProperty *list, qsizetype index)
+#endif
 {
     return reinterpret_cast<ToolBarLayout *>(list->data)->d->actions.at(index);
 }

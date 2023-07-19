@@ -2035,6 +2035,15 @@ Module {
         Property { name: "rightActions"; type: "QObject"; isList: true; isReadonly: true }
     }
     Component {
+        prototype: "QQuickTextArea"
+        name: "org.kde.kirigami/SelectableLabel 2.20"
+        exports: ["org.kde.kirigami/SelectableLabel 2.20"]
+        exportMetaObjectRevisions: [20]
+        isComposite: true
+        defaultProperty: "data"
+        Property { name: "cursorShape"; type: "Qt::CursorShape" }
+    }
+    Component {
         prototype: "QQuickRectangle"
         name: "org.kde.kirigami/Separator 2.0"
         exports: ["org.kde.kirigami/Separator 2.0"]

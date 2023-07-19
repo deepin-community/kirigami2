@@ -5,7 +5,8 @@
 import QtQuick 2.15
 import QtQuick.Templates 2.15 as T
 import QtQuick.Controls 2.15 as QQC2
-import org.kde.kirigami 2.19 as Kirigami
+
+import org.kde.kirigami 2.20 as Kirigami
 
 T.ScrollView {
     id: control
@@ -25,13 +26,12 @@ T.ScrollView {
         }
     ]
 
-
     T.ScrollBar.vertical: QQC2.ScrollBar {
         parent: control
         x: control.mirrored ? 0 : control.width - width
         y: control.topPadding
         height: control.availableHeight
-        active: control.T.ScrollBar.vertical && control.T.ScrollBar.vertical.active
+        active: control.T.ScrollBar.horizontal.active
         stepSize: wheelHandler.verticalStepSize / control.contentHeight
     }
 
@@ -40,7 +40,7 @@ T.ScrollView {
         x: control.leftPadding
         y: control.height - height
         width: control.availableWidth
-        active: control.T.ScrollBar.horizontal && control.T.ScrollBar.horizontal.active
+        active: control.T.ScrollBar.vertical.active
         stepSize: wheelHandler.horizontalStepSize / control.contentWidth
     }
 }

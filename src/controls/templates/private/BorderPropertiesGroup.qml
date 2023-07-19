@@ -8,12 +8,12 @@ import QtQuick 2.5
 
 QtObject {
     /**
-     *  The color of this border.
+     *  @brief This property holds the color of this border.
      */
     property color color
 
     /**
-     *  The width of this border.
+     *  @brief This property holds the width of this border.
      */
     property real width
 }

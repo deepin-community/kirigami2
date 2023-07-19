@@ -3,10 +3,10 @@
 export DEB_BUILD_MAINT_OPTIONS = hardening=+all
 
 %:
-	dh $@ --with kf5,pkgkde_symbolshelper --buildsystem kf5 --without build_stamp
+	dh $@ --with pkgkde_symbolshelper
 
 override_dh_auto_configure:
-	dh_auto_configure -- -DBUILD_QCH=ON -DBREEZEICONS_DIR=/usr/share/icons/breeze
+	dh_auto_configure -- -DBUILD_QCH=ON
 
 override_dh_auto_test:
 	# Disable unittest at build time, they require the runtime

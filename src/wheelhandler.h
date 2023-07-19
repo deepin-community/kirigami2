@@ -345,6 +345,9 @@ Q_SIGNALS:
 protected:
     bool eventFilter(QObject *watched, QEvent *event) override;
 
+private Q_SLOTS:
+    void _k_rebindScrollBars();
+
 private:
     void setScrolling(bool scrolling);
     bool scrollFlickable(QPointF pixelDelta,
@@ -354,6 +357,8 @@ private:
     QPointer<QQuickItem> m_flickable;
     QPointer<QQuickItem> m_verticalScrollBar;
     QPointer<QQuickItem> m_horizontalScrollBar;
+    QMetaObject::Connection m_verticalChangedConnection;
+    QMetaObject::Connection m_horizontalChangedConnection;
     QPointer<QQuickItem> m_filterItem;
     // Matches QScrollArea and QTextEdit
     qreal m_defaultPixelStepSize = 20 * QGuiApplication::styleHints()->wheelScrollLines();

@@ -77,13 +77,21 @@ void PageRouter::appendRoute(QQmlListProperty<PageRoute> *prop, PageRoute *route
     router->m_routes.append(route);
 }
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 int PageRouter::routeCount(QQmlListProperty<PageRoute> *prop)
+#else
+qsizetype PageRouter::routeCount(QQmlListProperty<PageRoute> *prop)
+#endif
 {
     auto router = qobject_cast<PageRouter *>(prop->object);
     return router->m_routes.length();
 }
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 PageRoute *PageRouter::route(QQmlListProperty<PageRoute> *prop, int index)
+#else
+PageRoute *PageRouter::route(QQmlListProperty<PageRoute> *prop, qsizetype index)
+#endif
 {
     auto router = qobject_cast<PageRouter *>(prop->object);
     return router->m_routes[index];

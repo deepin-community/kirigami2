@@ -1,22 +1,27 @@
 /*
  *  SPDX-FileCopyrightText: 2017 Marco Martin <mart@kde.org>
+ *  SPDX-FileCopyrightText: 2022 ivan tkachenko <me@ratijas.tk>
  *
  *  SPDX-License-Identifier: LGPL-2.0-or-later
  */
 
-import QtQuick 2.6
-import QtQuick.Layouts 1.2
-import QtQuick.Controls 2.2
-import org.kde.kirigami 2.4 as Kirigami
+import QtQuick 2.15
+import QtQuick.Layouts 1.15
+import QtQuick.Controls 2.15 as QQC2
+import org.kde.kirigami 2.18 as Kirigami
 
 /**
  * This is the base class for Form layouts conforming to the
- * Kirigami Human interface guidelines. The layout will
- * be divided in two columns: on the right there will be a column
- * of fields, on the left their labels specified in the FormData attached
- * property.
+ * Kirigami Human Interface Guidelines. The layout consists
+ * of two columns: the left column contains only right-aligned
+ * labels provided by a Kirigami.FormData attached property,
+ * the right column contains left-aligned child types.
  *
- * Example:
+ * Child types can be sectioned using an QtQuick.Item
+ * or Kirigami.Separator with a Kirigami.FormData
+ * attached property, see FormLayoutAttached::isSection for details.
+ *
+ * Example usage:
  * @code
  * import org.kde.kirigami 2.3 as Kirigami
  * Kirigami.FormLayout {
@@ -34,47 +39,40 @@ import org.kde.kirigami 2.4 as Kirigami
  *    }
  * }
  * @endcode
- * @inherit QtQuick.Item
+ * @see FormLayoutAttached
  * @since 2.3
+ * @inherit QtQuick.Item
  */
 Item {
     id: root
 
     /**
-     * wideMode: bool
-     * If true the layout will be optimized for a wide screen, such as
+     * @brief This property tells whether the form layout is in wide mode.
+     *
+     * If true, the layout will be optimized for a wide screen, such as
      * a desktop machine (the labels will be on a left column,
      * the fields on a right column beside it), if false (such as on a phone)
      * everything is laid out in a single column.
-     * by default this will be based on whether the application is
-     * wide enough for the layout of being in such mode.
-     * It can be overridden by reassigning the property
+     *
+     * By default this property automatically adjusts the layout
+     * if there is enough screen space.
+     *
+     * Set this to true for a convergent design,
+     * set this to false for a mobile-only design.
      */
     property bool wideMode: width >= lay.wideImplicitWidth
 
-    implicitWidth: lay.wideImplicitWidth
-    implicitHeight: lay.implicitHeight
-    Layout.preferredHeight: lay.implicitHeight
-    Accessible.role: Accessible.Form
-
-    Component.onCompleted: {
-        relayoutTimer.triggered()
-    }
-
     /**
-     * twinFormLayouts: list<FormLayout>
      * If for some implementation reason multiple FormLayouts have to appear
      * on the same page, they can have each other in twinFormLayouts,
-     * so they will vertically align each other perfectly
+     * so they will vertically align with each other perfectly
+     *
      * @since 5.53
      */
-    //should be list<FormLayout> but we can't have a recursive declaration
-    property list<Item> twinFormLayouts
-
-    Layout.fillWidth: true
+    property list<Item> twinFormLayouts  // should be list<FormLayout> but we can't have a recursive declaration
 
     onTwinFormLayoutsChanged: {
-        for (let i in twinFormLayouts) {
+        for (const i in twinFormLayouts) {
             if (!(root in twinFormLayouts[i].children[0].reverseTwins)) {
                 twinFormLayouts[i].children[0].reverseTwins.push(root)
                 Qt.callLater(() => twinFormLayouts[i].children[0].reverseTwinsChanged());
@@ -82,11 +80,24 @@ Item {
         }
     }
 
+    Component.onCompleted: {
+        relayoutTimer.triggered();
+    }
+
     Component.onDestruction: {
-        for (let i in twinFormLayouts) {
-            twinFormLayouts[i].children[0].reverseTwins = twinFormLayouts[i].children[0].reverseTwins.filter(function(value, index, arr){ return value != root;})
+        for (const i in twinFormLayouts) {
+            const twin = twinFormLayouts[i];
+            const child = twin.children[0];
+            child.reverseTwins = child.reverseTwins.filter(value => value !== root);
         }
     }
+
+    implicitWidth: lay.wideImplicitWidth
+    implicitHeight: lay.implicitHeight
+    Layout.preferredHeight: lay.implicitHeight
+    Layout.fillWidth: true
+    Accessible.role: Accessible.Form
+
     GridLayout {
         id: lay
         property int wideImplicitWidth
@@ -104,25 +115,31 @@ Item {
         property var buddies: []
         property int knownItemsImplicitWidth: {
             let hint = 0;
-            for (let i in knownItems) {
-                let actualWidth = knownItems[i].implicitWidth
-                if (knownItems[i].Layout.preferredWidth > 0) {
-                    actualWidth = knownItems[i].Layout.preferredWidth
+            for (const i in knownItems) {
+                const item = knownItems[i];
+                if (typeof item.Layout === "undefined") {
+                    // Items may have been dynamically destroyed. Even
+                    // printing such zombie wrappers results in a
+                    // meaningless "TypeError: Type error". Normally they
+                    // should be cleaned up from the array, but it would
+                    // trigger a binding loop if done here.
+                    //
+                    // This is, so far, the only way to detect them.
+                    continue;
                 }
-                actualWidth = Math.min(actualWidth, knownItems[i].Layout.maximumWidth)
-                actualWidth = Math.max(actualWidth, knownItems[i].Layout.minimumWidth)
+                const actualWidth = item.Layout.preferredWidth > 0
+                    ? item.Layout.preferredWidth
+                    : item.implicitWidth;
 
-                hint = Math.max(hint, actualWidth);
+                hint = Math.max(hint, item.Layout.minimumWidth, Math.min(actualWidth, item.Layout.maximumWidth));
             }
             return hint;
         }
         property int buddiesImplicitWidth: {
             let hint = 0;
-            
-            // HACK: we use var instead of let here, since it seems to trigger a very obscure bug
-            // see: https://invent.kde.org/teams/plasma-mobile/issues/-/issues/88
-            for (var i in buddies) {
-                if (buddies[i].visible && !buddies[i].item.Kirigami.FormData.isSection) {
+
+            for (const i in buddies) {
+                if (buddies[i].visible && buddies[i].item !== null && !buddies[i].item.Kirigami.FormData.isSection) {
                     hint = Math.max(hint, buddies[i].implicitWidth);
                 }
             }
@@ -131,14 +148,14 @@ Item {
         readonly property var actualTwinFormLayouts: {
             // We need to copy that array by value
             const list = lay.reverseTwins.slice();
-            for (let i in twinFormLayouts) {
-                let parentLay = twinFormLayouts[i];
+            for (const i in twinFormLayouts) {
+                const parentLay = twinFormLayouts[i];
                 if (!parentLay || !parentLay.hasOwnProperty("children")) {
                     continue;
                 }
                 list.push(parentLay);
-                for (let j in parentLay.children[0].reverseTwins) {
-                    let childLay = parentLay.children[0].reverseTwins[j];
+                for (const j in parentLay.children[0].reverseTwins) {
+                    const childLay = parentLay.children[0].reverseTwins[j];
                     if (childLay && !(childLay in list)) {
                         list.push(childLay);
                     }
@@ -162,26 +179,26 @@ Item {
         Item {
             Layout.preferredWidth: {
                 let hint = lay.buddiesImplicitWidth;
-                for (let i in lay.actualTwinFormLayouts) {
+                for (const i in lay.actualTwinFormLayouts) {
                     if (lay.actualTwinFormLayouts[i] && lay.actualTwinFormLayouts[i].hasOwnProperty("children")) {
                         hint = Math.max(hint, lay.actualTwinFormLayouts[i].children[0].buddiesImplicitWidth);
                     }
                 }
                 return hint;
             }
-            Layout.preferredHeight:2
+            Layout.preferredHeight: 2
         }
         Item {
             Layout.preferredWidth: {
                 let hint = Math.min(root.width, lay.knownItemsImplicitWidth);
-                for (let i in lay.actualTwinFormLayouts) {
+                for (const i in lay.actualTwinFormLayouts) {
                     if (lay.actualTwinFormLayouts[i] && lay.actualTwinFormLayouts[i].hasOwnProperty("children")) {
                         hint = Math.max(hint, lay.actualTwinFormLayouts[i].children[0].knownItemsImplicitWidth);
                     }
                 }
                 return hint;
             }
-            Layout.preferredHeight:2
+            Layout.preferredHeight: 2
         }
     }
 
@@ -202,34 +219,38 @@ Item {
 
         /**
          * @param {Item} item
-         *
-         * @returns {number}
+         * @returns {Qt::Alignment}
          */
         function effectiveLayout(item) {
+            if (!item) {
+                return 0;
+            }
             const verticalAlignment =
                 item.Kirigami.FormData.labelAlignment !== 0
                 ? item.Kirigami.FormData.labelAlignment
-                : Qt.AlignTop
+                : Qt.AlignTop;
 
             if (item.Kirigami.FormData.isSection) {
-                return Qt.AlignHCenter
+                return Qt.AlignHCenter;
             }
             if (root.wideMode) {
-                return Qt.AlignRight | verticalAlignment
+                return Qt.AlignRight | verticalAlignment;
             }
-            return Qt.AlignLeft | Qt.AlignBottom
+            return Qt.AlignLeft | Qt.AlignBottom;
         }
 
         /**
          * @param {Item} item
-         *
-         * @returns {number}
+         * @returns vertical alignment of the item passed as an argument.
          */
         function effectiveTextLayout(item) {
-            if (root.wideMode) {
-                return item.Kirigami.FormData.labelAlignment != 0 ? item.Kirigami.FormData.labelAlignment : Text.AlignVCenter
+            if (!item) {
+                return 0;
             }
-            return Text.AlignBottom
+            if (root.wideMode) {
+                return item.Kirigami.FormData.labelAlignment !== 0 ? item.Kirigami.FormData.labelAlignment : Text.AlignVCenter;
+            }
+            return Text.AlignBottom;
         }
     }
 
@@ -237,35 +258,27 @@ Item {
         id: relayoutTimer
         interval: 0
         onTriggered: {
-            let __items = children;
-            //exclude the layout and temp
+            const __items = root.children;
+            // exclude the layout and temp
             for (let i = 2; i < __items.length; ++i) {
                 const item = __items[i];
 
-                //skip items that are already there
-                if (lay.knownItems.indexOf(item) != -1 ||
-                    //exclude Repeaters
-                    //NOTE: this is an heuristic but there are't better ways
-                    (item.hasOwnProperty("model") && item.model !== undefined && item.children.length === 0)) {
+                // skip items that are already there
+                if (lay.knownItems.indexOf(item) !== -1 || item instanceof Repeater) {
                     continue;
                 }
                 lay.knownItems.push(item);
 
-                const itemContainer = itemComponent.createObject(temp, {item: item})
+                const itemContainer = itemComponent.createObject(temp, { item });
 
-                //if section, label goes after the separator
-                if (item.Kirigami.FormData.isSection) {
-                    //put an extra spacer
-                    var placeHolder = placeHolderComponent.createObject(lay, {item: item});
-                    itemContainer.parent = lay;
+                // if it's a labeled section header, add extra spacing before it
+                if (item.Kirigami.FormData.label.length > 0 && item.Kirigami.FormData.isSection) {
+                    placeHolderComponent.createObject(lay, { item });
                 }
 
-                let buddy;
-                if (item.Kirigami.FormData.checkable) {
-                    buddy = checkableBuddyComponent.createObject(lay, {item: item})
-                } else {
-                    buddy = buddyComponent.createObject(lay, {item: item, index: i - 2})
-                }
+                const buddy = item.Kirigami.FormData.checkable
+                    ? checkableBuddyComponent.createObject(lay, { item })
+                    : buddyComponent.createObject(lay, { item, index: i - 2 });
 
                 itemContainer.parent = lay;
                 lay.buddies.push(buddy);
@@ -282,50 +295,58 @@ Item {
         id: itemComponent
         Item {
             id: container
-            property var item
-            enabled: item.enabled
-            visible: item.visible
 
-            //NOTE: work around a  GridLayout quirk which doesn't lay out items with null size hints causing things to be laid out incorrectly in some cases
-            implicitWidth: Math.max(item.implicitWidth, 1)
-            implicitHeight: Math.max(item.implicitHeight, 1)
-            Layout.preferredWidth: Math.max(1, item.Layout.preferredWidth > 0 ? item.Layout.preferredWidth : item.implicitWidth)
-            Layout.preferredHeight: Math.max(1, item.Layout.preferredHeight > 0 ? item.Layout.preferredHeight : item.implicitHeight)
+            property Item item
 
-            Layout.minimumWidth: item.Layout.minimumWidth
-            Layout.minimumHeight: item.Layout.minimumHeight
+            enabled: item !== null && item.enabled
+            visible: item !== null && item.visible
 
-            Layout.maximumWidth: item.Layout.maximumWidth
-            Layout.maximumHeight: item.Layout.maximumHeight
+            // NOTE: work around a  GridLayout quirk which doesn't lay out items with null size hints causing things to be laid out incorrectly in some cases
+            implicitWidth: item !== null ? Math.max(item.implicitWidth, 1) : 0
+            implicitHeight: item !== null ? Math.max(item.implicitHeight, 1) : 0
+            Layout.preferredWidth: item !== null ? Math.max(1, item.Layout.preferredWidth > 0 ? item.Layout.preferredWidth : Math.ceil(item.implicitWidth)) : 0
+            Layout.preferredHeight: item !== null ? Math.max(1, item.Layout.preferredHeight > 0 ? item.Layout.preferredHeight : Math.ceil(item.implicitHeight)) : 0
+
+            Layout.minimumWidth: item !== null ? item.Layout.minimumWidth : 0
+            Layout.minimumHeight: item !== null ? item.Layout.minimumHeight : 0
+
+            Layout.maximumWidth: item !== null ? item.Layout.maximumWidth : 0
+            Layout.maximumHeight: item !== null ? item.Layout.maximumHeight : 0
 
             Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
-            Layout.fillWidth: item instanceof TextInput || item.Layout.fillWidth || item.Kirigami.FormData.isSection
-            Layout.columnSpan: item.Kirigami.FormData.isSection ? lay.columns : 1
+            Layout.fillWidth: item !== null && (item instanceof TextInput || item.Layout.fillWidth || item.Kirigami.FormData.isSection)
+            Layout.columnSpan: item !== null && item.Kirigami.FormData.isSection ? lay.columns : 1
             onItemChanged: {
                 if (!item) {
                     container.destroy();
                 }
             }
-            onXChanged: item.x = x + lay.x;
-            //Assume lay.y is always 0
-            onYChanged: item.y = y + lay.y;
-            onWidthChanged: item.width = width;
+            onXChanged: if (item !== null) { item.x = x + lay.x; }
+            // Assume lay.y is always 0
+            onYChanged: if (item !== null) { item.y = y + lay.y; }
+            onWidthChanged: if (item !== null) { item.width = width; }
             Component.onCompleted: item.x = x + lay.x;
             Connections {
                 target: lay
-                function onXChanged() { item.x = x + lay.x }
+                function onXChanged() {
+                    if (item !== null) {
+                        item.x = x + lay.x;
+                    }
+                }
             }
         }
     }
     Component {
         id: placeHolderComponent
         Item {
-            property var item
-            enabled: item.enabled
-            visible: item.visible
+            property Item item
+
+            enabled: item !== null && item.enabled
+            visible: item !== null && item.visible
+
             width: Kirigami.Units.smallSpacing
             height: Kirigami.Units.smallSpacing
-            Layout.topMargin: item.height > 0 ? Kirigami.Units.smallSpacing : 0
+            Layout.topMargin: item !== null && item.height > 0 ? Kirigami.Units.smallSpacing : 0
             onItemChanged: {
                 if (!item) {
                     labelItem.destroy();
@@ -340,23 +361,27 @@ Item {
 
             property Item item
             property int index
-            enabled: item.enabled && item.Kirigami.FormData.enabled
-            visible: item.visible && (root.wideMode || text.length > 0)
-            Kirigami.MnemonicData.enabled: item.Kirigami.FormData.buddyFor && item.Kirigami.FormData.buddyFor.activeFocusOnTab
-            Kirigami.MnemonicData.controlType: Kirigami.MnemonicData.FormLabel
-            Kirigami.MnemonicData.label: item.Kirigami.FormData.label
-            text: Kirigami.MnemonicData.richTextLabel
-            font.weight: root.wideMode || item.Kirigami.FormData.isSection ? Font.Normal : Font.Bold // use bold in narrow layouts for contrast
-                                                                    
-            level: item.Kirigami.FormData.isSection ? 2 : 5
 
-            Layout.columnSpan: item.Kirigami.FormData.isSection ? lay.columns : 1
+            enabled: item !== null && item.enabled && item.Kirigami.FormData.enabled
+            visible: item !== null && item.visible && (root.wideMode || text.length > 0)
+            Kirigami.MnemonicData.enabled: item !== null && item.Kirigami.FormData.buddyFor && item.Kirigami.FormData.buddyFor.activeFocusOnTab
+            Kirigami.MnemonicData.controlType: Kirigami.MnemonicData.FormLabel
+            Kirigami.MnemonicData.label: item !== null ? item.Kirigami.FormData.label : ""
+            text: Kirigami.MnemonicData.richTextLabel
+            type: item !== null && item.Kirigami.FormData.isSection ? Kirigami.Heading.Type.Primary : Kirigami.Heading.Type.Normal
+
+            level: item !== null && item.Kirigami.FormData.isSection ? 3 : 5
+
+            Layout.columnSpan: item !== null && item.Kirigami.FormData.isSection ? lay.columns : 1
             Layout.preferredHeight: {
+                if (!item) {
+                    return 0;
+                }
                 if (item.Kirigami.FormData.label.length > 0) {
-                    if (root.wideMode && !(item.Kirigami.FormData.buddyFor instanceof TextArea)) {
+                    if (root.wideMode && !(item.Kirigami.FormData.buddyFor instanceof QQC2.TextArea)) {
                         return Math.max(implicitHeight, item.Kirigami.FormData.buddyFor.height)
                     }
-                    return implicitHeight
+                    return implicitHeight;
                 }
                 return Kirigami.Units.smallSpacing;
             }
@@ -368,16 +393,16 @@ Item {
             wrapMode: Text.Wrap
 
             Layout.topMargin: {
+                if (!item) {
+                    return 0;
+                }
                 if (root.wideMode && item.Kirigami.FormData.buddyFor.parent !== root) {
                     return item.Kirigami.FormData.buddyFor.y;
-                }
-                if (root.wideMode && (item.Kirigami.FormData.buddyFor instanceof TextArea)) {
-                    return Kirigami.Units.smallSpacing;
                 }
                 if (index === 0 || root.wideMode) {
                     return 0;
                 }
-                return Kirigami.Units.smallSpacing;
+                return Kirigami.Units.largeSpacing * 2;
             }
             onItemChanged: {
                 if (!item) {
@@ -386,31 +411,44 @@ Item {
             }
             Shortcut {
                 sequence: labelItem.Kirigami.MnemonicData.sequence
-                onActivated: item.Kirigami.FormData.buddyFor.forceActiveFocus()
+                onActivated: labelItem.item.Kirigami.FormData.buddyFor.forceActiveFocus()
             }
         }
     }
     Component {
         id: checkableBuddyComponent
-        CheckBox {
+        QQC2.CheckBox {
             id: labelItem
-            property Item item
-            visible: item.visible
-            Kirigami.MnemonicData.enabled: item.Kirigami.FormData.buddyFor && item.Kirigami.FormData.buddyFor.activeFocusOnTab
-            Kirigami.MnemonicData.controlType: Kirigami.MnemonicData.FormLabel
-            Kirigami.MnemonicData.label: item.Kirigami.FormData.label
 
-            Layout.columnSpan: item.Kirigami.FormData.isSection ? lay.columns : 1
-            Layout.preferredHeight: item.Kirigami.FormData.label.length > 0 ? implicitHeight : Kirigami.Units.smallSpacing
+            property Item item
+
+            visible: item !== null && item.visible
+            Kirigami.MnemonicData.enabled: item !== null && item.Kirigami.FormData.buddyFor && item.Kirigami.FormData.buddyFor.activeFocusOnTab
+            Kirigami.MnemonicData.controlType: Kirigami.MnemonicData.FormLabel
+            Kirigami.MnemonicData.label: item !== null ? item.Kirigami.FormData.label : ""
+
+            Layout.columnSpan: item !== null && item.Kirigami.FormData.isSection ? lay.columns : 1
+            Layout.preferredHeight: {
+                if (!item) {
+                    return 0;
+                }
+                if (item.Kirigami.FormData.label.length > 0) {
+                    if (root.wideMode && !(item.Kirigami.FormData.buddyFor instanceof QQC2.TextArea)) {
+                        return Math.max(implicitHeight, item.Kirigami.FormData.buddyFor.height);
+                    }
+                    return implicitHeight;
+                }
+                return Kirigami.Units.smallSpacing;
+            }
 
             Layout.alignment: temp.effectiveLayout(this)
-            Layout.topMargin: item.Kirigami.FormData.buddyFor.height > implicitHeight * 2 ? Kirigami.Units.smallSpacing/2 : 0
+            Layout.topMargin: item !== null && item.Kirigami.FormData.buddyFor.height > implicitHeight * 2 ? Kirigami.Units.smallSpacing/2 : 0
 
             activeFocusOnTab: indicator.visible && indicator.enabled
-            //HACK: desktop style checkboxes have also the text in the background item
-            //text: labelItem.Kirigami.MnemonicData.richTextLabel
-            enabled: labelItem.item.Kirigami.FormData.enabled
-            checked: labelItem.item.Kirigami.FormData.checked
+            // HACK: desktop style checkboxes have also the text in the background item
+            // text: Kirigami.MnemonicData.richTextLabel
+            enabled: item !== null && item.Kirigami.FormData.enabled
+            checked: item !== null && item.Kirigami.FormData.checked
 
             onItemChanged: {
                 if (!item) {
@@ -420,20 +458,21 @@ Item {
             Shortcut {
                 sequence: labelItem.Kirigami.MnemonicData.sequence
                 onActivated: {
-                    checked = !checked
-                    item.Kirigami.FormData.buddyFor.forceActiveFocus()
+                    checked = !checked;
+                    item.Kirigami.FormData.buddyFor.forceActiveFocus();
                 }
             }
             onCheckedChanged: {
-                item.Kirigami.FormData.checked = checked
+                item.Kirigami.FormData.checked = checked;
             }
             contentItem: Kirigami.Heading {
                 id: labelItemHeading
-                level: labelItem.item.Kirigami.FormData.isSection ? 2 : 5
-                text: labelItem.text
+                level: labelItem.item !== null && labelItem.item.Kirigami.FormData.isSection ? 3 : 5
+                text: labelItem.Kirigami.MnemonicData.richTextLabel
+                type: labelItem.item !== null && labelItem.item.Kirigami.FormData.isSection ? Kirigami.Heading.Type.Primary : Kirigami.Heading.Type.Normal
                 verticalAlignment: temp.effectiveTextLayout(labelItem.item)
-                enabled: labelItem.item.Kirigami.FormData.enabled
-                leftPadding: height//parent.indicator.width
+                enabled: labelItem.item !== null && labelItem.item.Kirigami.FormData.enabled
+                leftPadding: height  // parent.indicator.width
             }
             Rectangle {
                 enabled: labelItem.indicator.enabled

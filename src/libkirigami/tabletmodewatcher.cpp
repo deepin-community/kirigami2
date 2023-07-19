@@ -5,6 +5,7 @@
  */
 
 #include "tabletmodewatcher.h"
+#include <QCoreApplication>
 
 #if defined(KIRIGAMI_ENABLE_DBUS)
 #include "tabletmodemanager_interface.h"
@@ -15,6 +16,8 @@
 
 namespace Kirigami
 {
+KIRIGAMI2_EXPORT QEvent::Type TabletModeChangedEvent::type = QEvent::None;
+
 class TabletModeWatcherSingleton
 {
 public:
@@ -29,6 +32,9 @@ public:
     TabletModeWatcherPrivate(TabletModeWatcher *watcher)
         : q(watcher)
     {
+        // Called here to avoid collisions with application event types so we should use
+        // registerEventType for generating the event types.
+        TabletModeChangedEvent::type = QEvent::Type(QEvent::registerEventType());
 #if !defined(KIRIGAMI_ENABLE_DBUS) && (defined(Q_OS_ANDROID) || defined(Q_OS_IOS))
         isTabletModeAvailable = true;
         isTabletMode = true;
@@ -50,8 +56,14 @@ public:
 
             if (m_interface->isValid()) {
                 // NOTE: the initial call is actually sync, because is better a tiny freeze than having the ui always recalculated and changed at the start
-                isTabletModeAvailable = m_interface->tabletModeAvailable();
-                isTabletMode = m_interface->tabletMode();
+                QDBusMessage message = QDBusMessage::createMethodCall(QStringLiteral("org.kde.KWin"),
+                                                                      QStringLiteral("/org/kde/KWin"),
+                                                                      QStringLiteral("org.freedesktop.DBus.Properties"),
+                                                                      QStringLiteral("GetAll"));
+                message.setArguments({m_interface->interface()});
+                QDBusReply<QVariantMap> propsReply = QDBusConnection::sessionBus().call(message);
+                isTabletModeAvailable = propsReply.value()[QLatin1String("tabletModeAvailable")].toBool();
+                isTabletMode = propsReply.value()[QLatin1String("tabletMode")].toBool();
                 QObject::connect(m_interface, &OrgKdeKWinTabletModeManagerInterface::tabletModeChanged, q, [this](bool tabletMode) {
                     setIsTablet(tabletMode);
                 });
@@ -77,6 +89,7 @@ public:
 #if defined(KIRIGAMI_ENABLE_DBUS)
     OrgKdeKWinTabletModeManagerInterface *m_interface = nullptr;
 #endif
+    QVector<QObject *> watchers;
     bool isTabletModeAvailable = false;
     bool isTabletMode = false;
 };
@@ -88,7 +101,11 @@ void TabletModeWatcherPrivate::setIsTablet(bool tablet)
     }
 
     isTabletMode = tablet;
+    TabletModeChangedEvent event{tablet};
     Q_EMIT q->tabletModeChanged(tablet);
+    for (auto *w : watchers) {
+        QCoreApplication::sendEvent(w, &event);
+    }
 }
 
 TabletModeWatcher::TabletModeWatcher(QObject *parent)
@@ -117,6 +134,15 @@ bool TabletModeWatcher::isTabletMode() const
     return d->isTabletMode;
 }
 
+void TabletModeWatcher::addWatcher(QObject *watcher)
+{
+    d->watchers.append(watcher);
+}
+
+void TabletModeWatcher::removeWatcher(QObject *watcher)
+{
+    d->watchers.removeAll(watcher);
+}
 }
 
 #include "moc_tabletmodewatcher.cpp"

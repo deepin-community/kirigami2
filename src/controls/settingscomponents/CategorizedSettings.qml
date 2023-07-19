@@ -10,7 +10,7 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15 as QQC2
 import QtQuick.Layouts 1.15
-import org.kde.kirigami 2.11
+import org.kde.kirigami 2.11 as Kirigami
 
 /**
  * A container for setting actions showing them in a list view and displaying
@@ -18,49 +18,88 @@ import org.kde.kirigami 2.11
  *
  * @since 5.86
  * @since org.kde.kirigami 2.18
+ * @inherit kde::org::kirigami::PageRow
  */
-PageRow {
+Kirigami.PageRow {
     id: pageSettingStack
 
-    property list<PagePoolAction> actions
+    property list<Kirigami.PagePoolAction> actions
     property alias stack: pageSettingStack
-    property PagePool pool: PagePool {}
+    property Kirigami.PagePool pool: Kirigami.PagePool {}
 
     readonly property string title: pageSettingStack.depth < 2 ? qsTr("Settings") : qsTr("Settings — %1").arg(pageSettingStack.get(1).title)
+
+    property bool completed: false
 
     bottomPadding: 0
     leftPadding: 0
     rightPadding: 0
     topPadding: 0
 
-    columnView.columnWidth: Units.gridUnit * 7 // So it's the same size as the kxmlgui settings dialogs
-    globalToolBar.showNavigationButtons: ApplicationHeaderStyle.NoNavigationButtons
-    globalToolBar.style: ApplicationHeaderStyle.Breadcrumb
+    // With this, we get the longest word's width
+    TextMetrics {
+        id: maxWordMetrics
+    }
+    columnView.columnWidth: {
+        if(!pageSettingStack.completed || actions.length === 0) {
+            return Kirigami.Units.gridUnit * 6  // we return the min width if the component isn't completed
+        }
+        let maxWordWidth = 0;
+        for (let i = 0; i < actions.length; i++) {
+            const words = actions[i].text.split(" ");
+
+            for (let j = 0; j < words.length; j++) {
+                maxWordMetrics.text = words[j]
+                const currWordWidth = Math.ceil(maxWordMetrics.advanceWidth)
+                if (currWordWidth > maxWordWidth) {
+                    maxWordWidth = currWordWidth
+                }
+            }
+        }
+
+        // fix words getting wrapped weirdly when the vertical scrollbar is shown
+        const vScrollBarWidth = initialPage.contentItem.QQC2.ScrollBar.vertical.width;
+
+        // sum maximum word width, ListView's delegate spacing, and vertical scrollbar width
+        const calcWidth = maxWordWidth + Kirigami.Units.smallSpacing * 6 + vScrollBarWidth;
+        const minWidth = Kirigami.Units.gridUnit * 6;
+        const maxWidth = Kirigami.Units.gridUnit * 8.5;
+
+        return Math.max(minWidth, Math.min(calcWidth, maxWidth));
+    }
+    globalToolBar.showNavigationButtons: Kirigami.ApplicationHeaderStyle.NoNavigationButtons
+    globalToolBar.style: Kirigami.Settings.isMobile ? Kirigami.ApplicationHeaderStyle.Breadcrumb : Kirigami.ApplicationHeaderStyle.None
 
     signal backRequested(var event)
-    onBackRequested: {
+    onBackRequested: event => {
         if (pageSettingStack.depth > 1 && !pageSettingStack.wideMode && pageSettingStack.currentIndex !== 0) {
             event.accepted = true;
             pageSettingStack.pop();
         }
     }
-    onWidthChanged: if (pageSettingStack.depth < 2 && pageSettingStack.width >= Units.gridUnit * 40) {
-        actions[0].trigger();
+    onWidthChanged: {
+        if (pageSettingStack.depth < 2 && pageSettingStack.width >= Kirigami.Units.gridUnit * 40) {
+            actions[0].trigger();
+        }
     }
 
-    initialPage: ScrollablePage {
+    initialPage: Kirigami.ScrollablePage {
         title: qsTr("Settings")
         bottomPadding: 0
         leftPadding: 0
         rightPadding: 0
         topPadding: 0
-        Theme.colorSet: Theme.View
+        Kirigami.Theme.colorSet: Kirigami.Theme.View
         ListView {
             id: listview
-            Component.onCompleted: if (pageSettingStack.width >= Units.gridUnit * 40) {
+            Component.onCompleted: if (pageSettingStack.width >= Kirigami.Units.gridUnit * 40) {
                 actions[0].trigger();
             } else {
-                listview.currentIndex = -1;
+                if (count > 0) {
+                    listview.currentIndex = 0;
+                } else {
+                    listview.currentIndex = -1;
+                }
             }
             model: pageSettingStack.actions
             delegate: pageSettingStack.wideMode ? desktopStyle : mobileStyle
@@ -72,29 +111,31 @@ PageRow {
 
         QQC2.ItemDelegate {
             width: parent && parent.width > 0 ? parent.width : implicitWidth
-            implicitWidth: contentItem.implicitWidth + Units.smallSpacing * 4
-            implicitHeight: contentItem.implicitHeight + Units.smallSpacing * 2
-            highlighted: ListView.isCurrentItem
+            implicitWidth: contentItem.implicitWidth + Kirigami.Units.smallSpacing * 4
+            implicitHeight: contentItem.implicitHeight + Kirigami.Units.smallSpacing * 2
+
+            padding: Kirigami.Units.smallSpacing
 
             action: modelData
+            highlighted: listview.currentIndex === index
             onClicked: listview.currentIndex = index
             contentItem: ColumnLayout {
-                spacing: Units.smallSpacing
+                spacing: Kirigami.Units.smallSpacing
 
-                Icon {
+                Kirigami.Icon {
                     Layout.alignment: Qt.AlignHCenter
-                    Layout.preferredWidth: Units.iconSizes.medium
+                    Layout.preferredWidth: Kirigami.Units.iconSizes.medium
                     Layout.preferredHeight: width
                     source: modelData.icon.name
                 }
 
                 QQC2.Label {
                     Layout.fillWidth: true
-                    Layout.leftMargin: Units.smallSpacing
-                    Layout.rightMargin: Units.smallSpacing
+                    Layout.leftMargin: Kirigami.Units.smallSpacing
+                    Layout.rightMargin: Kirigami.Units.smallSpacing
                     text: modelData.text
                     wrapMode: Text.Wrap
-                    color: highlighted ? Theme.highlightedTextColor : Theme.textColor
+                    color: highlighted ? Kirigami.Theme.highlightedTextColor : Kirigami.Theme.textColor
                     horizontalAlignment: Text.AlignHCenter
                 }
             }
@@ -105,12 +146,16 @@ PageRow {
     Component {
         id: mobileStyle
 
-        BasicListItem {
+        Kirigami.BasicListItem {
             action: modelData
             onClicked: {
                 listview.currentIndex = index;
             }
         }
+    }
+
+    Component.onCompleted: {
+        pageSettingStack.completed = true;
     }
 }
 

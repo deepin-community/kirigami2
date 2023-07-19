@@ -4,14 +4,13 @@
  *  SPDX-License-Identifier: LGPL-2.0-or-later
  */
 
-import QtQuick 2.5
-import "templates/private"
+import QtQuick 2.15
 import org.kde.kirigami 2.4 as Kirigami
 
 /**
- * An item that provides the features of ApplicationWindow without the window itself.
- * This allows embedding into a larger application.
+ * @brief An item that provides the features of ApplicationWindow without the window itself.
  *
+ * This allows embedding into a larger application.
  * It's based around the PageRow component that allows adding/removing of pages.
  *
  * Example usage:
@@ -19,7 +18,6 @@ import org.kde.kirigami 2.4 as Kirigami
  * import org.kde.kirigami 2.4 as Kirigami
  *
  * Kirigami.ApplicationItem {
- *  [...]
  *     globalDrawer: Kirigami.GlobalDrawer {
  *         actions: [
  *            Kirigami.Action {
@@ -69,19 +67,15 @@ import org.kde.kirigami 2.4 as Kirigami
  *                 }
  *             }
  *         ]
- *       [...]
+ *         // ...
  *     }
- *  [...]
  * }
  * @endcode
- *
 */
-AbstractApplicationItem {
+Kirigami.AbstractApplicationItem {
     id: root
 
     /**
-     * @property QtQuick.StackView ApplicationItem::pageStack
-     *
      * @brief This property holds the PageRow used to allocate the pages and
      * manage the transitions between them.
      *
@@ -91,36 +85,37 @@ AbstractApplicationItem {
      * fullscreen column, a tablet device would have many tiled columns.
      *
      * @warning This property is readonly.
+     * @property QtQuick.StackView ApplicationItem::pageStack
      */
     property alias pageStack: __pageStack // TODO KF6 make readonly
 
     // Redefines here as here we can know a pointer to PageRow
-    wideScreen: width >= applicationWindow().pageStack.defaultColumnWidth*2
+    wideScreen: width >= applicationWindow().pageStack.defaultColumnWidth * 2
 
     Component.onCompleted: {
         if (pageStack.currentItem) {
-            pageStack.currentItem.forceActiveFocus()
+            pageStack.currentItem.forceActiveFocus();
         }
     }
 
-    PageRow {
+    Kirigami.PageRow {
         id: __pageStack
         anchors {
             fill: parent
-            //HACK: workaround a bug in android iOS keyboard management
-            bottomMargin: ((Qt.platform.os == "android" || Qt.platform.os == "ios") || !Qt.inputMethod.visible) ? 0 : Qt.inputMethod.keyboardRectangle.height
+            // HACK: workaround a bug in android iOS keyboard management
+            bottomMargin: ((Qt.platform.os === "android" || Qt.platform.os === "ios") || !Qt.inputMethod.visible) ? 0 : Qt.inputMethod.keyboardRectangle.height
             onBottomMarginChanged: {
                 if (bottomMargin > 0) {
                     root.reachableMode = false;
                 }
             }
         }
-        //FIXME
+        // FIXME
         onCurrentIndexChanged: root.reachableMode = false;
 
         function goBack() {
-            //NOTE: drawers are handling the back button by themselves
-            var backEvent = {accepted: false}
+            // NOTE: drawers are handling the back button by themselves
+            const backEvent = {accepted: false}
             if (root.pageStack.currentIndex >= 1) {
                 root.pageStack.currentItem.backRequested(backEvent);
                 if (!backEvent.accepted) {
@@ -134,22 +129,18 @@ AbstractApplicationItem {
             }
         }
         function goForward() {
-            root.pageStack.currentIndex = Math.min(root.pageStack.depth-1, root.pageStack.currentIndex + 1);
+            root.pageStack.currentIndex = Math.min(root.pageStack.depth - 1, root.pageStack.currentIndex + 1);
         }
-        Keys.onBackPressed: {
+        Keys.onBackPressed: event => {
             goBack();
-            event.accepted = true
+            event.accepted = true;
         }
         Shortcut {
-            sequence: "Forward"
+            sequences: [StandardKey.Forward]
             onActivated: __pageStack.goForward();
         }
         Shortcut {
-            sequence: StandardKey.Forward
-            onActivated: __pageStack.goForward();
-        }
-        Shortcut {
-            sequence: StandardKey.Back
+            sequences: [StandardKey.Back]
             onActivated: __pageStack.goBack();
         }
 

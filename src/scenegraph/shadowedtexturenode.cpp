@@ -32,6 +32,11 @@ ShadowedTextureNode::ShadowedTextureNode()
     setFlag(QSGNode::UsePreprocess);
 }
 
+ShadowedTextureNode::~ShadowedTextureNode()
+{
+    QObject::disconnect(m_textureChangeConnectionHandle);
+}
+
 void ShadowedTextureNode::setTextureSource(QSGTextureProvider *source)
 {
     if (m_textureSource == source) {
@@ -43,7 +48,7 @@ void ShadowedTextureNode::setTextureSource(QSGTextureProvider *source)
     }
 
     m_textureSource = source;
-    QObject::connect(m_textureSource.data(), &QSGTextureProvider::textureChanged, [this] {
+    m_textureChangeConnectionHandle = QObject::connect(m_textureSource.data(), &QSGTextureProvider::textureChanged, [this] {
         markDirty(QSGNode::DirtyMaterial);
     });
     markDirty(QSGNode::DirtyMaterial);

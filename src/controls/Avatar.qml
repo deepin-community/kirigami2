@@ -5,16 +5,16 @@
  */
 
 import QtQuick 2.13
-import org.kde.kirigami 2.14 as Kirigami
+import QtQuick.Window 2.15
 import QtQuick.Controls 2.13 as QQC2
-import QtGraphicalEffects 1.0
-import org.kde.kirigami.private 2.14
+import QtGraphicalEffects 1.0 as GE
+import org.kde.kirigami 2.14 as Kirigami
+import org.kde.kirigami.private 2.14 as KP
+import "templates/private" as TP
 
-import "templates/private" as P
-
+//TODO KF6: generic enough or belongs to a different framework?
 /**
- * An element that represents a user, either with initials, an icon, or a profile image.
- *
+ * @brief An element that represents a user, either with initials, an icon, or a profile image.
  * @inherit QtQuick.Controls.Control
  */
 QQC2.Control {
@@ -30,8 +30,9 @@ QQC2.Control {
         UseIcon
     }
 
+//BEGIN properties
     /**
-     * This property holds the given name of a user.
+     * @brief This property holds the given name of a user.
      *
      * The user's name will be used for generating initials and to provide the
      * accessible name for assistive technology.
@@ -39,62 +40,74 @@ QQC2.Control {
     property string name
 
     /**
-     * This property holds the source of the user's profile picture; an image.
+     * @brief This property holds the source of the user's profile picture; an image.
+     * @see QtQuick.Image::source
+     * @property url source
      */
     property alias source: avatarImage.source
 
     /**
-     * This property holds the source of the internal Kirigami.Icon used. It is displayed
-     * when using an icon with `Avatar.InitialsMode.UseIcon` and `Avatar.ImageNode.AlwaysShowInitials`
-     * enabled.
+     * @brief This property holds avatar's icon source.
      *
-     * By default this is a generic user icon.
+     * This icon  is displayed when using an icon with ``Avatar.InitialsMode.UseIcon`` and
+     * ``Avatar.ImageNode.AlwaysShowInitials`` enabled.
+     *
+     * @see org::kde::kirigami::Icon::source
+     * @property var iconSource
      */
     property alias iconSource: avatarIcon.source
 
     /**
-     * This property holds how the button should represent the user when there is no image available.
+     * @brief This property holds how the button should represent the user when no user-set image is available.
      *
      * Possible values are:
-     * * `Avatar.InitialsMode.UseInitials` - Use initials when the image is not available
-     * * `Avatar.InitialsMode.UseIcon` - Use an icon of a user when the image is not available
+     * * ``Avatar.InitialsMode.UseInitials``: Show the user's initials.
+     * * ``Avatar.InitialsMode.UseIcon``: Show a generic icon.
+     *
+     * @see org::kde::kirigami::Avatar::InitialsMode
      */
     property int initialsMode: Kirigami.Avatar.InitialsMode.UseInitials
 
     /**
+     * @brief This property holds how the avatar should be shown.
+     *
      * This property holds whether the button should always show the image; show the image if one is
      * available and show initials when it is not; or always show initials.
      *
      * Possible values are:
-     * * `Avatar.ImageMode.AlwaysShowImage`: Always try to show the image; even if it hasn't loaded yet or is undefined.
-     * * `Avatar.ImageMode.AdaptiveImageOrInitals`: Show the image if it is valid; or show initials if it is not
-     * * `Avatar.ImageMode.AlwaysShowInitials`: Always show initials
+     * * ``Avatar.ImageMode.AlwaysShowImage``: Always try to show the image; even if it hasn't loaded yet or is undefined.
+     * * ``Avatar.ImageMode.AdaptiveImageOrInitals``: Show the image if it is valid; or show initials if it is not
+     * * ``Avatar.ImageMode.AlwaysShowInitials``: Always show initials
+     *
+     * @see org::kde::kirigami::Avatar::ImageMode
      */
     property int imageMode: Kirigami.Avatar.ImageMode.AdaptiveImageOrInitals
 
     /**
-     * This property holds whether or not the image loaded from the provided source should be cached.
-     *
+     * @brief This property sets whether the provided image should be cached.
+     * @see QtQuick.Image::cache
      * @property bool cache
      */
     property alias cache: avatarImage.cache
 
     /**
-     * This property holds the source size of the user's profile picture.
-     *
+     * @brief This property holds the source size of the user's profile picture.
+     * @see QtQuick.Image::sourceSize
      * @property int sourceSize
      */
     property alias sourceSize: avatarImage.sourceSize
 
     /**
-     * This property holds whether or not the image loaded from the provided source should be smoothed.
+     * @brief This property holds whether the provided image should be smoothed.
+     * @see QtQuick.Image::smooth
+     * @property bool smooth
      */
     property alias smooth: avatarImage.smooth
 
     /**
-     * This property holds the color to use for this avatar.
+     * @brief This property holds the color to use for this avatar.
      *
-     * If not explicitly set, this defaults to generating a colour from the name.
+     * If not explicitly set, this defaults to generating a color from the name.
      *
      * @property color color
      */
@@ -103,9 +116,7 @@ QQC2.Control {
     // as undefined, which will result in a generated colour being used.
 
     /**
-     * This property holds the main and secondary actions associated
-     * with this avatar.
-     *
+     * @brief This property holds the main and secondary actions associated with this avatar.
      * @code
      * Kirigami.Avatar {
      *     actions.main: Kirigami.Action {}
@@ -118,11 +129,10 @@ QQC2.Control {
      * @note The secondary action should only be used for shortcuts of actions
      * elsewhere in your application's UI, and cannot be accessed on mobile platforms.
      */
-    property AvatarGroup actions: AvatarGroup {}
+    property KP.AvatarGroup actions: KP.AvatarGroup {}
 
     /**
-     * This property holds the border properties.
-     *
+     * @brief This property holds the border properties group.
      * @code
      * Kirigami.Avatar {
      *     border.width: 10
@@ -130,10 +140,11 @@ QQC2.Control {
      * }
      * @endcode
      */
-    property P.BorderPropertiesGroup border: P.BorderPropertiesGroup {
+    property TP.BorderPropertiesGroup border: TP.BorderPropertiesGroup {
         width: 0
         color: Qt.rgba(0,0,0,0.2)
     }
+//END properties
 
     padding: 0
     horizontalPadding: padding
@@ -151,11 +162,16 @@ QQC2.Control {
     Accessible.role: !!actions.main ? Accessible.Button : Accessible.Graphic
     Accessible.name: !!actions.main ? qsTr("%1 — %2").arg(name).arg(actions.main.text) : name
     Accessible.focusable: !!actions.main
-    Accessible.onPressAction: {
-        avatarRoot.actions.main.trigger()
+    Accessible.onPressAction: __triggerMainAction()
+    Keys.onReturnPressed: event => __triggerMainAction()
+    Keys.onEnterPressed: event => __triggerMainAction()
+    Keys.onSpacePressed: event => __triggerMainAction()
+
+    function __triggerMainAction() {
+        if (actions.main) {
+            actions.main.trigger();
+        }
     }
-    Keys.onEnterPressed: if (!!avatarRoot.actions.main.trigger()) avatarRoot.actions.main.trigger()
-    Keys.onSpacePressed: if (!!avatarRoot.actions.main.trigger()) avatarRoot.actions.main.trigger()
 
     background: Rectangle {
         radius: parent.width / 2
@@ -180,27 +196,30 @@ QQC2.Control {
             anchors.fill: parent
             hoverEnabled: true
             property bool mouseInCircle: {
-                let x = avatarRoot.width / 2, y = avatarRoot.height / 2
-                let xPrime = mouseX, yPrime = mouseY
+                const x = avatarRoot.width / 2, y = avatarRoot.height / 2
+                const xPrime = mouseX, yPrime = mouseY
 
-                let distance = (x - xPrime) ** 2 + (y - yPrime) ** 2
-                let radiusSquared = (Math.min(avatarRoot.width, avatarRoot.height) / 2) ** 2
+                const distance = (x - xPrime) ** 2 + (y - yPrime) ** 2
+                const radiusSquared = (Math.min(avatarRoot.width, avatarRoot.height) / 2) ** 2
 
                 return distance < radiusSquared
             }
 
-            onClicked: {
+            onClicked: mouse =>{
                 if (mouseY > avatarRoot.height - secondaryRect.height && !!avatarRoot.actions.secondary) {
                     avatarRoot.actions.secondary.trigger()
                     return
                 }
-                if (!!avatarRoot.actions.main) {
-                    avatarRoot.actions.main.trigger()
-                }
+                avatarRoot.__triggerMainAction()
             }
 
             enabled: !!avatarRoot.actions.main || !!avatarRoot.actions.secondary
             cursorShape: containsMouse && mouseInCircle && enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
+
+            QQC2.ToolTip {
+                text: avatarRoot.actions.main && avatarRoot.actions.main.tooltip ? avatarRoot.actions.main.tooltip : ''
+                visible: primaryMouse.containsMouse && text
+            }
 
             states: [
                 State {
@@ -217,12 +236,12 @@ QQC2.Control {
 
     QtObject {
         id: __private
-        property color textColor: Kirigami.ColorUtils.brightnessForColor(avatarRoot.color) == Kirigami.ColorUtils.Light
+        property color textColor: Kirigami.ColorUtils.brightnessForColor(avatarRoot.color) === Kirigami.ColorUtils.Light
                                 ? "black"
                                 : "white"
         property bool showImage: {
-            return (avatarRoot.imageMode == Kirigami.Avatar.ImageMode.AlwaysShowImage) ||
-                   (avatarImage.status == Image.Ready && avatarRoot.imageMode == Kirigami.Avatar.ImageMode.AdaptiveImageOrInitals)
+            return (avatarRoot.imageMode === Kirigami.Avatar.ImageMode.AlwaysShowImage) ||
+                   (avatarImage.status === Image.Ready && avatarRoot.imageMode === Kirigami.Avatar.ImageMode.AdaptiveImageOrInitals)
         }
     }
 
@@ -230,7 +249,7 @@ QQC2.Control {
         Text {
             id: avatarText
             fontSizeMode: Text.Fit
-            visible: avatarRoot.initialsMode == Kirigami.Avatar.InitialsMode.UseInitials &&
+            visible: avatarRoot.initialsMode === Kirigami.Avatar.InitialsMode.UseInitials &&
                     !__private.showImage &&
                     !Kirigami.NameUtils.isStringUnsuitableForInitials(avatarRoot.name) &&
                     avatarRoot.width > Kirigami.Units.gridUnit
@@ -249,7 +268,7 @@ QQC2.Control {
         }
         Kirigami.Icon {
             id: avatarIcon
-            visible: (avatarRoot.initialsMode == Kirigami.Avatar.InitialsMode.UseIcon && !__private.showImage) ||
+            visible: (avatarRoot.initialsMode === Kirigami.Avatar.InitialsMode.UseIcon && !__private.showImage) ||
                     (Kirigami.NameUtils.isStringUnsuitableForInitials(avatarRoot.name) && !__private.showImage)
 
             source: "user"
@@ -266,8 +285,8 @@ QQC2.Control {
             mipmap: true
             smooth: true
             sourceSize {
-                width: avatarRoot.width
-                height: avatarRoot.height
+                width: avatarRoot.width * Screen.devicePixelRatio
+                height: avatarRoot.height * Screen.devicePixelRatio
             }
 
             fillMode: Image.PreserveAspectCrop
@@ -313,7 +332,7 @@ QQC2.Control {
         }
 
         layer.enabled: true
-        layer.effect: OpacityMask {
+        layer.effect: GE.OpacityMask {
             maskSource: Rectangle {
                 height: avatarRoot.height
                 width: avatarRoot.width

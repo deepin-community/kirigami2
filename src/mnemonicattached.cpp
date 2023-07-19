@@ -43,7 +43,7 @@ static QString removeReducedCJKAccMark(const QString &label, int pos)
     return label;
 }
 
-QString removeAcceleratorMarker(const QString &label_)
+static QString removeAcceleratorMarker(const QString &label_)
 {
     QString label = label_;
 
@@ -143,8 +143,7 @@ bool MnemonicAttached::eventFilter(QObject *watched, QEvent *e)
     } else if (e->type() == QEvent::KeyRelease) {
         QKeyEvent *ke = static_cast<QKeyEvent *>(e);
         if (ke->key() == Qt::Key_Alt) {
-            m_actualRichTextLabel = m_label;
-            m_actualRichTextLabel = removeAcceleratorMarker(m_actualRichTextLabel);
+            m_actualRichTextLabel = removeAcceleratorMarker(m_label);
             Q_EMIT richTextLabelChanged();
             m_active = false;
             Q_EMIT activeChanged();
@@ -266,8 +265,7 @@ void MnemonicAttached::updateSequence()
     const QString text = label().replace(QStringLiteral("& "), QStringLiteral("&& "));
 
     if (!m_enabled) {
-        m_actualRichTextLabel = text;
-        m_actualRichTextLabel = removeAcceleratorMarker(m_actualRichTextLabel);
+        m_actualRichTextLabel = removeAcceleratorMarker(text);
         // was the label already completely plain text? try to limit signal emission
         if (m_mnemonicLabel != m_actualRichTextLabel) {
             m_mnemonicLabel = m_actualRichTextLabel;
@@ -323,8 +321,7 @@ void MnemonicAttached::updateSequence()
     if (!m_sequence.isEmpty()) {
         Q_EMIT sequenceChanged();
     }
-    m_actualRichTextLabel = text;
-    m_actualRichTextLabel = removeAcceleratorMarker(m_actualRichTextLabel);
+    m_actualRichTextLabel = removeAcceleratorMarker(text);
     m_mnemonicLabel = m_actualRichTextLabel;
 
     Q_EMIT richTextLabelChanged();
@@ -344,7 +341,11 @@ void MnemonicAttached::setLabel(const QString &text)
 
 QString MnemonicAttached::richTextLabel() const
 {
-    return !m_actualRichTextLabel.isEmpty() ? m_actualRichTextLabel : m_label;
+    if (!m_actualRichTextLabel.isEmpty()) {
+        return m_actualRichTextLabel;
+    } else {
+        return removeAcceleratorMarker(m_label);
+    }
 }
 
 QString MnemonicAttached::mnemonicLabel() const
@@ -447,8 +448,7 @@ void MnemonicAttached::setActive(bool active)
 
     } else {
         installEventFilterForWindow(m_window);
-        m_actualRichTextLabel = m_label;
-        m_actualRichTextLabel = removeAcceleratorMarker(m_actualRichTextLabel);
+        m_actualRichTextLabel = removeAcceleratorMarker(m_label);
         Q_EMIT richTextLabelChanged();
     }
 

@@ -20,7 +20,6 @@
 #include <QSGSimpleTextureNode>
 #include <QSGTexture>
 #include <QScreen>
-#include <QSharedPointer>
 #include <QtQml>
 
 Q_GLOBAL_STATIC(ImageTexturesCache, s_iconImageCache)
@@ -176,12 +175,8 @@ QSGNode *Icon::updatePaintNode(QSGNode *node, QQuickItem::UpdatePaintNodeData * 
             mNode = new ManagedTextureNode;
         }
         if (itemSize.width() != 0 && itemSize.height() != 0) {
-            const auto multiplier = QCoreApplication::instance()->testAttribute(Qt::AA_UseHighDpiPixmaps)
-                ? 1
-                : (window() ? window()->devicePixelRatio() : qGuiApp->devicePixelRatio());
-            const QSize size = itemSize * multiplier;
             mNode->setTexture(s_iconImageCache->loadTexture(window(), m_icon, QQuickWindow::TextureCanUseAtlas));
-            if (m_icon.size() != size) {
+            if (m_icon.size() != itemSize) {
                 // At this point, the image will already be scaled, but we need to output it in
                 // the correct aspect ratio, painted centered in the viewport. So:
                 QRect destination(QPoint(0, 0), m_icon.size().scaled(itemSize, Qt::KeepAspectRatio));
@@ -200,9 +195,15 @@ QSGNode *Icon::updatePaintNode(QSGNode *node, QQuickItem::UpdatePaintNodeData * 
     return node;
 }
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 void Icon::geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry)
 {
     QQuickItem::geometryChanged(newGeometry, oldGeometry);
+#else
+void Icon::geometryChange(const QRectF &newGeometry, const QRectF &oldGeometry)
+{
+    QQuickItem::geometryChange(newGeometry, oldGeometry);
+#endif
     if (newGeometry.size() != oldGeometry.size()) {
         polish();
     }
@@ -271,8 +272,9 @@ void Icon::updatePolish()
 
     const QSize itemSize(width(), height());
     if (itemSize.width() != 0 && itemSize.height() != 0) {
-        const auto multiplier =
-            QCoreApplication::instance()->testAttribute(Qt::AA_UseHighDpiPixmaps) ? 1 : (window() ? window()->devicePixelRatio() : qGuiApp->devicePixelRatio());
+        const auto multiplier = QCoreApplication::instance()->testAttribute(Qt::AA_UseHighDpiPixmaps)
+            ? 1
+            : (window() ? window()->effectiveDevicePixelRatio() : qGuiApp->devicePixelRatio());
         const QSize size = itemSize * multiplier;
 
         switch (m_source.type()) {
@@ -333,8 +335,9 @@ QImage Icon::findIcon(const QSize &size)
     QString iconSource = m_source.toString();
 
     if (iconSource.startsWith(QLatin1String("image://"))) {
-        const auto multiplier =
-            QCoreApplication::instance()->testAttribute(Qt::AA_UseHighDpiPixmaps) ? (window() ? window()->devicePixelRatio() : qGuiApp->devicePixelRatio()) : 1;
+        const auto multiplier = QCoreApplication::instance()->testAttribute(Qt::AA_UseHighDpiPixmaps)
+            ? (window() ? window()->effectiveDevicePixelRatio() : qGuiApp->devicePixelRatio())
+            : 1;
         QUrl iconUrl(iconSource);
         QString iconProviderId = iconUrl.host();
         // QUrl path has the  "/" prefix while iconId does not
@@ -370,6 +373,7 @@ QImage Icon::findIcon(const QSize &size)
                     QQuickTextureFactory *textureFactory = response->textureFactory();
                     if (textureFactory) {
                         m_loadedImage = textureFactory->image();
+                        delete textureFactory;
                     }
                     if (m_loadedImage.isNull()) {
                         // broken image from data, inform the user of this with some useful broken-image thing...
@@ -381,6 +385,7 @@ QImage Icon::findIcon(const QSize &size)
                     }
                     polish();
                 }
+                response->deleteLater();
             });
             // Temporary icon while we wait for the real image to load...
             const QIcon icon = QIcon::fromTheme(m_placeholder);
@@ -443,7 +448,7 @@ QImage Icon::findIcon(const QSize &size)
             }
         }
         if (!icon.isNull()) {
-            img = icon.pixmap(window(), icon.actualSize(size), iconMode(), QIcon::On).toImage();
+            img = icon.pixmap(window(), icon.actualSize(window(), size), iconMode(), QIcon::On).toImage();
 
             setStatus(Ready);
             /*const QColor tintColor = !m_color.isValid() || m_color == Qt::transparent ? (m_selected ? m_theme->highlightedTextColor() : m_theme->textColor())
@@ -534,7 +539,7 @@ bool Icon::guessMonochrome(const QImage &img)
         ++it;
     }
 
-    // Arbitrarly low values of entropy and colored pixels
+    // Arbitrarily low values of entropy and colored pixels
     m_monochromeHeuristics[stdSize] = saturatedPixels <= (img.size().width() * img.size().height() - transparentPixels) * 0.3 && entropy <= 0.3;
     return m_monochromeHeuristics[stdSize];
 }
@@ -614,6 +619,14 @@ void Icon::updatePaintedGeometry()
         m_paintedHeight = newHeight;
         Q_EMIT paintedAreaChanged();
     }
+}
+
+void Icon::itemChange(QQuickItem::ItemChange change, const QQuickItem::ItemChangeData &value)
+{
+    if (change == QQuickItem::ItemDevicePixelRatioHasChanged) {
+        polish();
+    }
+    QQuickItem::itemChange(change, value);
 }
 
 #include "moc_icon.cpp"

@@ -25,40 +25,53 @@ import org.kde.kirigami 2.4 as Kirigami
 T.ItemDelegate {
     id: root
 
+//BEGIN properties
     /**
-     * This item serves as header, it will be put either on top if headerOrientation
-     * is Qt.Vertical(default) or on the left if it's Qt.Horizontal
+     * @brief This property holds an item that serves as a header.
+     *
+     * This item will be positioned on top if headerOrientation is ``Qt.Vertical``
+     * or on the left if it is ``Qt.Horizontal``.
      */
     property Item header
 
     /**
-     * @var Qt.Orientation headerOrientation
-     * If Qt.Vertical the header will be positioned on top(default),
-     * if Qt.Horizontal will be positioned on the left (or right if an RTL layout is used)
+     * @brief This property sets the card's orientation.
+     *
+     * * ``Qt.Vertical``: the header will be positioned on top
+     * * ``Qt.Horizontal``: the header will be positioned on the left (or right if an RTL layout is used)
+     *
+     * default: ``Qt.Vertical``
+     *
+     * @property Qt::Orientation headerOrientation
      */
     property int headerOrientation: Qt.Vertical
 
     /**
-     * This item serves as footer, and it will be positioned at the bottom of the card.
+     * @brief This property holds an item that serves as a footer.
+     *
+     * This item will be positioned at the bottom if headerOrientation is ``Qt.Vertical``
+     * or on the right if it is ``Qt.Horizontal``.
      */
     property Item footer
 
     /**
-     * if true, when clicking or tapping on the card area, the card will be colored
-     * to show a visual click feedback.
+     * @brief This property sets whether clicking or tapping on the card area shows a visual click feedback.
+     *
      * Use this if you want to do an action in the onClicked signal handler of the card.
+     *
+     * default: ``false``
      */
     property bool showClickFeedback: false
+//END properties
 
     Layout.fillWidth: true
 
     implicitWidth: Math.max(background.implicitWidth, mainLayout.implicitWidth) + leftPadding + rightPadding
-
     implicitHeight: mainLayout.implicitHeight + topPadding + bottomPadding
 
     hoverEnabled: !Kirigami.Settings.tabletMode && showClickFeedback
-    //if it's in a CardLayout, try to expand horizontal cards to both columns
-    Layout.columnSpan: headerOrientation == Qt.Horizontal && parent.hasOwnProperty("columns") ? parent.columns : 1
+    // if it's in a CardLayout, try to expand horizontal cards to both columns
+    Layout.columnSpan: headerOrientation === Qt.Horizontal && parent.hasOwnProperty("columns") ? parent.columns : 1
 
     Kirigami.Theme.inherit: false
     Kirigami.Theme.colorSet: Kirigami.Theme.View
@@ -81,10 +94,10 @@ T.ItemDelegate {
             leftMargin: root.leftPadding
             topMargin: root.topPadding
             rightMargin: root.rightPadding
-            bottom:parent.bottom
+            bottom: parent.bottom
             bottomMargin: root.bottomPadding
         }
-        columns: headerOrientation == Qt.Vertical ? 1 : 2
+        columns: headerOrientation === Qt.Vertical ? 1 : 2
         function preferredHeight(item) {
             if (!item) {
                 return 0;
@@ -97,10 +110,10 @@ T.ItemDelegate {
         Item {
             id: headerParent
             Layout.fillWidth: true
-            Layout.fillHeight: root.headerOrientation == Qt.Horizontal
-            Layout.rowSpan: root.headerOrientation == Qt.Vertical ? 1 : 2
+            Layout.fillHeight: root.headerOrientation === Qt.Horizontal
+            Layout.rowSpan: root.headerOrientation === Qt.Vertical ? 1 : 2
             Layout.preferredWidth: header ? header.implicitWidth : 0
-            Layout.preferredHeight: root.headerOrientation == Qt.Vertical ? mainLayout.preferredHeight(header) : -1
+            Layout.preferredHeight: root.headerOrientation === Qt.Vertical ? mainLayout.preferredHeight(header) : -1
             visible: children.length > 0
         }
         Item {
@@ -149,7 +162,8 @@ T.ItemDelegate {
         footer.anchors.left = footerParent.left;
         footer.anchors.top = footerParent.top;
         footer.anchors.right = footerParent.right;
-        footer.anchors.topMargin = Qt.binding(function() {return (root.height - root.bottomPadding - root.topPadding)  - (footerParent.y + footerParent.height)});
+        footer.anchors.topMargin = Qt.binding(() =>
+            (root.height - root.bottomPadding - root.topPadding) - (footerParent.y + footerParent.height));
     }
     Component.onCompleted: {
         contentItemChanged();

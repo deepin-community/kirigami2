@@ -5,16 +5,16 @@
  */
 
 import QtQuick 2.2
-import org.kde.kirigami 2.14
 import QtQuick.Controls 2.1 as QQC2
+import org.kde.kirigami 2.14 as Kirigami
 
 /**
- * Shows a Button that looks like a link
+ * @brief A button that looks like a link.
  *
- * Uses the link color settings and allows to trigger an action when clicked.
+ * It uses the link color settings and triggers an action when clicked.
  *
  * Maps to the Command Link in the HIG:
- * https://hig.kde.org/components/navigation/commandlink.html
+ * https://develop.kde.org/hig/components/navigation/commandlink/
  *
  * @since 5.52
  * @since org.kde.kirigami 2.6
@@ -24,40 +24,66 @@ QQC2.Label {
     id: control
 
     property Action action: null
+
     /**
-     * @var Qt::MouseButtons acceptedButtons
-     * This property holds the mouse buttons that the mouse area reacts to.
-     * See <a href="https://doc.qt.io/qt-5/qml-qtquick-mousearea.html#acceptedButtons-prop">Qt documentation</a>.
+     * @brief This property holds the mouse buttons that the mouse area reacts to.
+     * @see QtQuick.MouseArea::acceptedButtons
+     * @property Qt::MouseButtons acceptedButtons
      */
     property alias acceptedButtons: area.acceptedButtons
+
     /**
-     * @var MouseArea ara
-     * Mouse area element covering the button.
+     * @brief This property holds the mouse area element covering the button.
+     * @property MouseArea area
      */
     property alias mouseArea: area
+
+    activeFocusOnTab: true
     Accessible.role: Accessible.Button
     Accessible.name: text
-    Accessible.onPressAction: control.clicked(null)
+    Accessible.onPressAction: control.clicked({"button": Qt.LeftButton})
 
     text: action ? action.text : ""
     enabled: !action || action.enabled
-    onClicked: if (action) action.trigger()
+    onClicked: mouse => {
+        if (action) {
+            action.trigger();
+        }
+    }
 
-    font.underline: control.enabled && area.containsMouse
-    color: enabled ? Theme.linkColor : Theme.textColor
+    font.bold: activeFocus
+    font.underline: control.enabled
+    color: enabled ? Kirigami.Theme.linkColor : Kirigami.Theme.textColor
     horizontalAlignment: Text.AlignHCenter
     verticalAlignment: Text.AlignVCenter
     elide: Text.ElideRight
 
-    signal pressed(QtObject mouse)
-    signal clicked(QtObject mouse)
+    signal pressed(var mouse)
+    signal clicked(var mouse)
+
+    Keys.onPressed: event => {
+        switch (event.key) {
+        case Qt.Key_Space:
+        case Qt.Key_Enter:
+        case Qt.Key_Return:
+        case Qt.Key_Select:
+            control.clicked({"button": Qt.LeftButton});
+            event.accepted = true;
+            break;
+        case Qt.Key_Menu:
+            control.pressed({"button": Qt.RightButton});
+            event.accepted = true;
+            break;
+        }
+    }
+
     MouseArea {
         id: area
         anchors.fill: parent
         hoverEnabled: true
         cursorShape: Qt.PointingHandCursor
 
-        onClicked: control.clicked(mouse)
-        onPressed: control.pressed(mouse)
+        onClicked: mouse => control.clicked(mouse)
+        onPressed: mouse => control.pressed(mouse)
     }
 }

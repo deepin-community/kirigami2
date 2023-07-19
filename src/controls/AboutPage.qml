@@ -8,10 +8,11 @@ import QtQuick 2.1
 import QtQuick.Controls 2.4 as QQC2
 import QtQuick.Window 2.15
 import QtQuick.Layouts 1.3
-import org.kde.kirigami 2.19
+import org.kde.kirigami 2.19 as Kirigami
 
+//TODO KF6: move somewhere else? kirigami addons?
 /**
- * An about page that is ready to integrate in a kirigami app.
+ * @brief An "About" page that is ready to integrate in a Kirigami app.
  *
  * Allows to have a page that will show the copyright notice of the application
  * together with the contributors and some information of which platform it's
@@ -19,12 +20,14 @@ import org.kde.kirigami 2.19
  *
  * @since 5.52
  * @since org.kde.kirigami 2.6
+ * @inherit org::kde::kirigami::ScrollablePage
  */
-ScrollablePage
-{
+Kirigami.ScrollablePage {
     id: page
+
+//BEGIN properties
     /**
-     * This property holds an object with the same shape as KAboutData.
+     * @brief This property holds an object with the same shape as KAboutData.
      *
      * For example:
      * @code{json}
@@ -61,40 +64,37 @@ ScrollablePage
        @endcode
      *
      * @see KAboutData
+     * @see org::kde::kirigami::AboutItem::aboutData
+     * @property KAboutData aboutData
      */
     property alias aboutData: aboutItem.aboutData
 
     /**
-     * This property holds a link to a "Get Involved" page. By default link to
-     * "https://community.kde.org/Get_Involved" when your application application
-     * id starts with "org.kde.", otherwise is empty.
+     * @brief This property holds a link to a "Get Involved" page.
+     *
+     * default: `"https://community.kde.org/Get_Involved" when your application id starts with "org.kde.", otherwise is empty`
+     *
+     * @property url getInvolvedUrl
      */
     property alias getInvolvedUrl: aboutItem.getInvolvedUrl
 
+    /**
+     * @brief This property holds a link to a "Donate" page.
+     * @since 5.101
+     *
+     * default: `"https://kde.org/community/donations" when application id starts with "org.kde.", otherwise it is empty.`
+     */
+    property url donateUrl: aboutData.desktopFileName.startsWith("org.kde.") ? "https://kde.org/community/donations" : ""
+
     /** @internal */
     default property alias _content: aboutItem._content
+//END properties
 
     title: qsTr("About %1").arg(page.aboutData.displayName)
 
-    actions.main: Action {
-        text: qsTr("Report Bug…")
-        icon.name: "tools-report-bug"
-        onTriggered: {
-            if (page.aboutData.bugAddress === "submit@bugs.kde.org") {
-                const elements = page.aboutData.productName.split('/');
-                let url = `https://bugs.kde.org/enter_bug.cgi?format=guided&product=${elements[0]}&version=${page.aboutData.version}`;
-                if (elements.length === 2) {
-                    url += "&component=" + elements[1]
-                }
-                Qt.openUrlExternally(url)
-            } else {
-                Qt.openUrlExternally(page.aboutData.bugAddress)
-            }
-        }
-    }
-
-    AboutItem {
+    Kirigami.AboutItem {
         id: aboutItem
+        wideMode: page.width >= aboutItem.implicitWidth
 
         _usePageStack: applicationWindow().pageStack ? true : false
     }

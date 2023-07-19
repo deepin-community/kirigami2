@@ -4,10 +4,10 @@
  *  SPDX-License-Identifier: LGPL-2.0-or-later
  */
 
-import QtQuick 2.6
-import QtQuick.Layouts 1.2
-import QtQuick.Controls 2.2 as QQC2
-import org.kde.kirigami 2.11 as Kirigami
+import QtQuick 2.15
+import QtQuick.Layouts 1.15
+import QtQuick.Controls 2.15 as QQC2
+import org.kde.kirigami 2.20 as Kirigami
 
 Kirigami.ApplicationWindow {
     id: root
@@ -44,10 +44,10 @@ Kirigami.ApplicationWindow {
     contextDrawer: Kirigami.OverlayDrawer {
         id: contextDrawer
         //they can depend on the page like that or be defined directly here
-        edge: Qt.application.layoutDirection == Qt.RightToLeft ? Qt.LeftEdge : Qt.RightEdge
+        edge: Qt.application.layoutDirection === Qt.RightToLeft ? Qt.LeftEdge : Qt.RightEdge
         modal: !root.wideScreen
         onModalChanged: drawerOpen = !modal
-        handleVisible: applicationWindow == undefined ? false : applicationWindow().controlsVisible
+        handleVisible: typeof applicationWindow === "undefined" ? false : applicationWindow().controlsVisible
 
         //here padding 0 as listitems look better without as opposed to any other control
         topPadding: 0

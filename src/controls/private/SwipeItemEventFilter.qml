@@ -5,7 +5,7 @@
  */
 
 import QtQuick 2.5
-import org.kde.kirigami 2.4
+import org.kde.kirigami 2.4 as Kirigami
 
 
 MouseArea {
@@ -21,13 +21,13 @@ MouseArea {
     property real peek
 
     preventStealing: true
-    width: Units.gridUnit
-    onPressed: {
-        var mapped = mapToItem(parent.flickableItem.contentItem, mouse.x, mouse.y);
+    width: Kirigami.Units.gridUnit
+    onPressed: mouse => {
+        const mapped = mapToItem(parent.flickableItem.contentItem, mouse.x, mouse.y);
         currentItem = parent.flickableItem.itemAt(mapped.x, mapped.y);
     }
-    onPositionChanged: {
-        var mapped = mapToItem(parent.flickableItem.contentItem, mouse.x, mouse.y);
+    onPositionChanged: mouse => {
+        const mapped = mapToItem(parent.flickableItem.contentItem, mouse.x, mouse.y);
         currentItem = parent.flickableItem.itemAt(mapped.x, mapped.y);
         peek = 1 - mapped.x / parent.flickableItem.contentItem.width;
     }

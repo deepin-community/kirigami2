@@ -17,7 +17,7 @@ cmake .. -DBUILD_EXAMPLES=ON
 make
 ```
 
-Than, you can run:
+Then, you can run:
 
 ```sh
 ./examples/applicationitemapp/applicationitemapp

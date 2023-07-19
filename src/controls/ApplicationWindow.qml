@@ -5,12 +5,10 @@
  */
 
 import QtQuick 2.5
-import "templates/private"
 import org.kde.kirigami 2.4 as Kirigami
-import QtGraphicalEffects 1.0
 
 /**
- * A window that provides some basic features needed for all apps
+ * @brief A window that provides some basic features needed for all apps
  *
  * It's usually used as a root QML component for the application.
  * It's based around the PageRow component, the application will be
@@ -23,7 +21,7 @@ import QtGraphicalEffects 1.0
  * will set its initial size, but it won't set it as an automatically binding.
  * to resize programmatically the ApplicationWindow they need to
  * be assigned again in an imperative fashion
- * 
+ *
  * Example usage:
  * @code
  * import org.kde.kirigami 2.4 as Kirigami
@@ -86,12 +84,10 @@ import QtGraphicalEffects 1.0
  * @endcode
  *
 */
-AbstractApplicationWindow {
+Kirigami.AbstractApplicationWindow {
     id: root
 
     /**
-     * @property QtQuick.StackView ApplicationItem::pageStack
-     *
      * @brief This property holds the stack used to allocate the pages and to
      * manage the transitions between them.
      *
@@ -101,8 +97,9 @@ AbstractApplicationWindow {
      * fullscreen column, a tablet device would have many tiled columns.
      *
      * @warning This property is not currently readonly, but it should be treated like it is readonly.
+     * @property org::kde::kirigami::PageRow pageStack
      */
-    property alias pageStack: __pageStack // TODO KF6 make readonly
+    property alias pageStack: __pageStack  // TODO KF6 make readonly
 
     // Redefined here as here we can know a pointer to PageRow.
     // We negate the canBeEnabled check because we don't want to factor in the automatic drawer provided by Kirigami for page actions for our calculations
@@ -119,59 +116,16 @@ AbstractApplicationWindow {
         globalToolBar.style: Kirigami.ApplicationHeaderStyle.Auto
         anchors {
             fill: parent
-            //HACK: workaround a bug in android iOS keyboard management
-            bottomMargin: ((Qt.platform.os == "android" || Qt.platform.os == "ios") || !Qt.inputMethod.visible) ? 0 : Qt.inputMethod.keyboardRectangle.height
+            // HACK: workaround a bug in android iOS keyboard management
+            bottomMargin: ((Qt.platform.os === "android" || Qt.platform.os === "ios") || !Qt.inputMethod.visible) ? 0 : Qt.inputMethod.keyboardRectangle.height
             onBottomMarginChanged: {
                 if (__pageStack.anchors.bottomMargin > 0) {
                     root.reachableMode = false;
                 }
             }
         }
-        //FIXME
+        // FIXME
         onCurrentIndexChanged: root.reachableMode = false;
-
-        function goBack() {
-            //NOTE: drawers are handling the back button by themselves
-            let backEvent = {accepted: false}
-            if (root.pageStack.hasOwnProperty("layers") && root.pageStack.layers && root.pageStack.layers.depth > 1) {
-                root.pageStack.layers.currentItem.backRequested(backEvent);
-                if (!backEvent.accepted) {
-                    root.pageStack.layers.pop();
-                    backEvent.accepted = true;
-                }
-            } else {
-                root.pageStack.currentItem.backRequested(backEvent);
-                if (root.pageStack.currentIndex >= 1) {
-                    if (!backEvent.accepted) {
-                        root.pageStack.flickBack();
-                        backEvent.accepted = true;
-                    }
-                }
-            }
-
-            if (Kirigami.Settings.isMobile && !backEvent.accepted && Qt.platform.os !== "ios") {
-                Qt.quit();
-            }
-        }
-        function goForward() {
-            root.pageStack.currentIndex = Math.min(root.pageStack.depth-1, root.pageStack.currentIndex + 1);
-        }
-        Keys.onBackPressed: {
-            goBack();
-            event.accepted = true
-        }
-        Shortcut {
-            sequence: "Forward"
-            onActivated: __pageStack.goForward();
-        }
-        Shortcut {
-            sequence: StandardKey.Forward
-            onActivated: __pageStack.goForward();
-        }
-        Shortcut {
-            sequence: StandardKey.Back
-            onActivated: __pageStack.goBack();
-        }
 
         focus: true
     }

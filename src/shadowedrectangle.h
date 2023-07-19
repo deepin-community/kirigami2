@@ -12,21 +12,23 @@
 class PaintedRectangleItem;
 
 /**
- * Grouped property for rectangle border.
+ * @brief Grouped property for rectangle border.
  */
 class BorderGroup : public QObject
 {
     Q_OBJECT
     /**
-     * The width of the border in pixels.
+     * @brief This property holds the border's width in pixels.
      *
-     * Default is 0.
+     * default: ``0``px
      */
     Q_PROPERTY(qreal width READ width WRITE setWidth NOTIFY changed)
     /**
-     * The color of the border.
+     * @brief This property holds the border's color.
      *
-     * Full RGBA colors are supported. The default is fully opaque black.
+     * Full RGBA colors are supported.
+     *
+     * default: ``Qt::black``
      */
     Q_PROPERTY(QColor color READ color WRITE setColor NOTIFY changed)
 
@@ -52,35 +54,36 @@ private:
 };
 
 /**
- * Grouped property for rectangle shadow.
+ * @brief Grouped property for the rectangle's shadow.
  */
 class ShadowGroup : public QObject
 {
     Q_OBJECT
     /**
-     * The size of the shadow.
+     * @brief This property holds the shadow's approximate size in pixels.
+     * @note The actual shadow size can be less than this value due to falloff.
      *
-     * This is the approximate size of the shadow in pixels. However, due to falloff
-     * the actual shadow size can differ. The default is 0, which means no shadow will
-     * be rendered.
+     * default: ``0``px
      */
     Q_PROPERTY(qreal size READ size WRITE setSize NOTIFY changed)
     /**
-     * Offset of the shadow on the X axis.
+     * @brief This property holds the shadow's offset in pixels on the X axis.
      *
-     * In pixels. The default is 0.
+     * default: ``0``px
      */
     Q_PROPERTY(qreal xOffset READ xOffset WRITE setXOffset NOTIFY changed)
     /**
-     * Offset of the shadow on the Y axis.
+     * @brief This property holds the shadow's offset in pixels on the Y axis.
      *
-     * In pixels. The default is 0.
+     * default: ``0``px
      */
     Q_PROPERTY(qreal yOffset READ yOffset WRITE setYOffset NOTIFY changed)
     /**
-     * The color of the shadow.
+     * @brief This property holds the shadow's color.
      *
-     * Full RGBA colors are supported. The default is fully opaque black.
+     * Full RGBA colors are supported.
+     *
+     * default: ``Qt::black``
      */
     Q_PROPERTY(QColor color READ color WRITE setColor NOTIFY changed)
 
@@ -109,33 +112,44 @@ private:
 };
 
 /**
- * Grouped property for corner radius.
+ * @brief Grouped property for corner radius.
  */
 class CornersGroup : public QObject
 {
     Q_OBJECT
     /**
-     * The radius of the top-left corner.
+     * @brief This property holds the top-left corner's radius in pixels.
      *
-     * In pixels. Defaults to -1, which indicates this value should not be used.
+     * Setting this to ``-1`` indicates that the value should be ignored.
+     * 
+     * default: ``-1``px
      */
     Q_PROPERTY(qreal topLeftRadius READ topLeft WRITE setTopLeft NOTIFY changed)
+
     /**
-     * The radius of the top-right corner.
+     * @brief This property holds the top-right corner's radius in pixels.
      *
-     * In pixels. Defaults to -1, which indicates this value should not be used.
+     * Setting this to ``-1`` indicates that the value should be ignored.
+     * 
+     * default: ``-1``px
      */
     Q_PROPERTY(qreal topRightRadius READ topRight WRITE setTopRight NOTIFY changed)
+
     /**
-     * The radius of the bottom-left corner.
+     * @brief This property holds the bottom-left corner's radius in pixels.
      *
-     * In pixels. Defaults to -1, which indicates this value should not be used.
+     * Setting this to ``-1`` indicates that the value should be ignored.
+     * 
+     * default: ``-1``px
      */
     Q_PROPERTY(qreal bottomLeftRadius READ bottomLeft WRITE setBottomLeft NOTIFY changed)
+
     /**
-     * The radius of the bottom-right corner.
+     * @brief This property holds the bottom-right corner's radius in pixels.
      *
-     * In pixels. Defaults to -1, which indicates this value should not be used.
+     * Setting this to ``-1`` indicates that the value should be ignored.
+     * 
+     * default: ``-1``px
      */
     Q_PROPERTY(qreal bottomRightRadius READ bottomRight WRITE setBottomRight NOTIFY changed)
 
@@ -166,97 +180,145 @@ private:
 };
 
 /**
- * A rectangle with a shadow.
+ * @brief A rectangle with a shadow behind it.
  *
  * This item will render a rectangle, with a shadow below it. The rendering is done
  * using distance fields, which provide greatly improved performance. The shadow is
  * rendered outside of the item's bounds, so the item's width and height are the
  * rectangle's width and height.
  *
- * @since 5.69 / 2.12
+ * @since 5.69
+ * @since 2.12
  */
 class ShadowedRectangle : public QQuickItem
 {
     Q_OBJECT
     /**
-     * Corner radius of the rectangle.
+     * @brief This property holds the radii of the rectangle's corners.
      *
      * This is the amount of rounding to apply to all of the rectangle's
-     * corners, in pixels. Individual corners can have a different radius, see
-     * \property corners.
+     * corners, in pixels. Each corner can have a different radius.
      *
-     * The default is 0.
+     * default: ``0``
+     *
+     * @see corners
      */
     Q_PROPERTY(qreal radius READ radius WRITE setRadius NOTIFY radiusChanged)
+
     /**
-     * The color of the rectangle.
+     * @brief This property holds the rectangle's color.
      *
-     * Full RGBA colors are supported. The default is fully opaque white.
+     * Full RGBA colors are supported.
+     *
+     * default: ``Qt::white``
      */
     Q_PROPERTY(QColor color READ color WRITE setColor NOTIFY colorChanged)
+
     /**
-     * Border properties.
+     * @brief This property holds the border's grouped property.
      *
-     * \sa BorderGroup
+     * Example usage:
+     * @code
+     * Kirigami.ShadowedRectangle {
+     *     border.width: 2
+     *     border.color: Kirigami.Theme.textColor
+     * }
+     * @endcode
+     * @see BorderGroup
      */
     Q_PROPERTY(BorderGroup *border READ border CONSTANT)
+
     /**
-     * Shadow properties.
+     * @brief This property holds the shadow's grouped property.
      *
-     * \sa ShadowGroup
+     * Example usage:
+     * @code
+     * Kirigami.ShadowedRectangle {
+     *     shadow.size: 20
+     *     shadow.xOffset: 5
+     *     shadow.yOffset: 5
+     * }
+     * @endcode
+     *
+     * @see ShadowGroup
      */
     Q_PROPERTY(ShadowGroup *shadow READ shadow CONSTANT)
+
     /**
-     * Corner radius.
+     * @brief This property holds the corners grouped property
      *
      * Note that the values from this group override \property radius for the
      * corner they affect.
      *
-     * \sa CornerGroup
+     * Example usage:
+     * @code
+     * Kirigami.ShadowedRectangle {
+     *     corners.topLeftRadius: 4
+     *     corners.topRightRadius: 5
+     *     corners.bottomLeftRadius: 2
+     *     corners.bottomRightRadius: 10
+     * @endcode
+     *
+     * @see CornersGroup
      */
     Q_PROPERTY(CornersGroup *corners READ corners CONSTANT)
 
     /**
-     * Render type of the rectangle and shadow.
+     * @brief This property holds the rectangle's render mode.
      *
-     * The default is Auto.
+     * default: ``RenderType::Auto``
+     *
+     * @see RenderType
      */
     Q_PROPERTY(RenderType renderType READ renderType WRITE setRenderType CONSTANT)
 
+    /**
+     * @brief This property tells whether software rendering is being used.
+     *
+     * default: ``false``
+     */
     Q_PROPERTY(bool softwareRendering READ isSoftwareRendering NOTIFY softwareRenderingChanged)
+
 public:
     ShadowedRectangle(QQuickItem *parent = nullptr);
     ~ShadowedRectangle() override;
 
     /**
-     * Available rendering types for ShadowedRectangle.
+     * @brief Available rendering types for ShadowedRectangle.
      */
     enum RenderType {
+
         /**
-         * Automatically determine the optimal rendering type.
+         * @brief Automatically determine the optimal rendering type.
+         *
          * This will use the highest rendering quality possible, falling back to
          * lower quality if the hardware doesn't support it. It will use software
          * rendering if the QtQuick scene graph is set to use software rendering.
          */
         Auto,
+
         /**
-         * Use the highest rendering quality possible, even if the hardware might
+         * @brief Use the highest rendering quality possible, even if the hardware might
          * not be able to handle it normally.
          */
         HighQuality,
+
         /**
-         * Use the lowest rendering quality, even if the hardware could handle 
-         * higher quality rendering. This might result in certain effects being
-         * omitted, like shadows.
+         * @brief Use the lowest rendering quality, even if the hardware could handle
+         * higher quality rendering.
+         *
+         * This might result in certain effects being omitted, like shadows.
          */
         LowQuality,
+
         /**
-         * Always use software rendering for this rectangle.
-         * Software rendering is intended as a fallback when the QtQuick scene 
-         * graph is configured to use software rendering. It will result in 
+         * @brief Always use software rendering for this rectangle.
+         *
+         * Software rendering is intended as a fallback when the QtQuick scene
+         * graph is configured to use software rendering. It will result in
          * a number of missing features, like shadows and multiple corner radii.
          */
-        Software 
+        Software
     };
     Q_ENUM(RenderType)
 

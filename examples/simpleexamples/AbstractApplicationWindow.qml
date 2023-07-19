@@ -4,13 +4,14 @@
  *  SPDX-License-Identifier: LGPL-2.0-or-later
  */
 
-import QtQuick 2.1
-import QtQuick.Layouts 1.2
-import QtQuick.Controls 2.0 as Controls
-import org.kde.kirigami 2.4 as Kirigami
+import QtQuick 2.15
+import QtQuick.Layouts 1.15
+import QtQuick.Controls 2.15 as QQC2
+import org.kde.kirigami 2.20 as Kirigami
 
 Kirigami.AbstractApplicationWindow {
     id: root
+
     width: 500
     height: 800
     visible: true
@@ -65,19 +66,19 @@ Kirigami.AbstractApplicationWindow {
                     pageStack.push(settingsComponent);
                 }
             }
-            ]
+        ]
 
-        Controls.CheckBox {
+        QQC2.CheckBox {
             checked: true
             text: "Option 1"
         }
-        Controls.CheckBox {
+        QQC2.CheckBox {
             text: "Option 2"
         }
-        Controls.CheckBox {
+        QQC2.CheckBox {
             text: "Option 3"
         }
-        Controls.Slider {
+        QQC2.Slider {
             Layout.fillWidth: true
             value: 0.5
         }
@@ -86,7 +87,7 @@ Kirigami.AbstractApplicationWindow {
         id: contextDrawer
     }
 
-    pageStack: Controls.StackView {
+    pageStack: QQC2.StackView {
         anchors.fill: parent
         property int currentIndex: 0
         focus: true
@@ -100,9 +101,9 @@ Kirigami.AbstractApplicationWindow {
         }
         initialItem: mainPageComponent
 
-        Keys.onReleased: {
-            if (event.key == Qt.Key_Back ||
-            (event.key === Qt.Key_Left && (event.modifiers & Qt.AltModifier))) {
+        Keys.onReleased: event => {
+            if (event.key === Qt.Key_Back ||
+                    (event.key === Qt.Key_Left && (event.modifiers & Qt.AltModifier))) {
                 event.accepted = true;
                 if (root.contextDrawer && root.contextDrawer.drawerOpen) {
                     root.contextDrawer.close();
@@ -130,7 +131,6 @@ Kirigami.AbstractApplicationWindow {
         }
     }
 
-
     Component {
         id: settingsComponent
         Kirigami.Page {
@@ -147,5 +147,4 @@ Kirigami.AbstractApplicationWindow {
         id: mainPageComponent
         MultipleColumnsGallery {}
     }
-
 }

@@ -5,18 +5,21 @@
  */
 
 import QtQuick 2.15
-import QtQuick.Controls 2.15 as Controls
-import QtQuick.Layouts 1.15
+import QtQuick.Controls 2.15 as QQC2
 import org.kde.kirigami 2.19 as Kirigami
 
-Controls.TabBar {
+/**
+ * @warning This will probably be deprecated in KF6.
+ */
+// TODO KF6 deprecated
+QQC2.TabBar {
     id: root
     property Kirigami.PageRow pageRow: parent.pageRow
 
     Repeater {
         id: mainRepeater
         model: pageRow.depth
-        delegate: Controls.TabButton {
+        delegate: QQC2.TabButton {
             anchors {
                 top:parent.top
                 bottom:parent.bottom

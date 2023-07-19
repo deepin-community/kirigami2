@@ -12,10 +12,10 @@ ManagedTextureNode::ManagedTextureNode()
 {
 }
 
-void ManagedTextureNode::setTexture(QSharedPointer<QSGTexture> texture)
+void ManagedTextureNode::setTexture(std::shared_ptr<QSGTexture> texture)
 {
     m_texture = texture;
-    QSGSimpleTextureNode::setTexture(texture.data());
+    QSGSimpleTextureNode::setTexture(texture.get());
 }
 
 ImageTexturesCache::ImageTexturesCache()
@@ -27,35 +27,35 @@ ImageTexturesCache::~ImageTexturesCache()
 {
 }
 
-QSharedPointer<QSGTexture> ImageTexturesCache::loadTexture(QQuickWindow *window, const QImage &image, QQuickWindow::CreateTextureOptions options)
+std::shared_ptr<QSGTexture> ImageTexturesCache::loadTexture(QQuickWindow *window, const QImage &image, QQuickWindow::CreateTextureOptions options)
 {
     qint64 id = image.cacheKey();
-    QSharedPointer<QSGTexture> texture = d->cache.value(id).value(window).toStrongRef();
+    std::shared_ptr<QSGTexture> texture = d->cache.value(id).value(window).lock();
 
     if (!texture) {
         auto cleanAndDelete = [this, window, id](QSGTexture *texture) {
-            QHash<QWindow *, QWeakPointer<QSGTexture>> &textures = (d->cache)[id];
+            QHash<QWindow *, std::weak_ptr<QSGTexture>> &textures = (d->cache)[id];
             textures.remove(window);
             if (textures.isEmpty()) {
                 d->cache.remove(id);
             }
             delete texture;
         };
-        texture = QSharedPointer<QSGTexture>(window->createTextureFromImage(image, options), cleanAndDelete);
-        (d->cache)[id][window] = texture.toWeakRef();
+        texture = std::shared_ptr<QSGTexture>(window->createTextureFromImage(image, options), cleanAndDelete);
+        (d->cache)[id][window] = texture;
     }
 
     // if we have a cache in an atlas but our request cannot use an atlassed texture
     // create a new texture and use that
     // don't use removedFromAtlas() as that requires keeping a reference to the non atlased version
     if (!(options & QQuickWindow::TextureCanUseAtlas) && texture->isAtlasTexture()) {
-        texture = QSharedPointer<QSGTexture>(window->createTextureFromImage(image, options));
+        texture = std::shared_ptr<QSGTexture>(window->createTextureFromImage(image, options));
     }
 
     return texture;
 }
 
-QSharedPointer<QSGTexture> ImageTexturesCache::loadTexture(QQuickWindow *window, const QImage &image)
+std::shared_ptr<QSGTexture> ImageTexturesCache::loadTexture(QQuickWindow *window, const QImage &image)
 {
     return loadTexture(window, image, {});
 }

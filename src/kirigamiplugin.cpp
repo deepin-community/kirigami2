@@ -15,6 +15,7 @@
 #include "formlayoutattached.h"
 #include "icon.h"
 #include "imagecolors.h"
+#include "inputmethod.h"
 #include "mnemonicattached.h"
 #include "pagepool.h"
 #include "pagerouter.h"
@@ -25,8 +26,8 @@
 #include "sizegroup.h"
 #include "spellcheckinghint.h"
 #include "toolbarlayout.h"
-#include "wheelhandler.h"
 #include "units.h"
+#include "wheelhandler.h"
 
 #include <QClipboard>
 #include <QGuiApplication>
@@ -45,7 +46,6 @@ static QString s_selectedStyle;
 
 #ifdef KIRIGAMI_BUILD_TYPE_STATIC
 #include "loggingcategory.h"
-#include "qrc_kirigami.cpp"
 #include <QDebug>
 #endif
 
@@ -93,11 +93,14 @@ QUrl KirigamiPlugin::componentUrl(const QString &fileName) const
 
 using SingletonCreationFunction = QObject *(*)(QQmlEngine *, QJSEngine *);
 
-template<typename T>
+template<class T>
 inline SingletonCreationFunction singleton()
 {
-    return [](QQmlEngine *, QJSEngine *) -> QObject * {
-        return new T;
+    static_assert(std::is_base_of<QObject, T>::value);
+    return [](QQmlEngine *engine, QJSEngine *) -> QObject * {
+        auto x = new T;
+        x->setParent(engine);
+        return x;
     };
 }
 
@@ -314,6 +317,16 @@ void KirigamiPlugin::registerTypes(const char *uri)
     qmlRegisterType(componentUrl(QStringLiteral("Dialog.qml")), uri, 2, 19, "Dialog");
     qmlRegisterType(componentUrl(QStringLiteral("MenuDialog.qml")), uri, 2, 19, "MenuDialog");
     qmlRegisterType(componentUrl(QStringLiteral("PromptDialog.qml")), uri, 2, 19, "PromptDialog");
+    qmlRegisterType(componentUrl(QStringLiteral("AbstractChip.qml")), uri, 2, 19, "AbstractChip");
+    qmlRegisterType(componentUrl(QStringLiteral("Chip.qml")), uri, 2, 19, "Chip");
+    qmlRegisterType(componentUrl(QStringLiteral("LoadingPlaceholder.qml")), uri, 2, 19, "LoadingPlaceholder");
+
+    qmlRegisterSingletonType<InputMethod>(uri, 2, 19, "InputMethod", [](QQmlEngine *, QJSEngine *) {
+        return new InputMethod{};
+    });
+
+    // 2.20
+    qmlRegisterType(componentUrl(QStringLiteral("SelectableLabel.qml")), uri, 2, 20, "SelectableLabel");
 
     qmlProtectModule(uri, 2);
 }
@@ -334,6 +347,8 @@ KirigamiPlugin& KirigamiPlugin::getInstance()
 void KirigamiPlugin::registerTypes(QQmlEngine* engine)
 {
     Q_INIT_RESOURCE(shaders);
+    Q_INIT_RESOURCE(KirigamiPlugin);
+
     if (engine) {
         engine->addImportPath(QLatin1String(":/"));
     }

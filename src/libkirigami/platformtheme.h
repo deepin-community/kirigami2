@@ -13,7 +13,7 @@
 #include <QPalette>
 #include <QQuickItem>
 
-#include <kirigami2_export.h>
+#include "kirigami2_export.h"
 
 namespace Kirigami
 {
@@ -21,7 +21,7 @@ class PlatformThemeData;
 class PlatformThemePrivate;
 
 /**
- * @class PlatformTheme platformtheme.h PlatformTheme
+ * @class PlatformTheme platformtheme.h <Kirigami/PlatformTheme>
  *
  * This class is the base for color management in Kirigami,
  * different platforms can reimplement this class to integrate with

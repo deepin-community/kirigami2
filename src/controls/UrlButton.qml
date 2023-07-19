@@ -5,26 +5,32 @@
  */
 
 import QtQuick 2.2
+import org.kde.kirigami 2.20 as Kirigami
 import org.kde.kirigami.private 2.6 as KirigamiPrivate
 import QtQuick.Controls 2.1 as QQC2
 
 /**
- * A link button that contains a URL
+ * @brief A link button that contains a URL.
  *
  * It will open the url by default, allow to copy it if triggered with the
  * secondary mouse button.
  *
  * @since 5.63
  * @since org.kde.kirigami 2.6
+ * @inherit QtQuick.LinkButton
  */
-LinkButton
-{
+Kirigami.LinkButton {
     id: button
+
     property string url
+
     text: url
     enabled: !!url
     visible: text.length > 0
     acceptedButtons: Qt.LeftButton | Qt.RightButton
+
+    Accessible.name: button.text !== button.url ? button.text : button.url
+    Accessible.description: i18nc("@info:whatsthis", "Open link %1", button.text !== button.url ? button.url : "")
 
     onPressed: if (mouse.button === Qt.RightButton) {
         menu.popup()
@@ -35,14 +41,15 @@ LinkButton
 
     QQC2.ToolTip {
         // If button's text has been overridden, show a tooltip to expose the raw URL
-        visible: button.text != button.url && button.mouseArea.containsMouse
+        visible: button.text !== button.url && button.mouseArea.containsMouse
         text: url
     }
 
     QQC2.Menu {
         id: menu
         QQC2.MenuItem {
-            text: qsTr("Copy link address")
+            text: qsTr("Copy Link to Clipboard")
+            icon.name: "edit-copy"
             onClicked: KirigamiPrivate.CopyHelperPrivate.copyTextToClipboard(button.url)
         }
     }

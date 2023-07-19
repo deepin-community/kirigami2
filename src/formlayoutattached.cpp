@@ -33,13 +33,13 @@ QString FormLayoutAttached::label() const
     return m_label;
 }
 
-void FormLayoutAttached::setLabelAlignment(int section)
+void FormLayoutAttached::setLabelAlignment(int alignment)
 {
-    if (m_labelAlignment == section) {
+    if (m_labelAlignment == alignment) {
         return;
     }
 
-    m_labelAlignment = section;
+    m_labelAlignment = alignment;
     Q_EMIT labelAlignmentChanged();
 }
 

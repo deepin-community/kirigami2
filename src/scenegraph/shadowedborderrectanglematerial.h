@@ -19,7 +19,11 @@ class ShadowedBorderRectangleMaterial : public ShadowedRectangleMaterial
 public:
     ShadowedBorderRectangleMaterial();
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     QSGMaterialShader *createShader() const override;
+#else
+    QSGMaterialShader *createShader(QSGRendererInterface::RenderMode) const override;
+#endif
     QSGMaterialType *type() const override;
     int compare(const QSGMaterial *other) const override;
 
@@ -34,10 +38,14 @@ class ShadowedBorderRectangleShader : public ShadowedRectangleShader
 public:
     ShadowedBorderRectangleShader(ShadowedRectangleMaterial::ShaderType shaderType);
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     void initialize() override;
     void updateState(const QSGMaterialShader::RenderState &state, QSGMaterial *newMaterial, QSGMaterial *oldMaterial) override;
 
 private:
     int m_borderWidthLocation = -1;
     int m_borderColorLocation = -1;
+#else
+    bool updateUniformData(QSGMaterialShader::RenderState &state, QSGMaterial *newMaterial, QSGMaterial *oldMaterial) override;
+#endif
 };

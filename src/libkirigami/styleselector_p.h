@@ -9,7 +9,7 @@
 
 #include <QStringList>
 
-#include <kirigami2_export.h>
+#include "kirigami2_export.h"
 
 class QUrl;
 

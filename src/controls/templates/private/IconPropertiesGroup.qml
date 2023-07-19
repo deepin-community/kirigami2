@@ -7,13 +7,14 @@
 import QtQml 2.1
 
 /**
- * \brief Group of icon properties.
+ * @brief Group of icon properties.
  * 
  * This is a subset of those used in QQC2, Kirigami.Action still needs the full one as needs 100% api compatibility
  */
 QtObject {
     /**
-     * This property holds the name of the icon to use.
+     * @brief This property holds icon name.
+     *
      * The icon will be loaded from the platform theme. If the icon is found
      * in the theme, it will always be used; even if icon.source is also set.
      * If the icon is not found, icon.source will be used instead.
@@ -21,13 +22,16 @@ QtObject {
     property string name
     
     /**
-     * This property holds the name of the icon to use.
+     * @brief This property holds the icon source.
+     *
      * The icon will be loaded as a regular image.
+     *
+     * @see QtQuick.Image::source
      */
     property var source
 
     /**
-     * This property holds the color of the icon.
+     * @brief This property holds the icon tint color.
      *
      * The icon is tinted with the specified color, unless the color is set to "transparent".
      */

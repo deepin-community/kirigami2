@@ -4,22 +4,81 @@
  */
 
 import QtQuick 2.15
-import QtQuick.Templates 2.15 as T
-import QtQuick.Controls 2.15 as QQC2
 import QtQuick.Layouts 1.15
+import QtQuick.Controls 2.15 as QQC2
+import QtQuick.Templates 2.15 as T
 import org.kde.kirigami 2.19 as Kirigami
-import QtGraphicalEffects 1.15
 
+/**
+ * @brief Navigation buttons to be used for the NavigationTabBar component.
+ *
+ * It supplies its own padding, and also supports using the QQC2 AbstractButton ``display`` property to be used in column lists.
+ *
+ * Alternative way to the "actions" property on NavigationTabBar, as it can be used
+ * with Repeater to generate buttons from models.
+ *
+ * Example usage:
+ * @code{.qml}
+ * Kirigami.NavigationTabBar {
+ *      id: navTabBar
+ *      Kirigami.NavigationTabButton {
+ *          visible: true
+ *          icon.name: "document-save"
+ *          text: `test ${tabIndex + 1}`
+ *          QQC2.ButtonGroup.group: navTabBar.tabGroup
+ *      }
+ *      Kirigami.NavigationTabButton {
+ *          visible: false
+ *          icon.name: "document-send"
+ *          text: `test ${tabIndex + 1}`
+ *          QQC2.ButtonGroup.group: navTabBar.tabGroup
+ *      }
+ *      actions: [
+ *          Kirigami.Action {
+ *              visible: true
+ *              icon.name: "edit-copy"
+ *              icon.height: 32
+ *              icon.width: 32
+ *              text: `test 3`
+ *              checked: true
+ *          },
+ *          Kirigami.Action {
+ *              visible: true
+ *              icon.name: "edit-cut"
+ *              text: `test 4`
+ *              checkable: true
+ *          },
+ *          Kirigami.Action {
+ *              visible: false
+ *              icon.name: "edit-paste"
+ *              text: `test 5`
+ *          },
+ *          Kirigami.Action {
+ *              visible: true
+ *              icon.source: "../logo.png"
+ *              text: `test 6`
+ *              checkable: true
+ *          }
+ *      ]
+ *  }
+ * @endcode
+ *
+ * @since 5.87
+ * @since org.kde.kirigami 2.19
+ * @inherit QtQuick.Templates.TabButton
+ */
 T.TabButton {
     id: control
 
     /**
-     * The index of this tab within the tab bar.
+     * @brief This property tells the index of this tab within the tab bar.
      */
     readonly property int tabIndex: {
         let tabIdx = 0
         for (let i = 0; i < parent.children.length; ++i) {
-            if (parent.children[i] === this) return tabIdx
+            if (parent.children[i] === this) {
+                return tabIdx
+            }
             // Checking for AbstractButtons because any AbstractButton can act as a tab
             if (parent.children[i] instanceof T.AbstractButton) {
                 ++tabIdx
@@ -28,32 +87,35 @@ T.TabButton {
         return -1
     }
 
-    property color foregroundColor: Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.7)
-    property color highlightForegroundColor: Kirigami.ColorUtils.tintWithAlpha(Kirigami.Theme.highlightColor, Kirigami.Theme.textColor, 0.5)
+    /**
+     * @brief This property sets whether the icon colors should be masked with a single color.
+     *
+     * default: ``true``
+     *
+     * @since 5.96
+     */
+    property bool recolorIcon: true
+
+    property color foregroundColor: Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.85)
+    property color highlightForegroundColor: Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.85)
     property color highlightBarColor: Kirigami.Theme.highlightColor
+
+    property color pressedColor: Qt.rgba(highlightBarColor.r, highlightBarColor.g, highlightBarColor.b, 0.3)
+    property color hoverSelectColor: Qt.rgba(highlightBarColor.r, highlightBarColor.g, highlightBarColor.b, 0.2)
+    property color checkedBorderColor: Qt.rgba(highlightBarColor.r, highlightBarColor.g, highlightBarColor.b, 0.7)
+    property color pressedBorderColor: Qt.rgba(highlightBarColor.r, highlightBarColor.g, highlightBarColor.b, 0.9)
 
     implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset,
                             implicitContentWidth + leftPadding + rightPadding)
     implicitHeight: Math.max(implicitBackgroundHeight + topInset + bottomInset,
                              implicitContentHeight + topPadding + bottomPadding)
 
-    width: {
-        // Counting buttons because Repeaters can be counted among visibleChildren
-        let visibleButtonCount = 0, minWidth = height * 0.75;
-        for (let i = 0; i < parent.visibleChildren.length; ++i) {
-            if (parent.width / visibleButtonCount >= minWidth && // make buttons go off the screen if there is physically no room for them
-                parent.visibleChildren[i] instanceof T.AbstractButton) { // Checking for AbstractButtons because any AbstractButton can act as a tab
-                ++visibleButtonCount
-            }
-        }
-        
-        return Math.round(parent.width / visibleButtonCount)
-    }
+    display: T.AbstractButton.TextUnderIcon
 
     Kirigami.Theme.colorSet: Kirigami.Theme.Window
     Kirigami.Theme.inherit: false
 
-    // not using the hover handler built into control, since it seems to misbehave and 
+    // not using the hover handler built into control, since it seems to misbehave and
     // permanently report hovered after a touch event
     HoverHandler {
         id: hoverHandler
@@ -62,53 +124,68 @@ T.TabButton {
     padding: Kirigami.Units.smallSpacing
     spacing: Kirigami.Units.smallSpacing
 
-    icon.height: Kirigami.Units.iconSizes.smallMedium
-    icon.width: Kirigami.Units.iconSizes.smallMedium
+    icon.height: control.display === T.AbstractButton.TextBesideIcon ? Kirigami.Units.iconSizes.small : Kirigami.Units.iconSizes.smallMedium
+    icon.width: control.display === T.AbstractButton.TextBesideIcon ? Kirigami.Units.iconSizes.small : Kirigami.Units.iconSizes.smallMedium
     icon.color: control.checked ? control.highlightForegroundColor : control.foregroundColor
 
     background: Rectangle {
-        implicitHeight: Kirigami.Units.gridUnit * 3 + Kirigami.Units.smallSpacing * 2
-        color: control.down ? Qt.rgba(0, 0, 0, 0.2)
-            : (hoverHandler.hovered ? Qt.rgba(0, 0, 0, 0.1)
-            : "transparent")
-        Behavior on color { ColorAnimation { duration: Kirigami.Units.shortDuration } }
-        // top highlight rectangle (if control is selected)
+        Kirigami.Theme.colorSet: Kirigami.Theme.Button
+        Kirigami.Theme.inherit: false
+
+        implicitHeight: (control.display === T.AbstractButton.TextBesideIcon) ? 0 : (Kirigami.Units.gridUnit * 3 + Kirigami.Units.smallSpacing * 2)
+
+        color: "transparent"
+
         Rectangle {
-            id: highlightRectangle
-            opacity: control.checked ? 1 : 0
-            color: control.highlightBarColor
-            anchors.top: parent.top
-            anchors.left: parent.left
-            anchors.right: parent.right
-            height: 2
-            Behavior on opacity { NumberAnimation { duration: Kirigami.Units.longDuration } }
-        }
-        Rectangle {
-            id: highlightShadow
-            visible: opacity === 0
-            opacity: control.checked ? 0.3 : 0
-            anchors.top: highlightRectangle.bottom
-            anchors.left: parent.left
-            anchors.right: parent.right
-            height: 2
-            gradient: Gradient {
-                GradientStop { position: 0.0; color: highlightRectangle.color }
-                GradientStop { position: 1.0; color: "transparent" }
-            }
-            Behavior on opacity { NumberAnimation { duration: Kirigami.Units.longDuration } }
+            width: parent.width - Kirigami.Units.largeSpacing
+            height: parent.height - Kirigami.Units.largeSpacing
+            anchors.centerIn: parent
+
+            radius: Kirigami.Units.smallSpacing
+            color: control.pressed ? pressedColor : (control.checked || hoverHandler.hovered ? hoverSelectColor : "transparent")
+
+            border.color: control.checked ? checkedBorderColor : (control.pressed ? pressedBorderColor : color)
+            border.width: 1
+
+            Behavior on color { ColorAnimation { duration: Kirigami.Units.shortDuration } }
+            Behavior on border.color { ColorAnimation { duration: Kirigami.Units.shortDuration } }
         }
     }
 
-    contentItem: ColumnLayout {
-        spacing: label.lineCount > 1 ? 0 : control.spacing
+    contentItem: GridLayout {
+        id: gridLayout
+        columnSpacing: 0
+        rowSpacing: (label.visible && label.lineCount > 1) ? 0 : control.spacing
+
+        // if this is a row or a column
+        columns: control.display !== T.AbstractButton.TextBesideIcon ? 1 : 2
+
+        property real verticalMargins: (control.display === T.AbstractButton.TextBesideIcon) ? Kirigami.Units.largeSpacing : 0
 
         Kirigami.Icon {
+            id: icon
             source: control.icon.name || control.icon.source
-            isMask: true
-            Layout.alignment: Qt.AlignHCenter | (label.lineCount > 1 ? 0 : Qt.AlignBottom)
-            implicitHeight: control.icon.height
-            implicitWidth: control.icon.width
+            isMask: control.recolorIcon
+            visible: control.icon.name !== '' && control.icon.source !== '' && control.display !== T.AbstractButton.TextOnly
             color: control.icon.color
+
+            Layout.topMargin: gridLayout.verticalMargins
+            Layout.bottomMargin: gridLayout.verticalMargins
+            Layout.leftMargin: (control.display === T.AbstractButton.TextBesideIcon) ? Kirigami.Units.gridUnit : 0
+            Layout.rightMargin: (control.display === T.AbstractButton.TextBesideIcon) ? Kirigami.Units.gridUnit : 0
+
+            Layout.alignment: {
+                if (control.display === T.AbstractButton.TextBesideIcon) {
+                    // row layout
+                    return Qt.AlignVCenter | Qt.AlignRight;
+                } else {
+                    // column layout
+                    return Qt.AlignHCenter | ((!label.visible || label.lineCount > 1) ? Qt.AlignVCenter : Qt.AlignBottom);
+                }
+            }
+            implicitHeight: source ? control.icon.height : 0
+            implicitWidth: source ? control.icon.width : 0
+
             Behavior on color { ColorAnimation {} }
             Behavior on opacity { NumberAnimation {} }
         }
@@ -117,27 +194,48 @@ T.TabButton {
             Kirigami.MnemonicData.enabled: control.enabled && control.visible
             Kirigami.MnemonicData.controlType: Kirigami.MnemonicData.MenuItem
             Kirigami.MnemonicData.label: control.text
-            
-            text: Kirigami.MnemonicData.richTextLabel
-            Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
-            horizontalAlignment: Text.AlignHCenter
 
+            text: Kirigami.MnemonicData.richTextLabel
+            horizontalAlignment: (control.display === T.AbstractButton.TextBesideIcon) ? Text.AlignLeft : Text.AlignHCenter
+
+            visible: control.display !== T.AbstractButton.IconOnly
             wrapMode: Text.Wrap
             elide: Text.ElideMiddle
             color: control.checked ? control.highlightForegroundColor : control.foregroundColor
-            
+
             font.bold: control.checked
             font.family: Kirigami.Theme.smallFont.family
-            font.pointSize: Kirigami.Theme.smallFont.pointSize
-            
+            font.pointSize: {
+                if (control.display === T.AbstractButton.TextBesideIcon) {
+                    // row layout
+                    return Kirigami.Theme.defaultFont.pointSize;
+                } else {
+                    // column layout
+                    return icon.visible ? Kirigami.Theme.smallFont.pointSize : Kirigami.Theme.defaultFont.pointSize * 1.20; // 1.20 is equivalent to level 2 heading
+                }
+            }
+
             Behavior on color { ColorAnimation {} }
             Behavior on opacity { NumberAnimation {} }
-            
+
+            Layout.topMargin: gridLayout.verticalMargins
+            Layout.bottomMargin: gridLayout.verticalMargins
+
+            Layout.alignment: {
+                if (control.display === T.AbstractButton.TextBesideIcon) {
+                    // row layout
+                    return Qt.AlignVCenter | Qt.AlignLeft;
+                } else {
+                    // column layout
+                    return icon.visible ? Qt.AlignHCenter | Qt.AlignTop : Qt.AlignCenter;
+                }
+            }
+
             // Work around bold text changing implicit size
             Layout.preferredWidth: boldMetrics.implicitWidth
             Layout.preferredHeight: boldMetrics.implicitHeight * label.lineCount
             Layout.fillWidth: true
-            
+
             QQC2.Label {
                 id: boldMetrics
                 visible: false

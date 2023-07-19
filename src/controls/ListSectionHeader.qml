@@ -5,11 +5,12 @@
  */
 
 import QtQuick 2.5
+import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.2
 import org.kde.kirigami 2.10 as Kirigami
 
 /**
- * A section delegate for the primitive ListView component.
+ * @brief A section delegate for the primitive ListView component.
  *
  * It's intended to make all listviews look coherent.
  *
@@ -35,22 +36,17 @@ import org.kde.kirigami 2.10 as Kirigami
  *  [...]
  * }
  * @endcode
- *
  */
 Kirigami.AbstractListItem {
     id: listSection
 
     /**
-     * label: string
-     * A single text label the list section header will contain
+     * @brief This property sets the text of the ListView's section header.
+     * @property string label
      */
     property alias label: listSection.text
 
     default property alias _contents: rowLayout.data
-
-    backgroundColor: Kirigami.Theme.backgroundColor
-    Kirigami.Theme.inherit: false
-    Kirigami.Theme.colorSet: Kirigami.Theme.Window
 
     separatorVisible: false
     sectionDelegate: true
@@ -58,13 +54,32 @@ Kirigami.AbstractListItem {
 
     activeFocusOnTab: false
 
+    // we do not need a background
+    background: Item {}
+
+    topPadding: Kirigami.Units.largeSpacing + Kirigami.Units.smallSpacing
+
     contentItem: RowLayout {
         id: rowLayout
+        spacing: Kirigami.Units.largeSpacing
 
         Kirigami.Heading {
-            level: 3
-            text: listSection.text
             Layout.fillWidth: rowLayout.children.length === 1
+            Layout.alignment: Qt.AlignVCenter
+
+            opacity: 0.7
+            level: 5
+            type: Kirigami.Heading.Primary
+            text: listSection.text
+            elide: Text.ElideRight
+
+            // we override the Primary type's font weight (DemiBold) for Bold for contrast with small text
+            font.weight: Font.Bold
+        }
+
+        Kirigami.Separator {
+            Layout.fillWidth: true
+            Layout.alignment: Qt.AlignVCenter
         }
     }
 }

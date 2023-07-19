@@ -11,7 +11,7 @@
 /**
  * A rectangle with a shadow, using a QQuickItem as texture.
  *
- * This item will render a rectangle, with a shadow below it. The rendering is done
+ * This item will render a source item, with a shadow below it. The rendering is done
  * using distance fields, which provide greatly improved performance. The shadow is
  * rendered outside of the item's bounds, so the item's width and height are the
  * rectangle's width and height.
@@ -22,6 +22,10 @@ class ShadowedTexture : public ShadowedRectangle
 {
     Q_OBJECT
 
+    /**
+     * This property holds the source item that will get rendered with the
+     * shadow.
+     */
     Q_PROPERTY(QQuickItem *source READ source WRITE setSource NOTIFY sourceChanged)
 
 public:

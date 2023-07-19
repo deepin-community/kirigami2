@@ -6,13 +6,13 @@
 
 import QtQuick 2.1
 import QtQuick.Layouts 1.0
-import org.kde.kirigami 2.4
-//NOTE: This must stay at 2.0 until KF6 due to retrocompatibility of the "icon" property
-import QtQuick.Templates 2.0 as T2
+import org.kde.kirigami 2.4 as Kirigami
+// NOTE: This must stay at 2.2 until KF6 due to retrocompatibility of the "icon" property
+import QtQuick.Templates 2.2 as T2
 import QtQuick.Templates 2.4 as QQC2
 
 /**
- * An item delegate for the primitive ListView component.
+ * @brief An item delegate for the primitive ListView component.
  *
  * It's intended to make all listviews look coherent.
  *
@@ -21,85 +21,118 @@ import QtQuick.Templates 2.4 as QQC2
 T2.ItemDelegate {
     id: listItem
 
+//BEGIN properties
     /**
-     * @deprecated
-     * Holds if the item emits signals related to mouse interaction.
-     * The default value is false.
+     * @brief This property sets whether the item should emit signals related to mouse interaction.
+     *
+     * default: ``true``
+     *
+     * @deprecated This will be removed in KF6.
      */
-    property bool supportsMouseEvents: hoverEnabled // TODO KF6 remove
+    property bool supportsMouseEvents: hoverEnabled
 
     /**
-     * @var bool containsMouse
-     * True when the user hovers the mouse over the list item
-     * NOTE: on mobile touch devices this will be true only when pressed is also true
+     * @brief This property tells whether the cursor is currently hovering over the item.
+     *
+     * On mobile touch devices, this will be true only when pressed.
+     *
+     * @see QtQuick.Templates.ItemDelegate::hovered
+     * @deprecated This will be removed in KF6; use the ``hovered``  property instead.
+     * @property bool containsMouse
      */
-    property alias containsMouse: listItem.hovered // TODO KF6 remove.
+    property alias containsMouse: listItem.hovered
 
     /**
-     * If true the background of the list items will be alternating between two
-     * colors, helping readability with multiple column views.
-     * Use it only when implementing a view which shows data visually in multiple columns
-     * @ since 2.7
+     * @brief This property sets whether instances of this list item will alternate
+     * between two colors, helping readability.
+     *
+     * It is suggested to use this only when implementing a view with multiple columns.
+     *
+     * default: ``false``
+     *
+     * @since 2.7
      */
     property bool alternatingBackground: false
 
     /**
-     * If true the item will be a delegate for a section, so will look like a
-     * "title" for the items under it.
+     * @brief This property sets whether this item is a section delegate.
+     *
+     * Setting this to true will make the list item look like a "title" for items under it.
+     *
+     * default: ``false``
+     *
+     * @see ListSectionHeader
      */
     property bool sectionDelegate: false
 
     /**
-     * True if the separator between items is visible
-     * default: true
-     */
-    property bool separatorVisible: true
-
-    /**
-     * Color for the text in the item
-     * It is advised to leave the default value (Theme.textColor)
+     * @brief This property sets whether the separator is visible.
      *
-     * Note: if custom text elements are inserted in an AbstractListItem,
-     * their color property will have to be manually bound with this property
+     * The separator is a line between this and the item under it.
+     *
+     * default: ``false``
      */
-    property color textColor: Theme.textColor
+    property bool separatorVisible: false
 
     /**
-     * Color for the background of the item
-     * It is advised to leave the default value (Theme.viewBackgroundColor)
+     * @brief This property holds list item's background color.
+     *
+     * It is advised to use the default value.
+     * default: ``"transparent"``
      */
     property color backgroundColor: "transparent"
 
     /**
-     * The background color to use if alternatingBackground is true.
-     * It is advised to leave the default.
+     * @brief This property holds the background color to be used when
+     * background alternating is enabled.
+     *
+     * It is advised to use the default value.
+     * default: ``Kirigami.Theme.alternateBackgroundColor``
+     *
      * @since 2.7
      */
-    property color alternateBackgroundColor: Theme.alternateBackgroundColor
+    property color alternateBackgroundColor: Kirigami.Theme.alternateBackgroundColor
 
     /**
-     * Color for the text in the item when pressed or selected
-     * It is advised to leave the default value (Theme.highlightedTextColor)
+     * @brief This property holds the color of the background
+     * when the item is pressed or selected.
      *
-     * Note: if custom text elements are inserted in an AbstractListItem,
-     * their color property will have to be manually bound with this property
+     * It is advised to use the default value.
+     * default: ``Kirigami.Theme.highlightColor``
      */
-    property color activeTextColor: Theme.highlightedTextColor
+    property color activeBackgroundColor: Kirigami.Theme.highlightColor
 
     /**
-     * Color for the background of the item when pressed or selected
-     * It is advised to leave the default value (Theme.highlightColor)
+     * @brief This property holds the color of the text in the item.
+     *
+     * It is advised to use the default value.
+     * default: ``Kirigami.Theme.textColor``
+     *
+     * If custom text elements are inserted in an AbstractListItem,
+     * their color will have to be manually set with this property.
      */
-    property color activeBackgroundColor: Theme.highlightColor
+    property color textColor: Kirigami.Theme.textColor
+
+    /**
+     * @brief This property holds the color of the text when the item is pressed or selected.
+     *
+     * It is advised to use the default value.
+     * default: ``Kirigami.Theme.highlightedTextColor``
+     *
+     * If custom text elements are inserted in an AbstractListItem,
+     * their color will have to be manually set with this property.
+     */
+    property color activeTextColor: Kirigami.Theme.highlightedTextColor
 
     default property alias _default: listItem.contentItem
 
-    // Overrides action property of newer import versions which we can't use
+    // NOTE: Overrides action property of newer import versions which we can't use
     /**
-     * This property holds the item action.
-     * \property QtQuick.Controls.Action AbstractListItem::action
+     * @brief This property holds the item action.
+     * @property QtQuick.Controls.Action action
      */
     property QQC2.Action action
+//END properties
 
     activeFocusOnTab: ListView.view ? false : true
 
@@ -118,17 +151,17 @@ T2.ItemDelegate {
         checked = Qt.binding(function() { return action.checked });
     }
     //Theme.inherit: false
-   //Theme.colorSet: Theme.View
+    //Theme.colorSet: Kirigami.Theme.View
 
-    padding: Settings.tabletMode ? Units.largeSpacing : Units.smallSpacing
+    padding: Kirigami.Settings.tabletMode ? Kirigami.Units.largeSpacing : Kirigami.Units.smallSpacing
 
-    leftPadding: padding*2
+    leftPadding: padding * 2
     topPadding: padding
 
-    rightPadding: padding*2
+    rightPadding: padding * 2
     bottomPadding: padding
 
-    implicitWidth: contentItem ? contentItem.implicitWidth + leftPadding + rightPadding : Units.gridUnit * 12
+    implicitWidth: contentItem ? contentItem.implicitWidth + leftPadding + rightPadding : Kirigami.Units.gridUnit * 12
 
     implicitHeight: contentItem.implicitHeight + topPadding + bottomPadding
 
@@ -137,15 +170,19 @@ T2.ItemDelegate {
 
     opacity: enabled ? 1 : 0.6
 
-    height: visible ? implicitHeight : 0
+    height: implicitHeight
+
+    onVisibleChanged: {
+        if (visible) {
+            height = Qt.binding(() => implicitHeight);
+        } else {
+            if (ListView.view && ListView.view.visible) {
+                height = 0;
+            }
+        }
+    }
 
     hoverEnabled: true
-
-    QtObject {
-        id: internal
-        property Flickable view: listItem.ListView.view || (listItem.parent ? listItem.parent.ListView.view : null)
-        property bool indicateActiveFocus: listItem.pressed || Settings.tabletMode || listItem.activeFocus || (view ? view.activeFocus : false)
-    }
 
     Accessible.role: Accessible.ListItem
     highlighted: focus && ListView.isCurrentItem && ListView.view && ListView.view.keyNavigationEnabled

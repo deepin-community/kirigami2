@@ -50,7 +50,7 @@ struct ImageData {
     QVariantList m_palette;
 
     bool m_darkPalette = true;
-    QColor m_dominant;
+    QColor m_dominant = Qt::transparent;
     QColor m_dominantContrast;
     QColor m_average;
     QColor m_highlight;
@@ -59,6 +59,9 @@ struct ImageData {
     QColor m_closestToWhite;
 };
 
+/**
+ * Extracts the dominant colors from an element or an image and exports it to a color palette.
+ */
 class ImageColors : public QObject
 {
     Q_OBJECT
@@ -249,7 +252,10 @@ Q_SIGNALS:
 
 private:
     static inline void positionColor(QRgb rgb, QList<ImageData::colorStat> &clusters);
-    static ImageData generatePalette(const QImage &sourceImage);
+    ImageData generatePalette(const QImage &sourceImage) const;
+
+    double getClusterScore(const ImageData::colorStat &stat) const;
+    void postProcess(ImageData &imageData) const;
 
     // Arbitrary number that seems to work well
     static const int s_minimumSquareDistance = 32000;
@@ -258,6 +264,7 @@ private:
     QPointer<QQuickItem> m_sourceItem;
     QSharedPointer<QQuickItemGrabResult> m_grabResult;
     QImage m_sourceImage;
+    QFutureWatcher<QImage> *m_futureSourceImageData = nullptr;
 
     QTimer *m_imageSyncTimer;
 
